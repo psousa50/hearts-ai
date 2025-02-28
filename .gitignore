@@ -1,0 +1,11 @@
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+.env
+
+# Project specific
+*.log
+*.sqlite

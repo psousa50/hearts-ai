@@ -1,0 +1,936 @@
+[
+  {
+    "game_id": 0,
+    "winner": "Bob",
+    "scores": [
+      [
+        "Alice",
+        4
+      ],
+      [
+        "Bob",
+        2
+      ],
+      [
+        "Charlie",
+        7
+      ],
+      [
+        "David",
+        13
+      ]
+    ],
+    "tricks": [
+      {
+        "cards": [
+          [
+            {
+              "suit": "C",
+              "rank": 2
+            },
+            0
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 10
+            },
+            1
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 14
+            },
+            2
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 3
+            },
+            3
+          ]
+        ],
+        "winner": 2,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "D",
+              "rank": 7
+            },
+            2
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 5
+            },
+            3
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 4
+            },
+            0
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 8
+            },
+            1
+          ]
+        ],
+        "winner": 1,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "S",
+              "rank": 11
+            },
+            1
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 14
+            },
+            2
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 3
+            },
+            3
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 13
+            },
+            0
+          ]
+        ],
+        "winner": 2,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "S",
+              "rank": 10
+            },
+            2
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 12
+            },
+            3
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 6
+            },
+            0
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 8
+            },
+            1
+          ]
+        ],
+        "winner": 3,
+        "score": 13
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "D",
+              "rank": 10
+            },
+            3
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 3
+            },
+            0
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 6
+            },
+            1
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 9
+            },
+            2
+          ]
+        ],
+        "winner": 3,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "S",
+              "rank": 9
+            },
+            3
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 5
+            },
+            0
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 2
+            },
+            1
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 7
+            },
+            2
+          ]
+        ],
+        "winner": 3,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "C",
+              "rank": 11
+            },
+            3
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 13
+            },
+            0
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 4
+            },
+            1
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 14
+            },
+            2
+          ]
+        ],
+        "winner": 0,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "C",
+              "rank": 7
+            },
+            0
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 12
+            },
+            1
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 2
+            },
+            2
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 9
+            },
+            3
+          ]
+        ],
+        "winner": 1,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "C",
+              "rank": 8
+            },
+            1
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 7
+            },
+            2
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 2
+            },
+            3
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 6
+            },
+            0
+          ]
+        ],
+        "winner": 1,
+        "score": 2
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "H",
+              "rank": 5
+            },
+            1
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 11
+            },
+            2
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 3
+            },
+            3
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 10
+            },
+            0
+          ]
+        ],
+        "winner": 2,
+        "score": 4
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "H",
+              "rank": 9
+            },
+            2
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 11
+            },
+            3
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 6
+            },
+            0
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 4
+            },
+            1
+          ]
+        ],
+        "winner": 2,
+        "score": 3
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "H",
+              "rank": 8
+            },
+            2
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 12
+            },
+            3
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 14
+            },
+            0
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 12
+            },
+            1
+          ]
+        ],
+        "winner": 0,
+        "score": 3
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "D",
+              "rank": 13
+            },
+            0
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 5
+            },
+            1
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 13
+            },
+            2
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 4
+            },
+            3
+          ]
+        ],
+        "winner": 0,
+        "score": 1
+      }
+    ],
+    "total_points": 26
+  },
+  {
+    "game_id": 1,
+    "winner": "David",
+    "scores": [
+      [
+        "Alice",
+        19
+      ],
+      [
+        "Bob",
+        5
+      ],
+      [
+        "Charlie",
+        2
+      ],
+      [
+        "David",
+        0
+      ]
+    ],
+    "tricks": [
+      {
+        "cards": [
+          [
+            {
+              "suit": "C",
+              "rank": 2
+            },
+            3
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 4
+            },
+            0
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 5
+            },
+            1
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 9
+            },
+            2
+          ]
+        ],
+        "winner": 2,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "D",
+              "rank": 4
+            },
+            2
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 3
+            },
+            3
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 11
+            },
+            0
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 13
+            },
+            1
+          ]
+        ],
+        "winner": 1,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "D",
+              "rank": 14
+            },
+            1
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 8
+            },
+            2
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 9
+            },
+            3
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 5
+            },
+            0
+          ]
+        ],
+        "winner": 1,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "S",
+              "rank": 13
+            },
+            1
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 8
+            },
+            2
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 2
+            },
+            3
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 5
+            },
+            0
+          ]
+        ],
+        "winner": 1,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "S",
+              "rank": 7
+            },
+            1
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 6
+            },
+            2
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 10
+            },
+            3
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 12
+            },
+            0
+          ]
+        ],
+        "winner": 0,
+        "score": 13
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "D",
+              "rank": 2
+            },
+            0
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 3
+            },
+            1
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 12
+            },
+            2
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 14
+            },
+            3
+          ]
+        ],
+        "winner": 2,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "C",
+              "rank": 11
+            },
+            2
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 8
+            },
+            3
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 14
+            },
+            0
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 7
+            },
+            1
+          ]
+        ],
+        "winner": 2,
+        "score": 2
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "D",
+              "rank": 6
+            },
+            2
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 5
+            },
+            3
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 7
+            },
+            0
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 10
+            },
+            1
+          ]
+        ],
+        "winner": 0,
+        "score": 2
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "H",
+              "rank": 8
+            },
+            0
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 9
+            },
+            1
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 6
+            },
+            2
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 13
+            },
+            3
+          ]
+        ],
+        "winner": 1,
+        "score": 3
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "S",
+              "rank": 3
+            },
+            1
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 12
+            },
+            2
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 4
+            },
+            3
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 9
+            },
+            0
+          ]
+        ],
+        "winner": 0,
+        "score": 0
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "H",
+              "rank": 4
+            },
+            0
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 13
+            },
+            1
+          ],
+          [
+            {
+              "suit": "D",
+              "rank": 10
+            },
+            2
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 14
+            },
+            3
+          ]
+        ],
+        "winner": 1,
+        "score": 2
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "H",
+              "rank": 2
+            },
+            1
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 6
+            },
+            2
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 10
+            },
+            3
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 11
+            },
+            0
+          ]
+        ],
+        "winner": 0,
+        "score": 2
+      },
+      {
+        "cards": [
+          [
+            {
+              "suit": "H",
+              "rank": 12
+            },
+            0
+          ],
+          [
+            {
+              "suit": "H",
+              "rank": 3
+            },
+            1
+          ],
+          [
+            {
+              "suit": "C",
+              "rank": 7
+            },
+            2
+          ],
+          [
+            {
+              "suit": "S",
+              "rank": 11
+            },
+            3
+          ]
+        ],
+        "winner": 0,
+        "score": 2
+      }
+    ],
+    "total_points": 26
+  }
+]
