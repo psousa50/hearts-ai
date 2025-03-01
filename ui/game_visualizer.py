@@ -17,6 +17,7 @@ CARD_WIDTH = 71
 CARD_HEIGHT = 96
 FPS = 60
 ANIMATION_SPEED = 20
+AUTO_PLAY_DELAY = 500  # milliseconds
 
 # Colors
 WHITE = (255, 255, 255)
@@ -115,6 +116,8 @@ class GameVisualizer:
         
         # Initialize player info
         self.players = self.games[self.current_game]["players"]
+        self.auto_play = False
+        self.last_auto_play = pygame.time.get_ticks()
 
     def calculate_running_scores(self):
         scores = [0] * len(self.players)
@@ -186,10 +189,42 @@ class GameVisualizer:
             self.cards_in_play.clear()
 
     def next_trick(self):
-        if self.current_trick < self.get_total_tricks() - 1:
+        if self.current_trick < len(self.games[self.current_game]["tricks"]) - 1:
             self.current_trick += 1
             self.current_card = 0
             self.cards_in_play.clear()
+
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+            elif event.type == pygame.KEYDOWN:
+                mods = pygame.key.get_mods()
+                if event.key == pygame.K_SPACE:
+                    self.auto_play = not self.auto_play
+                elif event.key == pygame.K_LEFT:
+                    if mods & pygame.KMOD_SHIFT:
+                        # Previous trick
+                        if self.current_trick > 0:
+                            self.current_trick -= 1
+                            self.current_card = 0
+                            self.cards_in_play.clear()
+                    else:
+                        # Previous card
+                        if self.current_card > 0:
+                            self.current_card -= 1
+                            self.cards_in_play.pop()
+                elif event.key == pygame.K_RIGHT:
+                    if mods & pygame.KMOD_SHIFT:
+                        self.next_trick()
+                    else:
+                        # Next card or next trick if at end of current trick
+                        trick = self.get_current_trick()
+                        if self.current_card < len(trick["cards"]):
+                            self.next_card()
+                        elif self.current_trick < len(self.games[self.current_game]["tricks"]) - 1:
+                            self.next_trick()
+        return True
 
     def draw(self):
         # Draw background
@@ -233,8 +268,8 @@ class GameVisualizer:
         controls = [
             "Controls:",
             "Space - Toggle auto-play",
-            "N - Play next card",
-            "Left/Right Arrow - Previous/Next trick",
+            "Left/Right - Previous/Next card",
+            "Shift+Left/Right - Previous/Next trick",
             "Close window to quit"
         ]
         for i, control in enumerate(controls):
@@ -245,32 +280,17 @@ class GameVisualizer:
 
     def run(self):
         running = True
-        auto_play = False
-        delay = 0
-        
         while running:
             self.clock.tick(FPS)
             
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        auto_play = not auto_play
-                    elif event.key == pygame.K_LEFT:
-                        self.previous_trick()
-                    elif event.key == pygame.K_RIGHT:
-                        self.next_trick()
-                    elif event.key == pygame.K_n:
-                        self.next_card()
+            running = self.handle_events()
             
             # Handle auto-play
-            if auto_play:
-                delay += 1
-                if delay >= FPS // 2:  # Play a card every half second
-                    if not self.next_card():
-                        auto_play = False
-                    delay = 0
+            if self.auto_play:
+                current_time = pygame.time.get_ticks()
+                if current_time - self.last_auto_play > AUTO_PLAY_DELAY:
+                    self.next_card()
+                    self.last_auto_play = current_time
             
             self.draw()
         
