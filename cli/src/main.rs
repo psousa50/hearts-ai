@@ -1,6 +1,7 @@
 mod analyze;
 mod generate;
 mod stats;
+mod training;
 
 use clap::{Parser, Subcommand};
 
@@ -30,6 +31,17 @@ enum Commands {
         #[arg(short, long, default_value = "game_results.json")]
         input: String,
     },
+
+    /// Generate AI training data from simulated games
+    GenerateAiTrainingData {
+        /// Number of games to simulate
+        #[arg(short, long, default_value_t = 1)]
+        num_games: usize,
+        
+        /// Output file for training data
+        #[arg(short, long, default_value = "ai-training-data.json")]
+        output: String,
+    },
 }
 
 fn main() {
@@ -41,6 +53,9 @@ fn main() {
         }
         Commands::AnalyzeResults { input } => {
             analyze::analyze_results(input);
+        }
+        Commands::GenerateAiTrainingData { num_games, output } => {
+            training::generate_training_data(*num_games, output);
         }
     }
 }
