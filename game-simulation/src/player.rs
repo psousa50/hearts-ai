@@ -1,31 +1,25 @@
 use crate::card::Card;
-use rand::seq::SliceRandom;
-use rand::thread_rng;
+use crate::strategy::{Strategy, PlayingStrategy};
 
 pub struct Player {
     pub name: String,
     pub hand: Vec<Card>,
     pub score: u8,
+    strategy: Strategy,
 }
 
 impl Player {
-    pub fn new(name: &str, hand: Vec<Card>) -> Self {
+    pub fn with_strategy(name: &str, hand: Vec<Card>, strategy: Strategy) -> Self {
         Self {
             name: name.to_string(),
             hand,
             score: 0,
+            strategy,
         }
     }
 
-    pub fn play_card(&mut self, valid_moves: Vec<Card>) -> Card {
-        let chosen_card = if valid_moves.is_empty() {
-            // If no valid moves (shouldn't happen), pick a random card from hand
-            self.hand.choose(&mut thread_rng()).copied().unwrap_or(self.hand[0])
-        } else {
-            // Pick a random card from valid moves
-            valid_moves.choose(&mut thread_rng()).copied().unwrap_or(valid_moves[0])
-        };
-        
+    pub fn play_card(&mut self, valid_moves: Vec<Card>, trick_cards: &[(Card, usize)]) -> Card {
+        let chosen_card = self.strategy.choose_card(&self.hand, &valid_moves, trick_cards);
         self.hand.retain(|c| *c != chosen_card);
         chosen_card
     }
