@@ -12,18 +12,10 @@ pub struct Trick {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct GameResult {
+    pub game_id: usize,
     pub tricks: Vec<Trick>,
     pub final_scores: Vec<(String, u8)>,
     pub winner: String,
-}
-
-#[derive(Debug, Clone, Serialize)]
-pub struct GameStats {
-    pub game_id: usize,
-    pub winner: String,
-    pub scores: Vec<(String, u8)>,
-    pub tricks: Vec<Trick>,
-    pub total_points: u8,
 }
 
 pub struct HeartsGame {
@@ -31,10 +23,11 @@ pub struct HeartsGame {
     hearts_broken: bool,
     current_leader: usize,
     tricks: Vec<Trick>,
+    game_id: usize,
 }
 
 impl HeartsGame {
-    pub fn new_with_strategies(player_configs: &[(&str, Strategy)]) -> Self {
+    pub fn new_with_strategies(player_configs: &[(&str, Strategy)], game_id: usize) -> Self {
         let mut deck = Deck::new();
         let hands = deck.deal(4);
         let players: Vec<Player> = player_configs
@@ -49,6 +42,7 @@ impl HeartsGame {
             hearts_broken: false,
             current_leader,
             tricks: Vec::new(),
+            game_id,
         }
     }
 
@@ -205,6 +199,7 @@ impl HeartsGame {
             .unwrap_or_else(|| "Unknown".to_string());
 
         GameResult {
+            game_id: self.game_id,
             tricks: self.tricks.clone(),
             final_scores,
             winner,
