@@ -19,10 +19,6 @@ enum Commands {
         /// Number of games to simulate
         #[arg(short, long, default_value_t = 1)]
         num_games: usize,
-        
-        /// Output file for game results
-        #[arg(short, long, default_value = "game_results.json")]
-        output: String,
     },
     
     /// Analyze existing game results
@@ -37,10 +33,10 @@ enum Commands {
         /// Number of games to simulate
         #[arg(short, long, default_value_t = 1)]
         num_games: usize,
-        
-        /// Output file for training data
-        #[arg(short, long, default_value = "ai-training-data.json")]
-        output: String,
+
+        /// Also save game results to a separate file
+        #[arg(short, long)]
+        save_games: bool,
     },
 }
 
@@ -48,14 +44,14 @@ fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::GenerateGames { num_games, output } => {
-            generate::generate_games(*num_games, output);
+        Commands::GenerateGames { num_games } => {
+            generate::generate_games(*num_games);
         }
         Commands::AnalyzeResults { input } => {
             analyze::analyze_results(input);
         }
-        Commands::GenerateAiTrainingData { num_games, output } => {
-            training::generate_training_data(*num_games, output);
+        Commands::GenerateAiTrainingData { num_games, save_games } => {
+            training::generate_training_data(*num_games, *save_games);
         }
     }
 }

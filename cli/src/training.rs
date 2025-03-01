@@ -2,9 +2,13 @@ use hearts_game::{AggressiveStrategy, AvoidPointsStrategy, Card, HeartsGame, Ran
 use serde::Serialize;
 use serde_json;
 use std::collections::HashSet;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::BufWriter;
+use std::path::PathBuf;
 use std::time::Instant;
+use chrono::Utc;
+
+use crate::generate;
 
 #[derive(Serialize)]
 struct TrainingDataItem {
@@ -22,7 +26,7 @@ struct TrainingTrick {
     winner: usize,
 }
 
-pub fn generate_training_data(num_games: usize, output: &str) {
+pub fn generate_training_data(num_games: usize, save_games: bool) {
     let start = Instant::now();
     let mut training_data = Vec::new();
     let mut excluded_moves = 0;
@@ -34,6 +38,8 @@ pub fn generate_training_data(num_games: usize, output: &str) {
         ("Charlie", Strategy::AvoidPoints(AvoidPointsStrategy)),
         ("David", Strategy::Aggressive(AggressiveStrategy)),
     ];
+
+    let mut all_game_results = Vec::with_capacity(num_games);
 
     for game_id in 0..num_games {
         // Play a full game and record its result
@@ -60,7 +66,7 @@ pub fn generate_training_data(num_games: usize, output: &str) {
             let mut trick_points = vec![0; 4]; // Track points in current trick
             
             // For each card played in the trick
-            for (i, (card, player_idx)) in trick.cards.iter().enumerate() {
+            for (_i, (card, player_idx)) in trick.cards.iter().enumerate() {
                 total_moves += 1;
                 
                 // Skip if player had bad final score
@@ -102,12 +108,34 @@ pub fn generate_training_data(num_games: usize, output: &str) {
                 winner: trick.winner,
             });
         }
+
+        if save_games {
+            all_game_results.push(game_result);
+        }
     }
 
-    // Save training data to file
-    let file = File::create(output).expect("Failed to create file");
+    // Create data directory if it doesn't exist
+    fs::create_dir_all("data").expect("Failed to create data directory");
+
+    // Generate timestamped filename and save training data
+    let timestamp = Utc::now().format("%Y%m%d_%H%M%S");
+    let filename = format!("training_data_{}_{}_games.json", timestamp, num_games);
+    let filepath = PathBuf::from("data").join(filename);
+
+    let file = File::create(&filepath).expect("Failed to create file");
     let writer = BufWriter::new(file);
     serde_json::to_writer_pretty(writer, &training_data).expect("Failed to write JSON");
+
+    // Save game results if requested
+    if save_games {
+        let filename = format!("game_results_{}_{}_games.json", timestamp, num_games);
+        let filepath = PathBuf::from("data").join(filename);
+        
+        let file = File::create(&filepath).expect("Failed to create file");
+        let writer = BufWriter::new(file);
+        serde_json::to_writer_pretty(writer, &all_game_results).expect("Failed to write JSON");
+        println!("Game results saved to: {}", filepath.display());
+    }
 
     let duration = start.elapsed();
     println!("Time to generate and save training data for {} games: {:?}", num_games, duration);
@@ -115,4 +143,5 @@ pub fn generate_training_data(num_games: usize, output: &str) {
     println!("Total moves: {}", total_moves);
     println!("Excluded moves: {} ({:.1}%)", excluded_moves, (excluded_moves as f64 / total_moves as f64) * 100.0);
     println!("Training examples generated: {}", training_data.len());
+    println!("Training data saved to: {}", filepath.display());
 }
