@@ -1,15 +1,13 @@
 use hearts_game::GameResult;
 use serde_json;
-use std::fs::File;
+use std::fs;
 
 use crate::stats::display_statistics;
 
-pub fn analyze_results(input: &str) {
-    let file = File::open(input).expect("Failed to open file");
-    let results: Vec<GameResult> = serde_json::from_reader(file).expect("Failed to parse JSON");
-    
-    println!("\nAnalyzing results from: {}", input);
-    println!("Total games analyzed: {}", results.len());
-    
-    display_statistics(&results);
+pub fn analyze_results(input_file: &str) {
+    let file_content = fs::read_to_string(input_file).expect("Failed to read file");
+    let results: Vec<GameResult> = serde_json::from_str(&file_content).expect("Failed to parse JSON");
+
+    let results_refs: Vec<&GameResult> = results.iter().collect();
+    display_statistics(&results_refs);
 }

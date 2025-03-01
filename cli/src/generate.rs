@@ -43,5 +43,5 @@ pub fn generate_games(num_games: usize) {
     println!("Average time per game: {:?}", duration / num_games as u32);
     println!("Data saved to: {}", filepath.display());
 
-    display_statistics(&results);
+    display_statistics(&results.iter().collect::<Vec<_>>());
 }

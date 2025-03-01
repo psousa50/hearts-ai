@@ -1,5 +1,5 @@
 use crate::card::Card;
-use crate::strategy::{Strategy, PlayingStrategy};
+use crate::strategy::Strategy;
 
 pub struct Player {
     pub name: String,
@@ -18,9 +18,17 @@ impl Player {
         }
     }
 
-    pub fn play_card(&mut self, valid_moves: Vec<Card>, trick_cards: &[(Card, usize)]) -> Card {
-        let chosen_card = self.strategy.choose_card(&self.hand, &valid_moves, trick_cards);
+    pub fn play_card(&mut self, valid_moves: &[Card]) -> Card {
+        let chosen_card = self.strategy.choose_card(&self.hand, valid_moves);
         self.hand.retain(|c| *c != chosen_card);
         chosen_card
+    }
+
+    pub fn strategy_name(&self) -> &'static str {
+        match self.strategy {
+            Strategy::Random(_) => "Random",
+            Strategy::AvoidPoints(_) => "Avoid Points",
+            Strategy::Aggressive(_) => "Aggressive",
+        }
     }
 }

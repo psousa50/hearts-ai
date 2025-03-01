@@ -13,6 +13,7 @@ pub struct Trick {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameResult {
     pub game_id: usize,
+    pub players: Vec<(String, String)>,  // (name, strategy)
     pub tricks: Vec<Trick>,
     pub final_scores: Vec<(String, u8)>,
     pub winner: String,
@@ -103,38 +104,37 @@ impl HeartsGame {
             }
         }
 
-        // Must follow suit if possible
-        if let Some(suit) = lead_suit {
-            let suit_cards = Self::must_follow_suit(hand, suit);
-            if !suit_cards.is_empty() {
-                return suit_cards;
+        // If a suit was led, must follow suit if possible
+        if let Some(lead_suit) = lead_suit {
+            let same_suit = Self::must_follow_suit(hand, lead_suit);
+            if !same_suit.is_empty() {
+                return same_suit;
             }
         }
 
-        // Leading a trick
-        if is_first_card {
-            // Can't lead hearts until broken
-            if !self.hearts_broken {
-                return Self::avoid_hearts(hand);
-            }
-            return hand.to_vec();
-        }
-
-        // Can't play penalties on first trick
+        // On first trick, can't play hearts or queen of spades
         if self.tricks.is_empty() {
             return Self::avoid_penalties(hand);
         }
 
-        // Any card is valid
+        // If hearts not broken, avoid hearts if possible
+        if !self.hearts_broken {
+            let non_hearts = Self::avoid_hearts(hand);
+            if !non_hearts.is_empty() {
+                return non_hearts;
+            }
+        }
+
         hand.to_vec()
     }
 
     fn determine_trick_winner(trick_cards: &[(Card, usize)], lead_suit: char) -> usize {
         trick_cards
             .iter()
-            .filter(|(card, _)| card.suit == lead_suit)
-            .max_by_key(|(card, _)| card.rank)
-            .map(|(_, player)| *player)
+            .enumerate()
+            .filter(|(_, (card, _))| card.suit == lead_suit)
+            .max_by_key(|(_, (card, _))| card.rank)
+            .map(|(_, (_, player_idx))| *player_idx)
             .unwrap()
     }
 
@@ -142,34 +142,36 @@ impl HeartsGame {
         trick_cards.iter().map(|(card, _)| card.score()).sum()
     }
 
-    pub fn play_trick(&mut self) -> Trick {
-        let mut trick_cards: Vec<(Card, usize)> = Vec::new();
+    fn play_trick(&mut self) -> Trick {
+        let mut trick_cards = Vec::new();
         let mut current_player = self.current_leader;
         let mut lead_suit = None;
 
-        for _ in 0..4 {
-            let hand = &self.players[current_player].hand;
-            let valid_moves = self.get_valid_moves(hand, lead_suit, trick_cards.is_empty());
+        for i in 0..4 {
+            let is_first_card = i == 0 && trick_cards.is_empty();
+            let valid_moves = self.get_valid_moves(
+                &self.players[current_player].hand,
+                lead_suit,
+                is_first_card,
+            );
 
-            let played_card = self.players[current_player].play_card(valid_moves, &trick_cards);
+            let played_card = self.players[current_player].play_card(&valid_moves);
+            if played_card.suit == 'H' {
+                self.hearts_broken = true;
+            }
 
-            if trick_cards.is_empty() {
+            // Set lead suit if this is the first card
+            if lead_suit.is_none() {
                 lead_suit = Some(played_card.suit);
-                if played_card.suit == 'H' {
-                    self.hearts_broken = true;
-                }
             }
 
             trick_cards.push((played_card, current_player));
             current_player = (current_player + 1) % 4;
         }
 
-        let lead_suit = trick_cards[0].0.suit;
+        let lead_suit = lead_suit.unwrap();
         let winner = Self::determine_trick_winner(&trick_cards, lead_suit);
-        let score = Self::calculate_trick_score(&trick_cards);
-
         self.current_leader = winner;
-        self.players[winner].score += score;
 
         Trick {
             cards: trick_cards,
@@ -178,31 +180,44 @@ impl HeartsGame {
     }
 
     pub fn play_game(&mut self) -> GameResult {
+        let mut scores = vec![0u8; 4];
+        let mut tricks = Vec::new();
+
         // Play all 13 tricks
         for _ in 0..13 {
             let trick = self.play_trick();
-            self.tricks.push(trick);
+            let trick_score = Self::calculate_trick_score(&trick.cards);
+            scores[trick.winner] += trick_score;
+            tricks.push(trick);
         }
 
-        // Calculate final scores
-        let final_scores: Vec<(String, u8)> = self
-            .players
+        // Create final scores with player names
+        let final_scores: Vec<(String, u8)> = self.players
             .iter()
-            .map(|p| (p.name.clone(), p.score))
+            .zip(scores.iter())
+            .map(|(player, score)| (player.name.clone(), *score))
             .collect();
 
         // Find winner (player with lowest score)
-        let winner = final_scores
+        let winner_idx = scores
             .iter()
-            .min_by_key(|(_, score)| score)
-            .map(|(name, _)| name.clone())
-            .unwrap_or_else(|| "Unknown".to_string());
+            .enumerate()
+            .min_by_key(|(_, score)| *score)
+            .map(|(idx, _)| idx)
+            .unwrap();
+
+        // Create player strategy info
+        let players: Vec<(String, String)> = self.players
+            .iter()
+            .map(|p| (p.name.clone(), p.strategy_name().to_string()))
+            .collect();
 
         GameResult {
             game_id: self.game_id,
-            tricks: self.tricks.clone(),
+            players,
+            tricks,
             final_scores,
-            winner,
+            winner: self.players[winner_idx].name.clone(),
         }
     }
 }

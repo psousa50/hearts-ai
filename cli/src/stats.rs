@@ -1,7 +1,7 @@
 use hearts_game::GameResult;
 use std::collections::HashMap;
 
-pub fn display_statistics(results: &[GameResult]) {
+pub fn display_statistics(results: &[&GameResult]) {
     let total_games = results.len();
     let wins_per_player: HashMap<_, _> = results.iter().map(|s| &s.winner).fold(
         HashMap::new(),

@@ -8,8 +8,6 @@ use std::path::PathBuf;
 use std::time::Instant;
 use chrono::Utc;
 
-use crate::generate;
-
 #[derive(Serialize)]
 struct TrainingDataItem {
     game_id: usize,
