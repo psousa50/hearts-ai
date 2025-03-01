@@ -5,18 +5,31 @@ use crate::strategy::Strategy;
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TrickCard {
+    pub card: Card,
+    pub player_index: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Trick {
-    pub cards: Vec<(Card, usize)>,
+    pub cards: Vec<TrickCard>,
     pub winner: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PlayerInfo {
+    pub index: usize,
+    pub name: String,
+    pub strategy: String,
+    pub score: u8,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameResult {
     pub game_id: usize,
-    pub players: Vec<(String, String)>,  // (name, strategy)
+    pub players: Vec<PlayerInfo>,
     pub tricks: Vec<Trick>,
-    pub final_scores: Vec<(String, u8)>,
-    pub winner: String,
+    pub winner: usize,
 }
 
 pub struct HeartsGame {
@@ -165,12 +178,18 @@ impl HeartsGame {
                 lead_suit = Some(played_card.suit);
             }
 
-            trick_cards.push((played_card, current_player));
+            trick_cards.push(TrickCard {
+                card: played_card,
+                player_index: current_player,
+            });
             current_player = (current_player + 1) % 4;
         }
 
         let lead_suit = lead_suit.unwrap();
-        let winner = Self::determine_trick_winner(&trick_cards, lead_suit);
+        let winner = Self::determine_trick_winner(
+            &trick_cards.iter().map(|tc| (tc.card.clone(), tc.player_index)).collect::<Vec<_>>(),
+            lead_suit,
+        );
         self.current_leader = winner;
 
         Trick {
@@ -186,16 +205,23 @@ impl HeartsGame {
         // Play all 13 tricks
         for _ in 0..13 {
             let trick = self.play_trick();
-            let trick_score = Self::calculate_trick_score(&trick.cards);
+            let trick_score = Self::calculate_trick_score(
+                &trick.cards.iter().map(|tc| (tc.card.clone(), tc.player_index)).collect::<Vec<_>>(),
+            );
             scores[trick.winner] += trick_score;
             tricks.push(trick);
         }
 
         // Create final scores with player names
-        let final_scores: Vec<(String, u8)> = self.players
+        let final_scores: Vec<PlayerInfo> = self.players
             .iter()
-            .zip(scores.iter())
-            .map(|(player, score)| (player.name.clone(), *score))
+            .enumerate()
+            .map(|(idx, player)| PlayerInfo {
+                index: idx,
+                name: player.name.clone(),
+                strategy: player.strategy_name().to_string(),
+                score: scores[idx],
+            })
             .collect();
 
         // Find winner (player with lowest score)
@@ -206,18 +232,11 @@ impl HeartsGame {
             .map(|(idx, _)| idx)
             .unwrap();
 
-        // Create player strategy info
-        let players: Vec<(String, String)> = self.players
-            .iter()
-            .map(|p| (p.name.clone(), p.strategy_name().to_string()))
-            .collect();
-
         GameResult {
             game_id: self.game_id,
-            players,
+            players: final_scores,
             tricks,
-            final_scores,
-            winner: self.players[winner_idx].name.clone(),
+            winner: winner_idx,
         }
     }
 }

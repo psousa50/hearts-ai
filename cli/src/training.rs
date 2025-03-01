@@ -45,15 +45,10 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
         let game_result = game.play_game();
         
         // Get players with more than 3 points in final score
-        let bad_players: HashSet<_> = game_result.final_scores
+        let bad_players: HashSet<_> = game_result.players
             .iter()
-            .filter(|(_, score)| *score > 3)
-            .map(|(name, _)| {
-                player_configs
-                    .iter()
-                    .position(|(n, _)| n == name)
-                    .expect("Player name not found")
-            })
+            .filter(|p| p.score > 3)
+            .map(|p| p.index)
             .collect();
 
         // Process each trick to create training data
@@ -64,24 +59,24 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
             let mut trick_points = vec![0; 4]; // Track points in current trick
             
             // For each card played in the trick
-            for (_i, (card, player_idx)) in trick.cards.iter().enumerate() {
+            for trick_card in trick.cards.iter() {
                 total_moves += 1;
                 
                 // Skip if player had bad final score
-                if bad_players.contains(player_idx) {
+                if bad_players.contains(&trick_card.player_index) {
                     excluded_moves += 1;
-                    current_trick_cards.push((*card, *player_idx));
+                    current_trick_cards.push((trick_card.card.clone(), trick_card.player_index));
                     continue;
                 }
 
                 // Calculate points this card would add to the trick
-                let card_points = card.score();
-                trick_points[*player_idx] += card_points;
+                let card_points = trick_card.card.score();
+                trick_points[trick_card.player_index] += card_points;
 
                 // Skip if this move causes player to score more than 1 point
-                if trick_points[*player_idx] > 1 {
+                if trick_points[trick_card.player_index] > 1 {
                     excluded_moves += 1;
-                    current_trick_cards.push((*card, *player_idx));
+                    current_trick_cards.push((trick_card.card.clone(), trick_card.player_index));
                     continue;
                 }
 
@@ -91,18 +86,18 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
                     trick_number,
                     previous_tricks: previous_tricks.clone(),
                     current_trick_cards: current_trick_cards.clone(),
-                    current_player_index: *player_idx,
-                    played_card: *card,
+                    current_player_index: trick_card.player_index,
+                    played_card: trick_card.card.clone(),
                 };
                 training_data.push(training_item);
                 
                 // Update current trick for next card
-                current_trick_cards.push((*card, *player_idx));
+                current_trick_cards.push((trick_card.card.clone(), trick_card.player_index));
             }
             
             // After processing all cards in the trick, add it to previous tricks
             previous_tricks.push(TrainingTrick {
-                cards: trick.cards.clone(),
+                cards: current_trick_cards,
                 winner: trick.winner,
             });
         }
