@@ -2,15 +2,15 @@ use crate::card::Card;
 use crate::deck::Deck;
 use crate::player::Player;
 use crate::strategy::Strategy;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Trick {
     pub cards: Vec<(Card, usize)>,
     pub winner: usize,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameResult {
     pub game_id: usize,
     pub tricks: Vec<Trick>,
