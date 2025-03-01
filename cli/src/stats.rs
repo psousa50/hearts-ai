@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use hearts_game::GameResult;
 
-pub fn display_statistics(games: &[&GameResult]) {
+pub fn display_statistics(games: &[GameResult]) {
     let mut total_scores = HashMap::new();
     let mut total_wins = HashMap::new();
 
