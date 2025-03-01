@@ -113,16 +113,23 @@ class GameVisualizer:
         self.cards_in_play: List[Card] = []
         self.trick_center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
         
-        # Initialize running scores
-        self.running_scores = [0, 0, 0, 0]
-        self.player_names = ["South", "West", "North", "East"]
+        # Initialize player info
+        self.players = self.games[self.current_game]["players"]
 
     def calculate_running_scores(self):
-        scores = [0, 0, 0, 0]
-        for trick_idx in range(self.current_trick + 1):
+        scores = [0] * len(self.players)
+        # Only count completed tricks
+        for trick_idx in range(self.current_trick):
             trick = self.games[self.current_game]["tricks"][trick_idx]
             winner = trick["winner"]
-            scores[winner] += trick["score"]
+            scores[winner] += trick["points"]
+        
+        # Add current trick points only if all cards have been played
+        if self.current_trick < len(self.games[self.current_game]["tricks"]):
+            current_trick = self.games[self.current_game]["tricks"][self.current_trick]
+            if self.current_card == len(current_trick["cards"]):
+                scores[current_trick["winner"]] += current_trick["points"]
+        
         return scores
 
     def get_current_trick(self):
@@ -159,8 +166,8 @@ class GameVisualizer:
         trick = self.get_current_trick()
         if self.current_card < len(trick["cards"]):
             # Add next card to current trick
-            card_data, player_idx = trick["cards"][self.current_card]
-            card = self.create_card_for_play(card_data, player_idx)
+            card_data = trick["cards"][self.current_card]
+            card = self.create_card_for_play(card_data["card"], card_data["player_index"])
             self.cards_in_play.append(card)
             self.current_card += 1
             return True
@@ -192,22 +199,21 @@ class GameVisualizer:
         font = pygame.font.Font(None, 36)
         running_scores = self.calculate_running_scores()
         
-        for i, (pos, name) in enumerate(zip(self.player_positions.values(), self.player_names)):
-            # Draw player name
-            text = font.render(name, True, WHITE)
-            text_rect = text.get_rect(center=(pos[0], pos[1] + (30 if i % 2 == 0 else 0)))
+        for player in self.players:
+            pos = self.player_positions[player["index"]]
+            # Draw player name and strategy
+            text = font.render(f"{player['name']} ({player['strategy']})", True, WHITE)
+            text_rect = text.get_rect(center=(pos[0], pos[1] + (30 if player["index"] % 2 == 0 else 0)))
             self.screen.blit(text, text_rect)
             
             # Draw running score
-            score_text = font.render(f"Score: {running_scores[i]}", True, WHITE)
-            score_rect = text_rect.copy()
-            score_rect.y += 25
+            score_text = font.render(str(running_scores[player["index"]]), True, WHITE)
+            score_rect = score_text.get_rect(center=(pos[0], pos[1] + (60 if player["index"] % 2 == 0 else 30)))
             self.screen.blit(score_text, score_rect)
         
         # Draw cards in play
         for card in self.cards_in_play:
-            if card.moving:
-                card.move_towards_target()
+            card.move_towards_target()
             self.screen.blit(card.image, card.rect)
         
         # Draw game info and current trick score
@@ -218,37 +224,55 @@ class GameVisualizer:
         
         # Draw current trick info if all cards are played
         if self.current_card == len(trick["cards"]):
-            winner = self.player_names[trick["winner"]]
-            score = trick["score"]
-            trick_info = f"Trick winner: {winner} (+{score} points)"
+            winner = self.players[trick["winner"]]["name"]
+            trick_info = f"Trick winner: {winner} (+{trick['points']} points)"
             trick_text = font.render(trick_info, True, WHITE)
             self.screen.blit(trick_text, (10, 40))
         
         # Draw controls info
-        controls = "Controls: Space - Next card/trick | Left/Right Arrow - Previous/Next trick | Esc - Quit"
-        controls_text = font.render(controls, True, WHITE)
-        self.screen.blit(controls_text, (10, WINDOW_HEIGHT - 30))
+        controls = [
+            "Controls:",
+            "Space - Toggle auto-play",
+            "N - Play next card",
+            "Left/Right Arrow - Previous/Next trick",
+            "Close window to quit"
+        ]
+        for i, control in enumerate(controls):
+            control_text = font.render(control, True, WHITE)
+            self.screen.blit(control_text, (10, WINDOW_HEIGHT - 30 * (len(controls) - i)))
         
         pygame.display.flip()
 
     def run(self):
         running = True
+        auto_play = False
+        delay = 0
+        
         while running:
+            self.clock.tick(FPS)
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        running = False
-                    elif event.key == pygame.K_SPACE:
-                        self.next_card()
+                    if event.key == pygame.K_SPACE:
+                        auto_play = not auto_play
                     elif event.key == pygame.K_LEFT:
                         self.previous_trick()
                     elif event.key == pygame.K_RIGHT:
                         self.next_trick()
+                    elif event.key == pygame.K_n:
+                        self.next_card()
+            
+            # Handle auto-play
+            if auto_play:
+                delay += 1
+                if delay >= FPS // 2:  # Play a card every half second
+                    if not self.next_card():
+                        auto_play = False
+                    delay = 0
             
             self.draw()
-            self.clock.tick(FPS)
         
         pygame.quit()
 
@@ -259,7 +283,7 @@ if __name__ == "__main__":
     
     game_file = sys.argv[1]
     if not os.path.exists(game_file):
-        print(f"Error: File {game_file} does not exist")
+        print(f"Error: File {game_file} not found")
         sys.exit(1)
     
     visualizer = GameVisualizer(game_file)

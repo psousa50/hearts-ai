@@ -14,6 +14,7 @@ pub struct TrickCard {
 pub struct Trick {
     pub cards: Vec<TrickCard>,
     pub winner: usize,
+    pub points: u8,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -151,10 +152,6 @@ impl HeartsGame {
             .unwrap()
     }
 
-    fn calculate_trick_score(trick_cards: &[(Card, usize)]) -> u8 {
-        trick_cards.iter().map(|(card, _)| card.score()).sum()
-    }
-
     fn play_trick(&mut self) -> Trick {
         let mut trick_cards = Vec::new();
         let mut current_player = self.current_leader;
@@ -192,9 +189,21 @@ impl HeartsGame {
         );
         self.current_leader = winner;
 
+        // Calculate points for the trick
+        let points = trick_cards.iter().map(|tc| {
+            if tc.card.suit == 'H' {
+                1
+            } else if tc.card.suit == 'S' && tc.card.rank == 12 {
+                13
+            } else {
+                0
+            }
+        }).sum();
+
         Trick {
             cards: trick_cards,
             winner,
+            points,
         }
     }
 
@@ -205,9 +214,7 @@ impl HeartsGame {
         // Play all 13 tricks
         for _ in 0..13 {
             let trick = self.play_trick();
-            let trick_score = Self::calculate_trick_score(
-                &trick.cards.iter().map(|tc| (tc.card.clone(), tc.player_index)).collect::<Vec<_>>(),
-            );
+            let trick_score = trick.points;
             scores[trick.winner] += trick_score;
             tricks.push(trick);
         }
