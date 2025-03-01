@@ -1,15 +1,8 @@
-mod card;
-mod deck;
-mod game;
-mod player;
-mod strategy;
-
-use game::HeartsGame;
+use hearts_game::{AggressiveStrategy, AvoidPointsStrategy, HeartsGame, RandomStrategy, Strategy};
 use serde_json;
 use std::fs::File;
 use std::io::BufWriter;
 use std::time::Instant;
-use strategy::{AggressiveStrategy, AvoidPointsStrategy, RandomStrategy, Strategy};
 
 fn main() {
     let num_games = 1;

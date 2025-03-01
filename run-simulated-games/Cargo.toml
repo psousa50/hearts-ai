@@ -1,0 +1,8 @@
+[package]
+name = "run-simulated-games"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+hearts-game = { path = "../game-simulation" }
+serde_json = "1.0"
