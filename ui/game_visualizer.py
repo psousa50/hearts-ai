@@ -4,7 +4,8 @@ import sys
 import os
 import io
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
+from hearts_game import HeartsGame, Card, RandomStrategy, AvoidPointsStrategy, AggressiveStrategy, AIStrategy
 from cairosvg import svg2png
 
 # Initialize Pygame
@@ -23,15 +24,15 @@ AUTO_PLAY_DELAY = 500  # milliseconds
 WHITE = (255, 255, 255)
 GREEN = (34, 139, 34)
 BLACK = (0, 0, 0)
-DARK_GREEN = (0, 100, 0)  # Background color for player info
+DARK_GREEN = (0, 100, 0)
+RED = (255, 0, 0)
 
-class Card:
+class CardSprite:
     # Class-level cache for card images
     image_cache = {}
 
-    def __init__(self, suit: str, rank: int):
-        self.suit = suit
-        self.rank = rank
+    def __init__(self, card: Card):
+        self.card = card
         self.image = None
         self.rect = None
         self.target_pos = None
@@ -41,12 +42,11 @@ class Card:
 
     def load_image(self):
         # Use numeric rank for all cards (no conversion needed)
-        rank_str = str(self.rank)
-        card_key = f"{rank_str}{self.suit}"
+        card_key = f"{self.card.rank}{self.card.suit}"
         
         # Check if image is already in cache
-        if card_key in Card.image_cache:
-            self.image = Card.image_cache[card_key]
+        if card_key in CardSprite.image_cache:
+            self.image = CardSprite.image_cache[card_key]
         else:
             # Load SVG card image from assets folder using numeric format
             image_path = Path(__file__).parent / 'assets' / 'cards' / f'{card_key}.svg'
@@ -67,7 +67,7 @@ class Card:
                 self.image = pygame.image.load(png_file)
             
             # Cache the loaded image
-            Card.image_cache[card_key] = self.image
+            CardSprite.image_cache[card_key] = self.image
         
         self.rect = self.image.get_rect()
 
@@ -91,237 +91,386 @@ class Card:
         self.rect.center = self.current_pos
 
 class GameVisualizer:
-    def __init__(self, game_file: str):
+    def __init__(self, game_file: Optional[str] = None):
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption("Hearts Game Visualizer")
         self.clock = pygame.time.Clock()
         
-        # Load game data
-        with open(game_file, 'r') as f:
-            self.games = json.load(f)
-        
-        self.current_game = 0
-        self.current_trick = 0
-        self.current_card = 0
-        
         # Player positions (center points for names and scores)
         self.player_positions = {
-            0: (WINDOW_WIDTH // 2, WINDOW_HEIGHT - 50),   # Bottom
+            0: (WINDOW_WIDTH // 2, WINDOW_HEIGHT - 50),   # Bottom (moved up a bit)
             1: (200, WINDOW_HEIGHT // 2),                 # Left
             2: (WINDOW_WIDTH // 2, 30),                   # Top
             3: (WINDOW_WIDTH - 200, WINDOW_HEIGHT // 2)   # Right
         }
         
         # Hand display positions and offsets (reduced spacing between cards)
-        card_overlap = 30  # Only show 20 pixels of each card except the last
+        card_overlap = 20  # Only show 20 pixels of each card except the last
         self.hand_positions = {
-            0: {"start": (WINDOW_WIDTH // 4, WINDOW_HEIGHT - 180),  # Bottom (above names)
+            0: {"start": (WINDOW_WIDTH // 4, WINDOW_HEIGHT - 200),  # Bottom
                 "offset": (card_overlap, 0)},
-            1: {"start": (50, WINDOW_HEIGHT // 4),                  # Left (left of names)
+            1: {"start": (50, WINDOW_HEIGHT // 4),                  # Left
                 "offset": (0, card_overlap)},
-            2: {"start": (WINDOW_WIDTH // 4, 70),                   # Top (below names)
+            2: {"start": (WINDOW_WIDTH // 4, 70),                   # Top
                 "offset": (card_overlap, 0)},
-            3: {"start": (WINDOW_WIDTH - 120, WINDOW_HEIGHT // 4),  # Right (right of names)
+            3: {"start": (WINDOW_WIDTH - 120, WINDOW_HEIGHT // 4),  # Right
                 "offset": (0, card_overlap)}
         }
         
-        self.cards_in_play: List[Card] = []
+        self.cards_in_play: List[CardSprite] = []
         self.trick_center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
         
-        # Initialize player info
-        self.players = self.games[self.current_game]["players"]
+        if game_file:
+            # Load game from file
+            with open(game_file, 'r') as f:
+                self.games = json.load(f)
+            self.current_game = 0
+            self.current_trick = 0
+            self.current_card = 0
+            self.game = None
+            self.replay_mode = True
+        else:
+            # Create new real-time game
+            self.games = None
+            self.current_game = 0
+            self.current_trick = 0
+            self.current_card = 0
+            self.game = HeartsGame([
+                ("You", RandomStrategy()),  # Bottom player (human)
+                ("Bob", AvoidPointsStrategy()),  # Left player
+                ("Charlie", AggressiveStrategy()),  # Top player
+                ("AI", AIStrategy())  # Right player
+            ])
+            self.replay_mode = False
+        
         self.auto_play = False
         self.last_auto_play = pygame.time.get_ticks()
+        self.selected_card = None
+        self.trick_completed = False
+        self.trick_completion_time = 0
+        self.paused = False  # New flag for pausing after tricks
 
-    def calculate_running_scores(self):
-        scores = [0] * len(self.players)
-        # Only count completed tricks
-        for trick_idx in range(self.current_trick):
-            trick = self.games[self.current_game]["tricks"][trick_idx]
-            winner = trick["winner"]
-            scores[winner] += trick["points"]
-        
-        # Add current trick points only if all cards have been played
-        if self.current_trick < len(self.games[self.current_game]["tricks"]):
-            current_trick = self.games[self.current_game]["tricks"][self.current_trick]
-            if self.current_card == len(current_trick["cards"]):
-                scores[current_trick["winner"]] += current_trick["points"]
-        
-        return scores
+    def clear_trick_cards(self):
+        """Clear all cards from the current trick display"""
+        self.cards_in_play = []
 
-    def get_current_trick(self):
-        return self.games[self.current_game]["tricks"][self.current_trick]
-    
-    def get_total_tricks(self):
-        return len(self.games[self.current_game]["tricks"])
-
-    def create_card_for_play(self, card_data: Dict, player_idx: int):
-        card = Card(card_data["suit"], card_data["rank"])
-        start_pos = self.player_positions[player_idx]
-        
-        # Calculate target position in a diamond pattern
-        # Offset from center based on player position
-        offsets = {
-            0: (0, 60),      # Bottom player's card goes below center
-            1: (-60, 0),     # Left player's card goes left of center
-            2: (0, -60),     # Top player's card goes above center
-            3: (60, 0)       # Right player's card goes right of center
-        }
-        offset_x, offset_y = offsets[player_idx]
-        target_pos = (
-            self.trick_center[0] + offset_x,
-            self.trick_center[1] + offset_y
-        )
-        
-        card.current_pos = start_pos
-        card.target_pos = target_pos
-        card.rect.center = start_pos
-        card.moving = True
-        return card
-
-    def next_card(self):
-        trick = self.get_current_trick()
-        if self.current_card < len(trick["cards"]):
-            # Add next card to current trick
-            card_data = trick["cards"][self.current_card]
-            card = self.create_card_for_play(card_data["card"], card_data["player_index"])
-            self.cards_in_play.append(card)
-            self.current_card += 1
-            return True
-        elif self.current_trick < self.get_total_tricks() - 1:
-            # Move to next trick
-            self.current_trick += 1
-            self.current_card = 0
-            self.cards_in_play.clear()
+    def check_and_complete_trick(self):
+        """Check if trick is complete and handle completion"""
+        if len(self.game.current_trick) == 4:
+            self.trick_completed = True
+            self.paused = True
+            self.game.complete_trick()
             return True
         return False
 
-    def previous_trick(self):
-        if self.current_trick > 0:
-            self.current_trick -= 1
-            self.current_card = 0
-            self.cards_in_play.clear()
-
-    def next_trick(self):
-        if self.current_trick < len(self.games[self.current_game]["tricks"]) - 1:
-            self.current_trick += 1
-            self.current_card = 0
-            self.cards_in_play.clear()
+    def handle_click(self, pos):
+        if not self.replay_mode and self.game.current_player == 0:
+            # Check if clicked on a card in the player's hand
+            hand = self.game.hands[0]
+            start_x, start_y = self.hand_positions[0]["start"]
+            offset_x, _ = self.hand_positions[0]["offset"]
+            
+            # Check cards from right to left so we select the rightmost visible card
+            for i in range(len(hand) - 1, -1, -1):
+                card = hand[i]
+                x = start_x + (i * offset_x)
+                rect = pygame.Rect(x, start_y, CARD_WIDTH, CARD_HEIGHT)
+                if rect.collidepoint(pos):
+                    try:
+                        played_card = self.game.play_card(0, card)
+                        sprite = CardSprite(played_card)
+                        sprite.current_pos = (x + CARD_WIDTH//2, start_y + CARD_HEIGHT//2)
+                        sprite.target_pos = self.get_trick_position(len(self.game.current_trick) - 1)
+                        sprite.moving = True
+                        self.cards_in_play.append(sprite)
+                        self.last_auto_play = pygame.time.get_ticks()
+                        
+                        # Check if trick is complete after human plays
+                        if not any(card.moving for card in self.cards_in_play):
+                            self.check_and_complete_trick()
+                        
+                        # Update AI state with played card
+                        for _, strategy in self.game.players:
+                            if isinstance(strategy, AIStrategy):
+                                strategy.current_trick_cards = [(c.suit, c.rank) for c, _ in self.game.current_trick]
+                        break
+                    except ValueError:
+                        # Invalid move, ignore
+                        pass
 
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Left click
+                    self.handle_click(event.pos)
             elif event.type == pygame.KEYDOWN:
-                mods = pygame.key.get_mods()
                 if event.key == pygame.K_SPACE:
-                    self.auto_play = not self.auto_play
-                elif event.key == pygame.K_LEFT:
-                    if mods & pygame.KMOD_SHIFT:
-                        # Previous trick
-                        if self.current_trick > 0:
-                            self.current_trick -= 1
-                            self.current_card = 0
-                            self.cards_in_play.clear()
-                    else:
-                        # Previous card
-                        if self.current_card > 0:
-                            self.current_card -= 1
-                            self.cards_in_play.pop()
-                elif event.key == pygame.K_RIGHT:
-                    if mods & pygame.KMOD_SHIFT:
-                        self.next_trick()
-                    else:
-                        # Next card or next trick if at end of current trick
-                        trick = self.get_current_trick()
-                        if self.current_card < len(trick["cards"]):
-                            self.next_card()
-                        elif self.current_trick < len(self.games[self.current_game]["tricks"]) - 1:
+                    if self.paused:  # Resume game when space is pressed
+                        self.paused = False
+                        self.clear_trick_cards()
+                        self.trick_completed = False
+                        self.last_auto_play = pygame.time.get_ticks()
+                if event.key == pygame.K_RETURN:
+                    self.auto_play = not self.auto_play  # Toggle auto-play if not paused
+                elif event.key == pygame.K_ESCAPE:
+                    return False
+                mods = pygame.key.get_mods()
+                if self.replay_mode:
+                    if event.key == pygame.K_LEFT:
+                        if mods & pygame.KMOD_SHIFT:
+                            if self.current_trick > 0:
+                                self.current_trick -= 1
+                                self.current_card = 0
+                                self.clear_trick_cards()
+                        else:
+                            if self.current_card > 0:
+                                self.current_card -= 1
+                                self.cards_in_play.pop()
+                    elif event.key == pygame.K_RIGHT:
+                        if mods & pygame.KMOD_SHIFT:
                             self.next_trick()
+                        else:
+                            trick = self.get_current_trick()
+                            if self.current_card < len(trick["cards"]):
+                                self.next_card()
+                            elif self.current_trick < len(self.games[self.current_game]["tricks"]) - 1:
+                                self.next_trick()
         return True
 
-    def draw_player_hand(self, player_idx: int, hand: List[Dict]):
+    def update(self):
+        print("pausing", self.paused)
+        print("trick completed", self.trick_completed)
+        print("auto play", self.auto_play)
+        print("replay mode", self.replay_mode)
+        if not self.replay_mode:
+            current_time = pygame.time.get_ticks()
+            
+            # Don't update if paused
+            if self.paused:
+                return
+            
+            # Only auto-play for AI players or if auto_play is explicitly enabled
+            if self.game.current_player != 0 or (self.auto_play and self.game.current_player == 0):
+                if current_time - self.last_auto_play > AUTO_PLAY_DELAY:
+                    # Wait for any card animations to finish before checking trick completion
+                    if any(card.moving for card in self.cards_in_play):
+                        return
+                        
+                    # Check if trick is complete
+                    if self.check_and_complete_trick():
+                        return
+                    
+                    # If this is the start of a new trick, clear any remaining cards
+                    if len(self.game.current_trick) == 0:
+                        self.clear_trick_cards()
+                    
+                    # Play next card
+                    card = self.game.play_card(self.game.current_player)
+                    start_pos = self.hand_positions[self.game.current_player]["start"]
+                    sprite = CardSprite(card)
+                    sprite.current_pos = (start_pos[0] + CARD_WIDTH//2, 
+                                        start_pos[1] + CARD_HEIGHT//2)
+                    sprite.target_pos = self.get_trick_position(len(self.game.current_trick) - 1)
+                    sprite.moving = True
+                    self.cards_in_play.append(sprite)
+                    
+                    # Check if trick is complete after AI plays
+                    if not any(card.moving for card in self.cards_in_play):
+                        self.check_and_complete_trick()
+                    
+                    # Update AI state with played card
+                    for _, strategy in self.game.players:
+                        if isinstance(strategy, AIStrategy):
+                            strategy.current_trick_cards = [(c.suit, c.rank) for c, _ in self.game.current_trick]
+                    self.last_auto_play = current_time
+
+            # Check for game over
+            if self.game.get_game_state()["game_over"]:
+                # Start a new game after a delay
+                if current_time - self.last_auto_play > AUTO_PLAY_DELAY * 2:
+                    self.game.reset_game()
+                    self.clear_trick_cards()
+                    self.trick_completed = False
+                    self.paused = False
+                    self.auto_play = False  # Turn off auto-play when game resets
+                    # Reset AI game state
+                    for _, strategy in self.game.players:
+                        if isinstance(strategy, AIStrategy):
+                            strategy.game_id += 1
+                            strategy.trick_number = 0
+                            strategy.previous_tricks = []
+                            strategy.current_trick_cards = []
+                    self.last_auto_play = current_time
+
+        # Update card animations
+        moving_cards = []
+        for card in self.cards_in_play:
+            if card.moving:
+                card.move_towards_target()
+                moving_cards.append(card)
+            elif not self.trick_completed:  # Only keep non-moving cards if trick is not completed
+                moving_cards.append(card)
+        self.cards_in_play = moving_cards
+
+    def get_trick_position(self, card_index: int) -> Tuple[int, int]:
+        # Position cards in a diamond pattern around the center
+        offsets = [
+            (0, 60),      # Bottom player's card goes below center
+            (-60, 0),     # Left player's card goes left of center
+            (0, -60),     # Top player's card goes above center
+            (60, 0)       # Right player's card goes right of center
+        ]
+        offset_x, offset_y = offsets[card_index]
+        return (self.trick_center[0] + offset_x,
+                self.trick_center[1] + offset_y)
+
+    def draw_player_hand(self, player_idx: int, hand: List[Card], highlight_valid: bool = False):
         pos = self.hand_positions[player_idx]
         start_x, start_y = pos["start"]
         offset_x, offset_y = pos["offset"]
         
-        for i, card_data in enumerate(hand):
-            card = Card(card_data["suit"], card_data["rank"])
+        valid_moves = self.game.get_valid_moves(player_idx) if highlight_valid else []
+        
+        for i, card in enumerate(hand):
+            sprite = CardSprite(card)
             x = start_x + (i * offset_x)
             y = start_y + (i * offset_y)
-            self.screen.blit(card.image, (x, y))
+            
+            # Highlight valid moves for human player
+            if highlight_valid and card in valid_moves:
+                pygame.draw.rect(self.screen, (255, 255, 0), 
+                               (x-2, y-2, CARD_WIDTH+4, CARD_HEIGHT+4))
+            
+            self.screen.blit(sprite.image, (x, y))
 
     def draw(self):
-        # Draw background
         self.screen.fill(GREEN)
+        
+        # Get current game state
+        if self.replay_mode:
+            game_state = self.games[self.current_game]
+            trick = self.get_current_trick()
+            current_trick = trick["cards"][:self.current_card + 1] if trick else []
+            current_player = (len(current_trick)) % 4 if current_trick else 0
+            hands = game_state["hands"]
+            scores = game_state["scores"]
+            players = game_state["players"]
+        else:
+            game_state = self.game.get_game_state()
+            current_trick = game_state["current_trick"]
+            current_player = game_state["current_player"]
+            hands = game_state["hands"]
+            scores = game_state["scores"]
+            players = game_state["players"]
         
         # Draw player positions and scores
         font = pygame.font.Font(None, 36)
-        running_scores = self.calculate_running_scores()
+        medium_font = pygame.font.Font(None, 24)
         
-        for player in self.players:
-            pos = self.player_positions[player["index"]]
+        for i, player in enumerate(players):
+            pos = self.player_positions[i]
             
             # Create background rectangle for player info
-            text = f"{player['name']} ({player['strategy']})"
-            text_surface = font.render(text, True, WHITE)
-            text_rect = text_surface.get_rect(center=(pos[0], pos[1]))
-            bg_rect = text_rect.inflate(20, 10)  # Make background slightly larger
+            name_text = player['name']
+            strategy_text = f"({player['strategy']})"
+            score_text = str(scores[i])
             
-            score_text = str(running_scores[player["index"]])
+            name_surface = font.render(name_text, True, WHITE)
+            strategy_surface = medium_font.render(strategy_text, True, WHITE)
             score_surface = font.render(score_text, True, WHITE)
+            
+            name_rect = name_surface.get_rect(center=(pos[0], pos[1] - 15))
+            strategy_rect = strategy_surface.get_rect(center=(pos[0], pos[1] + 5))
             score_rect = score_surface.get_rect(center=(pos[0], pos[1] + 30))
-            score_bg_rect = score_rect.inflate(20, 10)
             
-            # Draw background rectangles
+            # Calculate background rectangle to fit all elements
+            bg_rect = pygame.Rect(0, 0, 
+                                max(name_rect.width, strategy_rect.width, score_rect.width) + 20, 
+                                name_rect.height + strategy_rect.height + score_rect.height + 25)
+            bg_rect.center = (pos[0], pos[1] + 5)
+            
             pygame.draw.rect(self.screen, DARK_GREEN, bg_rect)
-            pygame.draw.rect(self.screen, DARK_GREEN, score_bg_rect)
-            
-            # Draw text
-            self.screen.blit(text_surface, text_rect)
+            self.screen.blit(name_surface, name_rect)
+            self.screen.blit(strategy_surface, strategy_rect)
             self.screen.blit(score_surface, score_rect)
+
+        # Draw pause overlay
+        if self.paused:
+            # Calculate trick points
+            trick_points = 0
+            for card, _ in current_trick:
+                if card.suit == 'H':
+                    trick_points += 1
+                elif card.suit == 'S' and card.rank == 12:  # Queen of Spades
+                    trick_points += 13
+
+            # Draw pause info box
+            info_lines = [
+                ("Press SPACE to continue", WHITE),
+                (f"Trick Points: {trick_points}", RED if trick_points > 0 else WHITE)
+            ]
+            
+            line_height = 30
+            total_height = line_height * len(info_lines)
+            y_start = WINDOW_HEIGHT // 2 + 80
+            
+            for i, (text, color) in enumerate(info_lines):
+                text_surface = font.render(text, True, color)
+                text_rect = text_surface.get_rect(center=(WINDOW_WIDTH // 2, y_start + i * line_height))
+                bg_rect = text_rect.inflate(20, 10)
+                pygame.draw.rect(self.screen, BLACK, bg_rect)
+                self.screen.blit(text_surface, text_rect)
         
-        # Draw current hands for all players
-        trick = self.get_current_trick()
-        if self.current_card < len(trick["cards"]):
-            # Show all player hands from the current state
-            for player_idx in range(4):
-                # Find the most recent hand state for this player
-                hand = None
-                for i in range(self.current_card, -1, -1):
-                    if trick["cards"][i]["player_index"] == player_idx:
-                        hand = trick["cards"][i]["hand"]
-                        break
-                if hand:
-                    self.draw_player_hand(player_idx, hand)
+        # Draw hands
+        if self.replay_mode:
+            if self.current_card < len(trick["cards"]):
+                current_hand = trick["cards"][self.current_card]["hand"]
+                for player_idx in range(4):
+                    if player_idx == trick["cards"][self.current_card]["player_index"]:
+                        self.draw_player_hand(player_idx, current_hand)
+                    elif self.current_card > 0:
+                        prev_hand = trick["cards"][self.current_card - 1]["hand"]
+                        if trick["cards"][self.current_card - 1]["player_index"] == player_idx:
+                            self.draw_player_hand(player_idx, prev_hand)
+        else:
+            # Draw current hands for all players
+            for i in range(4):
+                self.draw_player_hand(i, self.game.hands[i], 
+                                    i == 0 and self.game.current_player == 0)
         
         # Draw cards in play
         for card in self.cards_in_play:
             card.move_towards_target()
             self.screen.blit(card.image, card.rect)
         
-        # Draw game info and current trick score
-        trick = self.get_current_trick()
-        game_info = f"Game {self.current_game + 1} - Trick {self.current_trick + 1}/{self.get_total_tricks()} - Card {self.current_card}/{len(trick['cards'])}"
+        # Draw game info
+        if self.replay_mode:
+            game_info = f"Game {self.current_game + 1} - Trick {self.current_trick + 1}/{len(game_state['tricks'])} - Card {self.current_card}/{len(trick['cards'])}"
+        else:
+            game_info = f"Current Player: {players[self.game.current_player]['name']}"
+            if len(self.game.current_trick) > 0:
+                game_info += f" - Cards in trick: {len(self.game.current_trick)}/4"
+        
         info_text = font.render(game_info, True, WHITE)
         self.screen.blit(info_text, (10, 10))
-        
-        # Draw current trick info if all cards are played
-        if self.current_card == len(trick["cards"]):
-            winner = self.players[trick["winner"]]["name"]
-            trick_info = f"Trick winner: {winner} (+{trick['points']} points)"
-            trick_text = font.render(trick_info, True, WHITE)
-            self.screen.blit(trick_text, (10, 40))
         
         # Draw controls info
         controls = [
             "Controls:",
             "Space - Toggle auto-play",
-            "Left/Right - Previous/Next card",
-            "Shift+Left/Right - Previous/Next trick",
-            "Close window to quit"
         ]
-        small_font = pygame.font.Font(None, 24)  # Smaller font for controls
+        if self.replay_mode:
+            controls.extend([
+                "Left/Right - Previous/Next card",
+                "Shift+Left/Right - Previous/Next trick",
+            ])
+        else:
+            controls.append("Click card to play (when it's your turn)")
+        controls.append("Close window to quit")
+        
+        small_font = pygame.font.Font(None, 24)
         for i, control in enumerate(controls):
             control_text = small_font.render(control, True, WHITE)
             self.screen.blit(control_text, (10, WINDOW_HEIGHT - 20 * (len(controls) - i)))
@@ -332,29 +481,26 @@ class GameVisualizer:
         running = True
         while running:
             self.clock.tick(FPS)
-            
             running = self.handle_events()
-            
-            # Handle auto-play
-            if self.auto_play:
-                current_time = pygame.time.get_ticks()
-                if current_time - self.last_auto_play > AUTO_PLAY_DELAY:
-                    self.next_card()
-                    self.last_auto_play = current_time
-            
+            self.update()
             self.draw()
         
         pygame.quit()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python game_visualizer.py <game_file.json>")
+    if len(sys.argv) < 2:
+        print("Usage:")
+        print("  Replay mode: python game_visualizer.py <game_file.json>")
+        print("  Real-time mode: python game_visualizer.py --realtime")
         sys.exit(1)
     
-    game_file = sys.argv[1]
-    if not os.path.exists(game_file):
-        print(f"Error: File {game_file} not found")
-        sys.exit(1)
+    if sys.argv[1] == "--realtime":
+        visualizer = GameVisualizer()
+    else:
+        game_file = sys.argv[1]
+        if not os.path.exists(game_file):
+            print(f"Error: File {game_file} not found")
+            sys.exit(1)
+        visualizer = GameVisualizer(game_file)
     
-    visualizer = GameVisualizer(game_file)
     visualizer.run()
