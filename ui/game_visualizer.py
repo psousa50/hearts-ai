@@ -23,6 +23,7 @@ AUTO_PLAY_DELAY = 500  # milliseconds
 WHITE = (255, 255, 255)
 GREEN = (34, 139, 34)
 BLACK = (0, 0, 0)
+DARK_GREEN = (0, 100, 0)  # Background color for player info
 
 class Card:
     # Class-level cache for card images
@@ -103,12 +104,25 @@ class GameVisualizer:
         self.current_trick = 0
         self.current_card = 0
         
-        # Player positions (center points for cards)
+        # Player positions (center points for names and scores)
         self.player_positions = {
-            0: (WINDOW_WIDTH // 2, WINDOW_HEIGHT - 100),  # Bottom
-            1: (100, WINDOW_HEIGHT // 2),                 # Left
-            2: (WINDOW_WIDTH // 2, 100),                 # Top
-            3: (WINDOW_WIDTH - 100, WINDOW_HEIGHT // 2)   # Right
+            0: (WINDOW_WIDTH // 2, WINDOW_HEIGHT - 50),   # Bottom
+            1: (200, WINDOW_HEIGHT // 2),                 # Left
+            2: (WINDOW_WIDTH // 2, 30),                   # Top
+            3: (WINDOW_WIDTH - 200, WINDOW_HEIGHT // 2)   # Right
+        }
+        
+        # Hand display positions and offsets (reduced spacing between cards)
+        card_overlap = 30  # Only show 20 pixels of each card except the last
+        self.hand_positions = {
+            0: {"start": (WINDOW_WIDTH // 4, WINDOW_HEIGHT - 180),  # Bottom (above names)
+                "offset": (card_overlap, 0)},
+            1: {"start": (50, WINDOW_HEIGHT // 4),                  # Left (left of names)
+                "offset": (0, card_overlap)},
+            2: {"start": (WINDOW_WIDTH // 4, 70),                   # Top (below names)
+                "offset": (card_overlap, 0)},
+            3: {"start": (WINDOW_WIDTH - 120, WINDOW_HEIGHT // 4),  # Right (right of names)
+                "offset": (0, card_overlap)}
         }
         
         self.cards_in_play: List[Card] = []
@@ -226,6 +240,17 @@ class GameVisualizer:
                             self.next_trick()
         return True
 
+    def draw_player_hand(self, player_idx: int, hand: List[Dict]):
+        pos = self.hand_positions[player_idx]
+        start_x, start_y = pos["start"]
+        offset_x, offset_y = pos["offset"]
+        
+        for i, card_data in enumerate(hand):
+            card = Card(card_data["suit"], card_data["rank"])
+            x = start_x + (i * offset_x)
+            y = start_y + (i * offset_y)
+            self.screen.blit(card.image, (x, y))
+
     def draw(self):
         # Draw background
         self.screen.fill(GREEN)
@@ -236,15 +261,39 @@ class GameVisualizer:
         
         for player in self.players:
             pos = self.player_positions[player["index"]]
-            # Draw player name and strategy
-            text = font.render(f"{player['name']} ({player['strategy']})", True, WHITE)
-            text_rect = text.get_rect(center=(pos[0], pos[1] + (30 if player["index"] % 2 == 0 else 0)))
-            self.screen.blit(text, text_rect)
             
-            # Draw running score
-            score_text = font.render(str(running_scores[player["index"]]), True, WHITE)
-            score_rect = score_text.get_rect(center=(pos[0], pos[1] + (60 if player["index"] % 2 == 0 else 30)))
-            self.screen.blit(score_text, score_rect)
+            # Create background rectangle for player info
+            text = f"{player['name']} ({player['strategy']})"
+            text_surface = font.render(text, True, WHITE)
+            text_rect = text_surface.get_rect(center=(pos[0], pos[1]))
+            bg_rect = text_rect.inflate(20, 10)  # Make background slightly larger
+            
+            score_text = str(running_scores[player["index"]])
+            score_surface = font.render(score_text, True, WHITE)
+            score_rect = score_surface.get_rect(center=(pos[0], pos[1] + 30))
+            score_bg_rect = score_rect.inflate(20, 10)
+            
+            # Draw background rectangles
+            pygame.draw.rect(self.screen, DARK_GREEN, bg_rect)
+            pygame.draw.rect(self.screen, DARK_GREEN, score_bg_rect)
+            
+            # Draw text
+            self.screen.blit(text_surface, text_rect)
+            self.screen.blit(score_surface, score_rect)
+        
+        # Draw current hands for all players
+        trick = self.get_current_trick()
+        if self.current_card < len(trick["cards"]):
+            # Show all player hands from the current state
+            for player_idx in range(4):
+                # Find the most recent hand state for this player
+                hand = None
+                for i in range(self.current_card, -1, -1):
+                    if trick["cards"][i]["player_index"] == player_idx:
+                        hand = trick["cards"][i]["hand"]
+                        break
+                if hand:
+                    self.draw_player_hand(player_idx, hand)
         
         # Draw cards in play
         for card in self.cards_in_play:
@@ -272,9 +321,10 @@ class GameVisualizer:
             "Shift+Left/Right - Previous/Next trick",
             "Close window to quit"
         ]
+        small_font = pygame.font.Font(None, 24)  # Smaller font for controls
         for i, control in enumerate(controls):
-            control_text = font.render(control, True, WHITE)
-            self.screen.blit(control_text, (10, WINDOW_HEIGHT - 30 * (len(controls) - i)))
+            control_text = small_font.render(control, True, WHITE)
+            self.screen.blit(control_text, (10, WINDOW_HEIGHT - 20 * (len(controls) - i)))
         
         pygame.display.flip()
 
