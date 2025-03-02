@@ -3,10 +3,30 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Embedding, GlobalAveragePooling1D, Concatenate, Dropout
 from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import ModelCheckpoint, CSVLogger, EarlyStopping
+from tensorflow.keras.callbacks import ModelCheckpoint, CSVLogger, EarlyStopping, Callback
 import json
+import time
 
 from common import encode_card, encode_game_state
+
+class TrainingProgressCallback(Callback):
+    def __init__(self, print_interval=1):
+        super().__init__()
+        self.print_interval = print_interval
+        self.last_time = None
+        
+    def on_train_begin(self, logs=None):
+        print("\nStarting training...", flush=True)
+        self.last_time = time.time()
+        
+    def on_batch_end(self, batch, logs=None):
+        if batch % self.print_interval == 0:
+            current_time = time.time()
+            elapsed = current_time - self.last_time
+            self.last_time = current_time
+            
+            metrics = " - ".join(f"{k}: {v:.4f}" for k, v in logs.items())
+            print(f"Batch {batch} ({elapsed:.2f}s) - {metrics}", flush=True)
 
 class HeartsModel:
     def __init__(self):
@@ -105,7 +125,7 @@ class HeartsModel:
 
         # Load the checkpoint
         checkpoint_path = os.path.join(checkpoint_dir, latest_checkpoint)
-        print(f"Loading checkpoint from {checkpoint_path}")
+        print(f"Loading checkpoint from {checkpoint_path}", flush=True)
         self.model = tf.keras.models.load_model(checkpoint_path)
         
         # Recompile to ensure metrics are built
@@ -129,7 +149,7 @@ class HeartsModel:
             data = json.load(f)
         
         num_examples = len(data)
-        print(f"Training on {num_examples} examples")
+        print(f"Training on {num_examples} examples", flush=True)
         
         # Calculate optimal parameters
         if batch_size is None:
@@ -144,19 +164,24 @@ class HeartsModel:
         patience = max(3, epochs // 10)
         
         steps_per_epoch = num_examples * (1 - validation_split) / batch_size
-        print(f"\nTraining parameters derived from dataset size:")
-        print(f"- Batch size: {batch_size} (sqrt of {num_examples} examples)")
-        print(f"- Epochs: {epochs} (100,000/{num_examples})")
-        print(f"- Steps per epoch: {steps_per_epoch:.1f}")
-        print(f"- Early stopping patience: {patience} epochs")
-        print(f"- Training examples: {int(num_examples * (1 - validation_split))}")
-        print(f"- Validation examples: {int(num_examples * validation_split)}\n")
+        print(f"\nTraining parameters derived from dataset size:", flush=True)
+        print(f"- Batch size: {batch_size} (sqrt of {num_examples} examples)", flush=True)
+        print(f"- Epochs: {epochs} (100,000/{num_examples})", flush=True)
+        print(f"- Steps per epoch: {steps_per_epoch:.1f}", flush=True)
+        print(f"- Early stopping patience: {patience} epochs", flush=True)
+        print(f"- Training examples: {int(num_examples * (1 - validation_split))}", flush=True)
+        print(f"- Validation examples: {int(num_examples * validation_split)}\n", flush=True)
         
         # Prepare training data
         X = []
         y = []
         
-        for example in data:
+        print("Loading training data...", flush=True)
+        total = len(data)
+        for i, example in enumerate(data, 1):
+            if i % 1000 == 0:
+                print(f"Processing example {i}/{total}...", flush=True)
+                
             # Encode game state as sequence
             sequence = encode_game_state(
                 trick_number=example['trick_number'],
@@ -175,8 +200,10 @@ class HeartsModel:
             X.append(sequence)
             y.append(target)
         
+        print("Converting to numpy arrays...", flush=True)
         X = np.array(X)
         y = np.array(y)
+        print("Data preparation complete!", flush=True)
         
         # Create directories if they don't exist
         os.makedirs('models', exist_ok=True)
@@ -188,7 +215,8 @@ class HeartsModel:
                 'models/model_epoch_{epoch:02d}.keras',
                 save_best_only=True,
                 monitor='val_accuracy',
-                mode='max'
+                mode='max',
+                verbose=1
             ),
             EarlyStopping(
                 monitor='val_accuracy',
@@ -197,15 +225,10 @@ class HeartsModel:
                 restore_best_weights=True,
                 verbose=1
             ),
-            CSVLogger('logs/training_log.csv'),
-            # Add TensorBoard for better progress tracking
-            tf.keras.callbacks.TensorBoard(
-                log_dir='./logs',
-                histogram_freq=1,
-                update_freq='epoch'
-            )
+            CSVLogger('logs/training_log.csv')
         ]
         
+        print("\nStarting model training...", flush=True)
         # Train with progress bar
         history = self.model.fit(
             X,
@@ -215,7 +238,7 @@ class HeartsModel:
             batch_size=batch_size,
             callbacks=callbacks,
             validation_split=validation_split,
-            verbose=1  # Show progress bar
+            verbose=2  # Show one line per epoch
         )
         
         # Save final model

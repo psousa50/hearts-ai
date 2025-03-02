@@ -2,7 +2,7 @@ use hearts_game::GameResult;
 use std::collections::HashMap;
 
 pub fn display_statistics(games: &[GameResult]) {
-    let mut total_scores: HashMap<(&String, &String), i64> = HashMap::new();
+    let mut total_scores = HashMap::new();
     let mut total_wins = HashMap::new();
 
     // Collect statistics
@@ -12,7 +12,7 @@ pub fn display_statistics(games: &[GameResult]) {
             let entry = total_scores
                 .entry((&player.name, &player.strategy))
                 .or_insert(0);
-            *entry += player.score as i64;  // Convert to i64 to avoid overflow
+            *entry += player.score;
         }
 
         // Update win counts
