@@ -180,7 +180,7 @@ class GameVisualizer:
                         played_card = self.game.play_card(0, card)
                         sprite = CardSprite(played_card)
                         sprite.current_pos = (x + CARD_WIDTH//2, start_y + CARD_HEIGHT//2)
-                        sprite.target_pos = self.get_trick_position(len(self.game.current_trick) - 1)
+                        sprite.target_pos = self.get_trick_position(len(self.game.current_trick) - 1, current_player=0)
                         sprite.moving = True
                         self.cards_in_play.append(sprite)
                         self.last_auto_play = pygame.time.get_ticks()
@@ -267,12 +267,13 @@ class GameVisualizer:
                         self.clear_trick_cards()
                     
                     # Play next card
-                    card = self.game.play_card(self.game.current_player)
-                    start_pos = self.hand_positions[self.game.current_player]["start"]
+                    current_player = self.game.current_player
+                    card = self.game.play_card(current_player)
+                    start_pos = self.hand_positions[current_player]["start"]
                     sprite = CardSprite(card)
                     sprite.current_pos = (start_pos[0] + CARD_WIDTH//2, 
                                         start_pos[1] + CARD_HEIGHT//2)
-                    sprite.target_pos = self.get_trick_position(len(self.game.current_trick) - 1)
+                    sprite.target_pos = self.get_trick_position(len(self.game.current_trick) - 1, current_player=current_player)
                     sprite.moving = True
                     self.cards_in_play.append(sprite)
                     
@@ -314,17 +315,29 @@ class GameVisualizer:
                 moving_cards.append(card)
         self.cards_in_play = moving_cards
 
-    def get_trick_position(self, card_index: int) -> Tuple[int, int]:
-        # Position cards in a diamond pattern around the center
-        offsets = [
-            (0, 60),      # Bottom player's card goes below center
-            (-60, 0),     # Left player's card goes left of center
-            (0, -60),     # Top player's card goes above center
-            (60, 0)       # Right player's card goes right of center
-        ]
-        offset_x, offset_y = offsets[card_index]
-        return (self.trick_center[0] + offset_x,
-                self.trick_center[1] + offset_y)
+    def get_trick_position(self, card_index: int, current_player: Optional[int] = None) -> Tuple[int, int]:
+        # Get the player who played this card
+        if current_player is not None:
+            # Use the provided player index for cards being played
+            player_idx = current_player
+        elif self.replay_mode:
+            trick = self.get_current_trick()
+            player_idx = trick["cards"][card_index]["player_index"]
+        else:
+            # In current_trick, each entry is (card, player_idx)
+            player_idx = self.game.current_trick[card_index][1]
+
+        # Position cards between the center and the player who played them
+        player_pos = self.player_positions[player_idx]
+        center_x, center_y = self.trick_center
+        player_x, player_y = player_pos
+        
+        # Calculate position 60% of the way from center to player
+        ratio = 0.4  # This determines how close to the player the card appears
+        x = center_x + (player_x - center_x) * ratio
+        y = center_y + (player_y - center_y) * ratio
+        
+        return (int(x), int(y))
 
     def draw_player_hand(self, player_idx: int, hand: List[Card], highlight_valid: bool = False):
         pos = self.hand_positions[player_idx]
