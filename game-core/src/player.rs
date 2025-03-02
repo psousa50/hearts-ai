@@ -29,6 +29,7 @@ impl Player {
             Strategy::Random(_) => "Random",
             Strategy::AvoidPoints(_) => "Avoid Points",
             Strategy::Aggressive(_) => "Aggressive",
+            Strategy::AI(_) => "AI",
         }
     }
 }

@@ -1,10 +1,10 @@
-use hearts_game::{AggressiveStrategy, AvoidPointsStrategy, HeartsGame, RandomStrategy, Strategy};
+use chrono::Utc;
+use hearts_game::{AggressiveStrategy, AvoidPointsStrategy, HeartsGame, RandomStrategy, Strategy, AIStrategy};
 use serde_json;
 use std::fs::{self, File};
 use std::io::BufWriter;
 use std::path::PathBuf;
 use std::time::Instant;
-use chrono::Utc;
 
 use crate::stats::display_statistics;
 
@@ -12,9 +12,10 @@ pub fn generate_games(num_games: usize) {
     let start = Instant::now();
     let mut results = Vec::with_capacity(num_games);
 
+    let ai_strategy = AIStrategy::new("http://localhost:8000/predict".to_string());
     let player_configs = [
         ("Alice", Strategy::Random(RandomStrategy)),
-        ("Bob", Strategy::Random(RandomStrategy)),
+        ("Bob", Strategy::AI(ai_strategy)),
         ("Charlie", Strategy::AvoidPoints(AvoidPointsStrategy)),
         ("David", Strategy::Aggressive(AggressiveStrategy)),
     ];

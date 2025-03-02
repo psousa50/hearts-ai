@@ -1,21 +1,25 @@
-use std::collections::HashMap;
 use hearts_game::GameResult;
+use std::collections::HashMap;
 
 pub fn display_statistics(games: &[GameResult]) {
-    let mut total_scores = HashMap::new();
+    let mut total_scores: HashMap<(&String, &String), i64> = HashMap::new();
     let mut total_wins = HashMap::new();
 
     // Collect statistics
     for game in games {
         // Update total scores
         for player in &game.players {
-            let entry = total_scores.entry((&player.name, &player.strategy)).or_insert(0);
-            *entry += player.score;
+            let entry = total_scores
+                .entry((&player.name, &player.strategy))
+                .or_insert(0);
+            *entry += player.score as i64;  // Convert to i64 to avoid overflow
         }
 
         // Update win counts
         let winner = &game.players[game.winner];
-        let entry = total_wins.entry((&winner.name, &winner.strategy)).or_insert(0);
+        let entry = total_wins
+            .entry((&winner.name, &winner.strategy))
+            .or_insert(0);
         *entry += 1;
     }
 

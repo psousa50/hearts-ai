@@ -17,6 +17,7 @@ struct TrainingDataItem {
     previous_tricks: Vec<TrainingTrick>,
     current_trick_cards: Vec<(Card, usize)>,
     current_player_index: usize,
+    player_hand: Vec<Card>,
     played_card: Card,
 }
 
@@ -84,6 +85,10 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
                     continue;
                 }
 
+                // Get player's hand at this point
+                let mut player_hand = trick_card.hand.clone();
+                player_hand.push(trick_card.card.clone()); // Add back the played card since it was in hand
+
                 // Create a training example for this play
                 let training_item = TrainingDataItem {
                     game_id,
@@ -91,6 +96,7 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
                     previous_tricks: previous_tricks.clone(),
                     current_trick_cards: current_trick_cards.clone(),
                     current_player_index: trick_card.player_index,
+                    player_hand,
                     played_card: trick_card.card.clone(),
                 };
                 training_data.push(training_item);

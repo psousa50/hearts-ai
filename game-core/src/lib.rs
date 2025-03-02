@@ -8,4 +8,4 @@ pub use card::Card;
 pub use deck::Deck;
 pub use game::{GameResult, HeartsGame};
 pub use player::Player;
-pub use strategy::{AggressiveStrategy, AvoidPointsStrategy, RandomStrategy, Strategy};
+pub use strategy::{AggressiveStrategy, AvoidPointsStrategy, RandomStrategy, Strategy, AIStrategy};

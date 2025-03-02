@@ -12,8 +12,8 @@ def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Train Hearts AI model on game data')
     parser.add_argument('json_file', help='Path to the training data JSON file')
-    parser.add_argument('--batch-size', type=int, default=32, help='Batch size for training')
-    parser.add_argument('--epochs', type=int, default=100, help='Maximum number of epochs')
+    parser.add_argument('--batch-size', type=int, help='Override automatic batch size calculation')
+    parser.add_argument('--epochs', type=int, help='Override automatic epochs calculation')
     parser.add_argument('--validation-split', type=float, default=0.2, help='Validation split ratio')
     args = parser.parse_args()
     
@@ -35,10 +35,10 @@ def main():
     # Train model
     try:
         print("Starting training...")
-        history = model.train(
+        model.train(
             train_data_path=args.json_file,
-            epochs=args.epochs,
-            batch_size=args.batch_size,
+            epochs=args.epochs,  # Will be None if not specified
+            batch_size=args.batch_size,  # Will be None if not specified
             validation_split=args.validation_split,
             initial_epoch=initial_epoch
         )

@@ -8,6 +8,7 @@ use serde::{Serialize, Deserialize};
 pub struct TrickCard {
     pub card: Card,
     pub player_index: usize,
+    pub hand: Vec<Card>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -178,6 +179,7 @@ impl HeartsGame {
             trick_cards.push(TrickCard {
                 card: played_card,
                 player_index: current_player,
+                hand: self.players[current_player].hand.clone(),
             });
             current_player = (current_player + 1) % 4;
         }

@@ -1,148 +1,224 @@
 import os
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Dense, Concatenate
+from tensorflow.keras.layers import Input, Dense, Embedding, GlobalAveragePooling1D, Concatenate, Dropout
 from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import ModelCheckpoint, CSVLogger
+from tensorflow.keras.callbacks import ModelCheckpoint, CSVLogger, EarlyStopping
 import json
 
-def encode_card(card):
-    """Create one-hot encoded vector for a single card"""
-    suit_map = {'H': 0, 'D': 1, 'C': 2, 'S': 3}
-    idx = (card['rank'] - 2) * 4 + suit_map[card['suit']]
-    return idx
+from common import encode_card, encode_game_state
 
-def get_valid_moves(current_trick_cards, previous_tricks):
-    """Get a list of all cards that have been played"""
-    played_cards = set()
-    
-    # Add cards from current trick
-    for card, _ in current_trick_cards:
-        played_cards.add((card['suit'], card['rank']))
-    
-    # Add cards from previous tricks
-    for trick in previous_tricks:
-        for card, _ in trick['cards']:
-            played_cards.add((card['suit'], card['rank']))
-    
-    # Create valid moves mask (1 for unplayed cards)
-    valid_moves = np.ones(52)
-    for suit, rank in played_cards:
-        idx = (rank - 2) * 4 + {'H': 0, 'D': 1, 'C': 2, 'S': 3}[suit]
-        valid_moves[idx] = 0
-    
-    return valid_moves
+class HeartsModel:
+    def __init__(self):
+        self.model = None
 
-def get_current_hand(current_trick_cards, previous_tricks):
-    """Get the current hand based on unplayed cards"""
-    # Start with all cards unplayed
-    hand = np.ones(52)
-    
-    # Mark played cards as 0
-    for card, _ in current_trick_cards:
-        idx = encode_card(card)
-        hand[idx] = 0
-    
-    for trick in previous_tricks:
-        for card, _ in trick['cards']:
+    def build_model(self, vocab_size=73, embedding_dim=64, sequence_length=84):
+        """Build the model architecture
+        
+        vocab_size: Number of unique tokens
+            - 0-12: trick numbers
+            - 13-16: player indices
+            - 17-68: card tokens
+            - 69-72: winner tokens
+            - 52: empty token
+        sequence_length: Length of input sequence
+            - 2 tokens for trick number and player
+            - 13 tricks * 5 tokens = 65 (4 cards + winner)
+            - 4 tokens for current trick
+            - 13 tokens for hand
+            Total: 84 tokens
+        """
+        # Input layer for sequence
+        sequence_input = Input(shape=(sequence_length,), name='sequence_input')
+        
+        # Embedding layer with larger dimension
+        x = Embedding(vocab_size, embedding_dim)(sequence_input)
+        
+        # Process sequence with deeper network
+        # First process local context (current trick and hand)
+        x1 = Dense(128, activation='relu')(x)
+        x1 = Dense(64, activation='relu')(x1)
+        
+        # Then process full sequence for global context
+        x2 = Dense(256, activation='relu')(x)
+        x2 = Dense(128, activation='relu')(x2)
+        
+        # Combine local and global features
+        x = Concatenate()([
+            GlobalAveragePooling1D()(x1),
+            GlobalAveragePooling1D()(x2)
+        ])
+        
+        # Dense layers with dropout for regularization
+        x = Dense(512, activation='relu')(x)
+        x = tf.keras.layers.Dropout(0.2)(x)
+        x = Dense(256, activation='relu')(x)
+        x = tf.keras.layers.Dropout(0.2)(x)
+        x = Dense(128, activation='relu')(x)
+        
+        # Output layer (52 cards)
+        predictions = Dense(52, activation='softmax', name='predictions')(x)
+        
+        # Create model
+        self.model = Model(inputs=sequence_input, outputs=predictions)
+        
+        # Compile model with learning rate schedule
+        initial_learning_rate = 0.001
+        decay_steps = 1000
+        decay_rate = 0.9
+        
+        learning_rate_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+            initial_learning_rate,
+            decay_steps=decay_steps,
+            decay_rate=decay_rate,
+            staircase=True
+        )
+        
+        self.model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate_schedule),
+            loss='categorical_crossentropy',
+            metrics=['accuracy']
+        )
+
+    def compile_model(self):
+        """Compile the model with optimizer and metrics"""
+        self.model.compile(
+            optimizer='adam',
+            loss='categorical_crossentropy',
+            metrics=['accuracy']
+        )
+
+    def load_latest_checkpoint(self):
+        """Load the latest checkpoint if it exists"""
+        checkpoint_dir = 'models'
+        if not os.path.exists(checkpoint_dir):
+            return 0, None
+
+        # Find all checkpoint files
+        checkpoints = [f for f in os.listdir(checkpoint_dir) if f.startswith('model_epoch_') and f.endswith('.keras')]
+        if not checkpoints:
+            return 0, None
+
+        # Get the latest checkpoint
+        latest_checkpoint = max(checkpoints, key=lambda x: int(x.split('_')[2].split('.')[0]))
+        epoch = int(latest_checkpoint.split('_')[2].split('.')[0])
+
+        # Load the checkpoint
+        checkpoint_path = os.path.join(checkpoint_dir, latest_checkpoint)
+        print(f"Loading checkpoint from {checkpoint_path}")
+        self.model = tf.keras.models.load_model(checkpoint_path)
+        
+        # Recompile to ensure metrics are built
+        self.compile_model()
+        
+        return epoch + 1, checkpoint_path
+
+    def train(self, train_data_path: str, epochs: int = None, batch_size: int = None, validation_split: float = 0.2, initial_epoch: int = 0):
+        """Train the model with automatically derived parameters based on dataset size
+        
+        Parameters are calculated as follows:
+        - batch_size: sqrt(N) where N is number of examples, capped between 32 and 128
+        - epochs: 100,000/N with minimum of 20 and maximum of 200
+        - early stopping patience: epochs/10 with minimum of 3
+        """
+        if self.model is None:
+            raise ValueError("Model not built. Call build_model() first.")
+
+        # Load training data
+        with open(train_data_path, 'r') as f:
+            data = json.load(f)
+        
+        num_examples = len(data)
+        print(f"Training on {num_examples} examples")
+        
+        # Calculate optimal parameters
+        if batch_size is None:
+            # Square root of N, capped between 32 and 128
+            batch_size = min(max(int(np.sqrt(num_examples)), 32), 128)
+            
+        if epochs is None:
+            # 100,000/N with min 20, max 200
+            epochs = min(max(int(100_000 / num_examples), 20), 200)
+            
+        # Early stopping patience: epochs/10 with min 3
+        patience = max(3, epochs // 10)
+        
+        steps_per_epoch = num_examples * (1 - validation_split) / batch_size
+        print(f"\nTraining parameters derived from dataset size:")
+        print(f"- Batch size: {batch_size} (sqrt of {num_examples} examples)")
+        print(f"- Epochs: {epochs} (100,000/{num_examples})")
+        print(f"- Steps per epoch: {steps_per_epoch:.1f}")
+        print(f"- Early stopping patience: {patience} epochs")
+        print(f"- Training examples: {int(num_examples * (1 - validation_split))}")
+        print(f"- Validation examples: {int(num_examples * validation_split)}\n")
+        
+        # Prepare training data
+        X = []
+        y = []
+        
+        for example in data:
+            # Encode game state as sequence
+            sequence = encode_game_state(
+                trick_number=example['trick_number'],
+                current_player_index=example['current_player_index'],
+                previous_tricks=example['previous_tricks'],
+                current_trick_cards=example['current_trick_cards'],
+                hand=example['player_hand']
+            )
+            
+            # One-hot encode target card
+            target = np.zeros(52)
+            card = example['played_card']
             idx = encode_card(card)
-            hand[idx] = 0
-    
-    return hand
-
-def build_model():
-    """Build the model architecture"""
-    # Input layers
-    hand_input = Input(shape=(52,), name='hand_input')
-    valid_moves_input = Input(shape=(52,), name='valid_moves_input')
-    
-    # Combine inputs
-    combined = Concatenate()([hand_input, valid_moves_input])
-    
-    # Dense layers
-    x = Dense(256, activation='relu')(combined)
-    x = Dense(128, activation='relu')(x)
-    x = Dense(64, activation='relu')(x)
-    
-    # Output layer (52 cards)
-    predictions = Dense(52, activation='softmax', name='predictions')(x)
-    
-    # Create model
-    model = Model(
-        inputs=[hand_input, valid_moves_input],
-        outputs=predictions
-    )
-    
-    # Compile model
-    model.compile(
-        optimizer='adam',
-        loss='categorical_crossentropy',
-        metrics=['accuracy']
-    )
-    
-    return model
-
-def train_model(data_path: str, epochs: int = 100, batch_size: int = 32):
-    """Train the model"""
-    # Load training data
-    with open(data_path, 'r') as f:
-        data = json.load(f)
-    
-    # Prepare training data
-    X_hand = []
-    X_valid = []
-    y = []
-    
-    for example in data:
-        # Get current hand and valid moves
-        hand = get_current_hand(example['current_trick_cards'], example['previous_tricks'])
-        valid_moves = get_valid_moves(example['current_trick_cards'], example['previous_tricks'])
+            target[idx] = 1
+            
+            X.append(sequence)
+            y.append(target)
         
-        # One-hot encode target card
-        target = np.zeros(52)
-        card = example['played_card']
-        idx = encode_card(card)
-        target[idx] = 1
+        X = np.array(X)
+        y = np.array(y)
         
-        X_hand.append(hand)
-        X_valid.append(valid_moves)
-        y.append(target)
-    
-    X_hand = np.array(X_hand)
-    X_valid = np.array(X_valid)
-    y = np.array(y)
-    
-    # Create model
-    model = build_model()
-    
-    # Create directories if they don't exist
-    os.makedirs('models', exist_ok=True)
-    os.makedirs('logs', exist_ok=True)
-    
-    # Callbacks
-    callbacks = [
-        ModelCheckpoint(
-            'models/model_epoch_{epoch:02d}.h5',
-            save_best_only=True,
-            monitor='accuracy'
-        ),
-        CSVLogger('logs/training_log.csv')
-    ]
-    
-    # Train
-    history = model.fit(
-        [X_hand, X_valid],
-        y,
-        epochs=epochs,
-        batch_size=batch_size,
-        callbacks=callbacks,
-        validation_split=0.2
-    )
-    
-    # Save final model
-    model.save('models/latest.h5')  # Using HDF5 format
-    
-    return history
-
-if __name__ == '__main__':
-    train_model('data/training_data_20250302_105143_10_games.json', epochs=10)
+        # Create directories if they don't exist
+        os.makedirs('models', exist_ok=True)
+        os.makedirs('logs', exist_ok=True)
+        
+        # Callbacks
+        callbacks = [
+            ModelCheckpoint(
+                'models/model_epoch_{epoch:02d}.keras',
+                save_best_only=True,
+                monitor='val_accuracy',
+                mode='max'
+            ),
+            EarlyStopping(
+                monitor='val_accuracy',
+                mode='max',
+                patience=patience,
+                restore_best_weights=True,
+                verbose=1
+            ),
+            CSVLogger('logs/training_log.csv'),
+            # Add TensorBoard for better progress tracking
+            tf.keras.callbacks.TensorBoard(
+                log_dir='./logs',
+                histogram_freq=1,
+                update_freq='epoch'
+            )
+        ]
+        
+        # Train with progress bar
+        history = self.model.fit(
+            X,
+            y,
+            epochs=epochs,
+            initial_epoch=initial_epoch,
+            batch_size=batch_size,
+            callbacks=callbacks,
+            validation_split=validation_split,
+            verbose=1  # Show progress bar
+        )
+        
+        # Save final model
+        self.model.save('models/latest.keras')  # Using native Keras format
+        
+        return history

@@ -1,7 +1,27 @@
 use crate::card::Card;
+use reqwest::blocking::Client;
+use serde::{Deserialize, Serialize};
 
 pub trait PlayingStrategy {
     fn choose_card(&self, hand: &[Card], valid_moves: &[Card]) -> Card;
+}
+
+#[derive(Clone)]
+pub struct AIStrategy {
+    client: Client,
+    endpoint: String,
+}
+
+#[derive(Serialize)]
+struct GameState {
+    hand: Vec<(char, u8)>,
+    valid_moves: Vec<(char, u8)>,
+}
+
+#[derive(Deserialize)]
+struct PredictResponse {
+    suit: char,
+    rank: u8,
 }
 
 #[derive(Clone)]
@@ -11,7 +31,10 @@ impl PlayingStrategy for RandomStrategy {
     fn choose_card(&self, _hand: &[Card], valid_moves: &[Card]) -> Card {
         use rand::seq::SliceRandom;
         let mut rng = rand::thread_rng();
-        valid_moves.choose(&mut rng).copied().unwrap_or(valid_moves[0])
+        valid_moves
+            .choose(&mut rng)
+            .copied()
+            .unwrap_or(valid_moves[0])
     }
 }
 
@@ -55,11 +78,52 @@ impl PlayingStrategy for AggressiveStrategy {
     }
 }
 
+impl AIStrategy {
+    pub fn new(endpoint: String) -> Self {
+        AIStrategy {
+            client: Client::new(),
+            endpoint,
+        }
+    }
+}
+
+impl PlayingStrategy for AIStrategy {
+    fn choose_card(&self, hand: &[Card], valid_moves: &[Card]) -> Card {
+        // Convert cards to the format expected by the Python service
+        let state = GameState {
+            hand: hand.iter().map(|c| (c.suit, c.rank)).collect(),
+            valid_moves: valid_moves.iter().map(|c| (c.suit, c.rank)).collect(),
+        };
+
+        // Make request to Python service
+        match self.client.post(&self.endpoint).json(&state).send() {
+            Ok(response) => {
+                if let Ok(prediction) = response.json::<PredictResponse>() {
+                    // Find the card in valid_moves that matches the prediction
+                    valid_moves
+                        .iter()
+                        .find(|c| c.suit == prediction.suit && c.rank == prediction.rank)
+                        .copied()
+                        .unwrap_or(valid_moves[0])
+                } else {
+                    // Fallback to first valid move if can't parse response
+                    valid_moves[0]
+                }
+            }
+            Err(_) => {
+                // Fallback to first valid move if request fails
+                valid_moves[0]
+            }
+        }
+    }
+}
+
 #[derive(Clone)]
 pub enum Strategy {
     Random(RandomStrategy),
     AvoidPoints(AvoidPointsStrategy),
     Aggressive(AggressiveStrategy),
+    AI(AIStrategy),
 }
 
 impl Strategy {
@@ -68,6 +132,7 @@ impl Strategy {
             Strategy::Random(s) => s.choose_card(hand, valid_moves),
             Strategy::AvoidPoints(s) => s.choose_card(hand, valid_moves),
             Strategy::Aggressive(s) => s.choose_card(hand, valid_moves),
+            Strategy::AI(s) => s.choose_card(hand, valid_moves),
         }
     }
 }

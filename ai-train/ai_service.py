@@ -1,53 +1,67 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 import tensorflow as tf
 import numpy as np
 import uvicorn
 
+from common import encode_card, encode_game_state, decode_card_token
+
 app = FastAPI()
 
-# Load the model at startup using TFSMLayer for Keras 3
-model = tf.keras.layers.TFSMLayer('models/latest', call_endpoint='serving_default')
+# Load the model at startup
+model = tf.keras.models.load_model('models/latest.keras')
+
+class TrainingTrick(BaseModel):
+    cards: List[Tuple[str, int]]  # List of (suit, rank) tuples
+    winner: int
 
 class GameState(BaseModel):
+    game_id: int
+    trick_number: int
+    previous_tricks: List[TrainingTrick]
+    current_trick_cards: List[Tuple[str, int]]  # List of (suit, rank) tuples
+    current_player_index: int
     hand: List[Tuple[str, int]]  # List of (suit, rank) tuples
     valid_moves: List[Tuple[str, int]]  # List of (suit, rank) tuples
-
-def encode_cards(cards: List[dict]) -> np.ndarray:
-    """Create one-hot encoded vector for cards"""
-    encoding = np.zeros(52)
-    for card in cards:
-        suit_map = {'H': 0, 'D': 1, 'C': 2, 'S': 3}
-        index = (card['rank'] - 2) * 4 + suit_map[card['suit']]
-        encoding[index] = 1
-    return encoding
 
 @app.post("/predict")
 async def predict(state: GameState):
     try:
         # Convert tuples to card dicts
         hand = [{'suit': suit, 'rank': rank} for suit, rank in state.hand]
-        valid_moves = [{'suit': suit, 'rank': rank} for suit, rank in state.valid_moves]
+        current_trick = [({"suit": suit, "rank": rank}, idx) for idx, (suit, rank) in enumerate(state.current_trick_cards)]
+        previous_tricks = [
+            {
+                "cards": [({"suit": suit, "rank": rank}, idx) for idx, (suit, rank) in enumerate(trick.cards)],
+                "winner": trick.winner
+            }
+            for trick in state.previous_tricks
+        ]
         
-        # Encode cards using same logic as training
-        hand_encoded = encode_cards(hand)
-        valid_moves_encoded = encode_cards(valid_moves)
+        # Encode game state as sequence
+        sequence = encode_game_state(
+            trick_number=state.trick_number,
+            current_player_index=state.current_player_index,
+            previous_tricks=previous_tricks,
+            current_trick_cards=current_trick,
+            hand=hand
+        )
         
-        # Get model prediction using the layer's call method
-        inputs = {
-            'hand_input': hand_encoded.reshape(1, -1),
-            'valid_moves_input': valid_moves_encoded.reshape(1, -1)
-        }
-        prediction = model(inputs)['predictions']
+        # Get model prediction
+        prediction = model.predict(
+            sequence.reshape(1, -1),
+            verbose=0
+        )
         
-        # Find the valid move with highest prediction score
+        # Find the valid move with highest prediction score among valid moves
         best_move_idx = 0
         best_score = float('-inf')
         
-        for i, move in enumerate(valid_moves):
-            suit_map = {'H': 0, 'D': 1, 'C': 2, 'S': 3}
-            card_idx = (move['rank'] - 2) * 4 + suit_map[move['suit']]
+        for i, move in enumerate(state.valid_moves):
+            suit, rank = move
+            card = {'suit': suit, 'rank': rank}
+            card_idx = encode_card(card)
             score = prediction[0][card_idx]
             if score > best_score:
                 best_score = score
