@@ -1,150 +1,148 @@
 import os
-import json
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.layers import Embedding, Input, Dense, LayerNormalization, Dropout, LSTM
+from tensorflow.keras.layers import Input, Dense, Concatenate
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, CSVLogger
-from typing import List, Tuple, Dict
+import json
 
-class HeartsModel:
-    def __init__(self, max_seq_length: int = 128, embedding_dim: int = 128):
-        self.max_seq_length = max_seq_length
-        self.embedding_dim = embedding_dim
-        self.model = None
-        self.checkpoint_dir = "checkpoints"
-        self.logs_dir = "logs"
-        
-        # Create directories if they don't exist
-        os.makedirs(self.checkpoint_dir, exist_ok=True)
-        os.makedirs(self.logs_dir, exist_ok=True)
-        
-        # Game tokens mapping
-        self.game_tokens = self._create_game_tokens()
-        
-    def _create_game_tokens(self) -> Dict[str, int]:
-        """Create mapping for game tokens (cards, suits, etc.)"""
-        tokens = {}
-        # Card tokens (RANK_X_SUIT_Y)
-        for rank in range(2, 15):  # 2-14 (Ace is 14)
-            for suit in ['H', 'D', 'C', 'S']:
-                tokens[f"RANK_{rank}_SUIT_{suit}"] = len(tokens)
-        # Special tokens
-        special_tokens = ['PAD', 'START', 'END', 'TRICK_START', 'TRICK_END']
-        for token in special_tokens:
-            tokens[token] = len(tokens)
-        return tokens
+def encode_card(card):
+    """Create one-hot encoded vector for a single card"""
+    suit_map = {'H': 0, 'D': 1, 'C': 2, 'S': 3}
+    idx = (card['rank'] - 2) * 4 + suit_map[card['suit']]
+    return idx
+
+def get_valid_moves(current_trick_cards, previous_tricks):
+    """Get a list of all cards that have been played"""
+    played_cards = set()
     
-    def build_model(self):
-        """Build the model architecture"""
-        input_ids = Input(shape=(self.max_seq_length,), dtype=tf.int32, name="input_ids")
-        
-        # Embedding layer
-        embedding_layer = Embedding(
-            input_dim=len(self.game_tokens),
-            output_dim=self.embedding_dim,
-            mask_zero=True
-        )(input_ids)
-        
-        # LSTM layers
-        x = LSTM(256, return_sequences=True, use_cudnn=False)(embedding_layer)
-        x = LSTM(128, use_cudnn=False)(x)
-        
-        # Dense layers
-        x = LayerNormalization()(x)
-        x = Dense(256, activation="relu")(x)
-        x = Dropout(0.1)(x)
-        x = Dense(128, activation="relu")(x)
-        
-        # Output layer (52 cards - 13 ranks * 4 suits)
-        output_layer = Dense(52, activation="softmax", name="card_prediction")(x)
-        
-        # Create model
-        self.model = Model(inputs=input_ids, outputs=output_layer)
-        
-        # Compile model
-        self.model.compile(
-            optimizer="adam",
-            loss="categorical_crossentropy",
-            metrics=["accuracy"]
-        )
-        
-        return self.model
+    # Add cards from current trick
+    for card, _ in current_trick_cards:
+        played_cards.add((card['suit'], card['rank']))
     
-    def load_latest_checkpoint(self) -> Tuple[int, int]:
-        """Load the latest checkpoint if it exists"""
-        checkpoints = sorted([
-            f for f in os.listdir(self.checkpoint_dir)
-            if f.startswith("model_epoch")
-        ])
-        
-        if not checkpoints:
-            return 0, 0
-        
-        latest_checkpoint = checkpoints[-1]
-        epoch = int(latest_checkpoint.split("_")[2])
-        step = int(latest_checkpoint.split("_")[4].split(".")[0])
-        
-        self.model.load_weights(os.path.join(self.checkpoint_dir, latest_checkpoint))
-        print(f"Loaded checkpoint from epoch {epoch}, step {step}")
-        
-        return epoch, step
+    # Add cards from previous tricks
+    for trick in previous_tricks:
+        for card, _ in trick['cards']:
+            played_cards.add((card['suit'], card['rank']))
     
-    def train(self, 
-              train_data_path: str,
-              epochs: int = 100,
-              batch_size: int = 32,
-              validation_split: float = 0.2,
-              initial_epoch: int = 0):
-        """Train the model with checkpointing"""
-        from data_processor import process_game_data
-        
-        # Process training data
-        X_train, y_train, X_val, y_val = process_game_data(
-            train_data_path,
-            self.game_tokens,
-            self.max_seq_length,
-            test_size=validation_split
-        )
-        
-        # Callbacks for saving progress
-        callbacks = [
-            ModelCheckpoint(
-                filepath=os.path.join(
-                    self.checkpoint_dir,
-                    "model_epoch_{epoch:02d}.weights.h5"
-                ),
-                save_weights_only=True,
-                save_best_only=True,
-                monitor="val_accuracy"
-            ),
-            CSVLogger(
-                os.path.join(self.logs_dir, "training_log.csv"),
-                append=True
-            )
-        ]
-        
-        # Train the model
-        history = self.model.fit(
-            X_train,
-            y_train,
-            validation_data=(X_val, y_val),
-            epochs=epochs,
-            batch_size=batch_size,
-            callbacks=callbacks,
-            initial_epoch=initial_epoch
-        )
-        
-        return history
+    # Create valid moves mask (1 for unplayed cards)
+    valid_moves = np.ones(52)
+    for suit, rank in played_cards:
+        idx = (rank - 2) * 4 + {'H': 0, 'D': 1, 'C': 2, 'S': 3}[suit]
+        valid_moves[idx] = 0
     
-    def predict_move(self, game_state: Dict) -> np.ndarray:
-        """Predict the next move given a game state"""
-        from data_processor import process_game_state
+    return valid_moves
+
+def get_current_hand(current_trick_cards, previous_tricks):
+    """Get the current hand based on unplayed cards"""
+    # Start with all cards unplayed
+    hand = np.ones(52)
+    
+    # Mark played cards as 0
+    for card, _ in current_trick_cards:
+        idx = encode_card(card)
+        hand[idx] = 0
+    
+    for trick in previous_tricks:
+        for card, _ in trick['cards']:
+            idx = encode_card(card)
+            hand[idx] = 0
+    
+    return hand
+
+def build_model():
+    """Build the model architecture"""
+    # Input layers
+    hand_input = Input(shape=(52,), name='hand_input')
+    valid_moves_input = Input(shape=(52,), name='valid_moves_input')
+    
+    # Combine inputs
+    combined = Concatenate()([hand_input, valid_moves_input])
+    
+    # Dense layers
+    x = Dense(256, activation='relu')(combined)
+    x = Dense(128, activation='relu')(x)
+    x = Dense(64, activation='relu')(x)
+    
+    # Output layer (52 cards)
+    predictions = Dense(52, activation='softmax', name='predictions')(x)
+    
+    # Create model
+    model = Model(
+        inputs=[hand_input, valid_moves_input],
+        outputs=predictions
+    )
+    
+    # Compile model
+    model.compile(
+        optimizer='adam',
+        loss='categorical_crossentropy',
+        metrics=['accuracy']
+    )
+    
+    return model
+
+def train_model(data_path: str, epochs: int = 100, batch_size: int = 32):
+    """Train the model"""
+    # Load training data
+    with open(data_path, 'r') as f:
+        data = json.load(f)
+    
+    # Prepare training data
+    X_hand = []
+    X_valid = []
+    y = []
+    
+    for example in data:
+        # Get current hand and valid moves
+        hand = get_current_hand(example['current_trick_cards'], example['previous_tricks'])
+        valid_moves = get_valid_moves(example['current_trick_cards'], example['previous_tricks'])
         
-        # Process the game state
-        X = process_game_state(game_state, self.game_tokens, self.max_seq_length)
-        X = np.expand_dims(X, axis=0)  # Add batch dimension
+        # One-hot encode target card
+        target = np.zeros(52)
+        card = example['played_card']
+        idx = encode_card(card)
+        target[idx] = 1
         
-        # Get predictions
-        predictions = self.model.predict(X)
-        return predictions[0]  # Remove batch dimension
+        X_hand.append(hand)
+        X_valid.append(valid_moves)
+        y.append(target)
+    
+    X_hand = np.array(X_hand)
+    X_valid = np.array(X_valid)
+    y = np.array(y)
+    
+    # Create model
+    model = build_model()
+    
+    # Create directories if they don't exist
+    os.makedirs('models', exist_ok=True)
+    os.makedirs('logs', exist_ok=True)
+    
+    # Callbacks
+    callbacks = [
+        ModelCheckpoint(
+            'models/model_epoch_{epoch:02d}.h5',
+            save_best_only=True,
+            monitor='accuracy'
+        ),
+        CSVLogger('logs/training_log.csv')
+    ]
+    
+    # Train
+    history = model.fit(
+        [X_hand, X_valid],
+        y,
+        epochs=epochs,
+        batch_size=batch_size,
+        callbacks=callbacks,
+        validation_split=0.2
+    )
+    
+    # Save final model
+    model.save('models/latest.h5')  # Using HDF5 format
+    
+    return history
+
+if __name__ == '__main__':
+    train_model('data/training_data_20250302_105143_10_games.json', epochs=10)
