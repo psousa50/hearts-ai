@@ -110,17 +110,18 @@ class GameVisualizer:
                 if rect.collidepoint(pos):
                     try:
                         played_card = self.game.play_card(0, card)
-                        sprite = CardSprite(played_card)
-                        sprite.current_pos = (x + CARD_WIDTH//2, start_y + CARD_HEIGHT//2)
-                        sprite.target_pos = self.get_trick_position(len(self.game.current_trick) - 1, current_player=0)
-                        sprite.moving = True
-                        self.cards_in_play.append(sprite)
-                        self.last_auto_play = pygame.time.get_ticks()
-                        
-                        # Update AI state with played card
-                        for _, strategy in self.game.players:
-                            if isinstance(strategy, AIStrategy):
-                                strategy.current_trick_cards = [(c.suit, c.rank) for c, _ in self.game.current_trick]
+                        if played_card is not None:
+                            sprite = CardSprite(played_card)
+                            sprite.current_pos = (x + CARD_WIDTH//2, start_y + CARD_HEIGHT//2)
+                            sprite.target_pos = self.get_trick_position(len(self.game.current_trick) - 1, current_player=0)
+                            sprite.moving = True
+                            self.cards_in_play.append(sprite)
+                            self.last_auto_play = pygame.time.get_ticks()
+                            
+                            # Update AI state with played card
+                            for _, strategy in self.game.players:
+                                if isinstance(strategy, AIStrategy):
+                                    strategy.current_trick_cards = [(c.suit, c.rank) for c, _ in self.game.current_trick]
                         break
                     except ValueError:
                         # Invalid move, ignore

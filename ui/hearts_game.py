@@ -70,7 +70,7 @@ class AIStrategy(Strategy):
                     return card
 
             return valid_moves[0]
-            
+
         except Exception as e:
             print(f"AI service unavailable, using fallback strategy: {e}")
             raise
@@ -169,7 +169,7 @@ class HeartsGame:
         else:
             # Validate the chosen card
             if card not in valid_moves:
-                raise ValueError("Invalid card played")
+                return None
         
         # Remove the card from hand
         self.hands[player_idx].remove(card)
