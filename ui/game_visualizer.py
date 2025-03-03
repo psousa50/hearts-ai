@@ -176,7 +176,7 @@ class GameVisualizer:
         print("trick completed", self.trick_completed)
         print("auto play", self.auto_play)
         print("replay mode", self.replay_mode)
-        if not self.replay_mode:
+        if not self.replay_mode or True:
             current_time = pygame.time.get_ticks()
             
             # Don't update if paused

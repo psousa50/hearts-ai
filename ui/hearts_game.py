@@ -202,11 +202,11 @@ class HeartsGame:
         
         # Determine winning card
         lead_suit = self.current_trick[0][0].suit
-        winning_card = max(
-            (card for card, _ in self.current_trick if card.suit == lead_suit),
-            key=lambda card: card.rank
-        )
-        winner_idx = next(i for i, (card, _) in enumerate(self.current_trick) if card == winning_card)
+        # First check if any cards followed suit
+        followed_suit_cards = [(card, player) for card, player in self.current_trick if card.suit == lead_suit]
+        # If no one followed suit, consider all cards
+        cards_to_compare = followed_suit_cards if followed_suit_cards else self.current_trick
+        winning_card, winner_idx = max(cards_to_compare, key=lambda x: x[0].rank)
         
         # Calculate points
         points = sum(1 for card, _ in self.current_trick if card.suit == 'H')
