@@ -68,9 +68,12 @@ class AIStrategy(Strategy):
             for card in valid_moves:
                 if card.suit == prediction["suit"] and card.rank == prediction["rank"]:
                     return card
+
+            return valid_moves[0]
             
         except Exception as e:
             print(f"AI service unavailable, using fallback strategy: {e}")
+            raise
         
         # Fallback to AvoidPoints strategy
         return self.fallback.choose_card(hand, valid_moves)

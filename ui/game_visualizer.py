@@ -2,11 +2,9 @@ import pygame
 import json
 import sys
 import os
-import io
-from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 from hearts_game import HeartsGame, Card, RandomStrategy, AvoidPointsStrategy, AggressiveStrategy, AIStrategy
-from cairosvg import svg2png
+from card_sprite import CardSprite, CARD_WIDTH, CARD_HEIGHT
 
 # Initialize Pygame
 pygame.init()
@@ -14,10 +12,7 @@ pygame.init()
 # Constants
 WINDOW_WIDTH = 1024
 WINDOW_HEIGHT = 768
-CARD_WIDTH = 71
-CARD_HEIGHT = 96
 FPS = 60
-ANIMATION_SPEED = 20
 AUTO_PLAY_DELAY = 500  # milliseconds
 
 # Colors
@@ -27,69 +22,6 @@ BLACK = (0, 0, 0)
 DARK_GREEN = (0, 100, 0)
 RED = (255, 0, 0)
 
-class CardSprite:
-    # Class-level cache for card images
-    image_cache = {}
-
-    def __init__(self, card: Card):
-        self.card = card
-        self.image = None
-        self.rect = None
-        self.target_pos = None
-        self.current_pos = None
-        self.moving = False
-        self.load_image()
-
-    def load_image(self):
-        # Use numeric rank for all cards (no conversion needed)
-        card_key = f"{self.card.rank}{self.card.suit}"
-        
-        # Check if image is already in cache
-        if card_key in CardSprite.image_cache:
-            self.image = CardSprite.image_cache[card_key]
-        else:
-            # Load SVG card image from assets folder using numeric format
-            image_path = Path(__file__).parent / 'assets' / 'cards' / f'{card_key}.svg'
-            if not image_path.exists():
-                # Create a default card representation if image doesn't exist
-                surf = pygame.Surface((CARD_WIDTH, CARD_HEIGHT))
-                surf.fill(WHITE)
-                pygame.draw.rect(surf, BLACK, (0, 0, CARD_WIDTH, CARD_HEIGHT), 2)
-                font = pygame.font.Font(None, 36)
-                text = font.render(card_key, True, BLACK)
-                surf.blit(text, (10, 30))
-                self.image = surf
-            else:
-                # Convert SVG to PNG in memory
-                png_data = svg2png(url=str(image_path), output_width=CARD_WIDTH, output_height=CARD_HEIGHT)
-                # Load PNG data into pygame surface
-                png_file = io.BytesIO(png_data)
-                self.image = pygame.image.load(png_file)
-            
-            # Cache the loaded image
-            CardSprite.image_cache[card_key] = self.image
-        
-        self.rect = self.image.get_rect()
-
-    def move_towards_target(self):
-        if not self.moving or not self.target_pos:
-            return
-        
-        dx = self.target_pos[0] - self.current_pos[0]
-        dy = self.target_pos[1] - self.current_pos[1]
-        distance = (dx ** 2 + dy ** 2) ** 0.5
-        
-        if distance < ANIMATION_SPEED:
-            self.current_pos = self.target_pos
-            self.moving = False
-            return
-        
-        move_x = (dx / distance) * ANIMATION_SPEED
-        move_y = (dy / distance) * ANIMATION_SPEED
-        
-        self.current_pos = (self.current_pos[0] + move_x, self.current_pos[1] + move_y)
-        self.rect.center = self.current_pos
-
 class GameVisualizer:
     def __init__(self, game_file: Optional[str] = None):
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -98,14 +30,14 @@ class GameVisualizer:
         
         # Player positions (center points for names and scores)
         self.player_positions = {
-            0: (WINDOW_WIDTH // 2, WINDOW_HEIGHT - 50),   # Bottom (moved up a bit)
+            0: (WINDOW_WIDTH // 2, WINDOW_HEIGHT - 50),   # Bottom
             1: (200, WINDOW_HEIGHT // 2),                 # Left
             2: (WINDOW_WIDTH // 2, 30),                   # Top
             3: (WINDOW_WIDTH - 200, WINDOW_HEIGHT // 2)   # Right
         }
         
-        # Hand display positions and offsets (reduced spacing between cards)
-        card_overlap = 20  # Only show 20 pixels of each card except the last
+        # Hand display positions and offsets
+        card_overlap = 30
         self.hand_positions = {
             0: {"start": (WINDOW_WIDTH // 4, WINDOW_HEIGHT - 200),  # Bottom
                 "offset": (card_overlap, 0)},
