@@ -32,7 +32,7 @@ class HeartsModel:
     def __init__(self):
         self.model = None
 
-    def build_model(self, vocab_size=73, embedding_dim=64, sequence_length=84):
+    def build_model(self):
         """Build the model architecture
         
         vocab_size: Number of unique tokens
@@ -48,6 +48,11 @@ class HeartsModel:
             - 13 tokens for hand
             Total: 84 tokens
         """
+
+        vocab_size=73
+        embedding_dim=64
+        sequence_length=84
+
         # Input layer for sequence
         sequence_input = Input(shape=(sequence_length,), name='sequence_input')
         
