@@ -11,10 +11,9 @@ def encode_game_state(
     trick_number: int,
     current_player_index: int,
     previous_tricks: List[Dict[str, Any]],
-    current_trick_cards: List[Tuple[Dict[str, Any], int]],
     hand: List[Dict[str, Any]],
+    current_trick_cards: List[Tuple[Dict[str, Any], int]],
     max_tricks: int = 13,
-    num_players: int = 4
 ) -> np.ndarray:
     """
     Encode game state as a sequence of tokens:

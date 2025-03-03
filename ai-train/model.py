@@ -192,8 +192,8 @@ class HeartsModel:
                 trick_number=example['trick_number'],
                 current_player_index=example['current_player_index'],
                 previous_tricks=example['previous_tricks'],
+                hand=example['player_hand'],
                 current_trick_cards=example['current_trick_cards'],
-                hand=example['player_hand']
             )
             
             # One-hot encode target card

@@ -58,8 +58,8 @@ async def predict(state: GameState):
             trick_number=state.trick_number,
             current_player_index=state.current_player_index,
             previous_tricks=previous_tricks,
+            hand=hand,
             current_trick_cards=current_trick,
-            hand=hand
         )
         
         # Get model prediction
