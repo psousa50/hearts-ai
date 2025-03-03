@@ -117,10 +117,6 @@ class GameVisualizer:
                         self.cards_in_play.append(sprite)
                         self.last_auto_play = pygame.time.get_ticks()
                         
-                        # Check if trick is complete after human plays
-                        if not any(card.moving for card in self.cards_in_play):
-                            self.check_and_complete_trick()
-                        
                         # Update AI state with played card
                         for _, strategy in self.game.players:
                             if isinstance(strategy, AIStrategy):
@@ -172,10 +168,6 @@ class GameVisualizer:
         return True
 
     def update(self):
-        print("pausing", self.paused)
-        print("trick completed", self.trick_completed)
-        print("auto play", self.auto_play)
-        print("replay mode", self.replay_mode)
         if not self.replay_mode or True:
             current_time = pygame.time.get_ticks()
             
@@ -189,9 +181,10 @@ class GameVisualizer:
                     # Wait for any card animations to finish before checking trick completion
                     if any(card.moving for card in self.cards_in_play):
                         return
-                        
+
+                    trick_completed = self.check_and_complete_trick()
                     # Check if trick is complete
-                    if self.check_and_complete_trick():
+                    if trick_completed:
                         return
                     
                     # If this is the start of a new trick, clear any remaining cards
@@ -208,10 +201,6 @@ class GameVisualizer:
                     sprite.target_pos = self.get_trick_position(len(self.game.current_trick) - 1, current_player=current_player)
                     sprite.moving = True
                     self.cards_in_play.append(sprite)
-                    
-                    # Check if trick is complete after AI plays
-                    if not any(card.moving for card in self.cards_in_play):
-                        self.check_and_complete_trick()
                     
                     # Update AI state with played card
                     for _, strategy in self.game.players:
@@ -286,7 +275,7 @@ class GameVisualizer:
             # Highlight valid moves for human player
             if highlight_valid and card in valid_moves:
                 pygame.draw.rect(self.screen, (255, 255, 0), 
-                               (x-2, y-2, CARD_WIDTH+4, CARD_HEIGHT+4))
+                               (x-3, y-3, CARD_WIDTH+6, CARD_HEIGHT+6))
             
             self.screen.blit(sprite.image, (x, y))
 
@@ -419,6 +408,22 @@ class GameVisualizer:
         for i, control in enumerate(controls):
             control_text = small_font.render(control, True, WHITE)
             self.screen.blit(control_text, (10, WINDOW_HEIGHT - 20 * (len(controls) - i)))
+        
+        # Draw debug info in bottom right corner
+        debug_font = pygame.font.Font(None, 16)  # Smaller font for debug info
+        debug_info = [
+            f"Paused: {self.paused}",
+            f"Trick Completed: {self.trick_completed}",
+            f"Auto Play: {self.auto_play}",
+            f"Replay Mode: {self.replay_mode}"
+        ]
+        
+        for i, info in enumerate(debug_info):
+            debug_text = debug_font.render(info, True, WHITE)
+            debug_rect = debug_text.get_rect()
+            debug_rect.right = WINDOW_WIDTH - 10
+            debug_rect.bottom = WINDOW_HEIGHT - (len(debug_info) - 1 - i) * 15
+            self.screen.blit(debug_text, debug_rect)
         
         pygame.display.flip()
 

@@ -22,6 +22,9 @@ class CardSprite:
         self.moving = False
         self.load_image()
 
+    def __str__(self):
+        return f"{self.card}"
+
     def load_image(self):
         # Use numeric rank for all cards (no conversion needed)
         card_key = f"{self.card.rank}{self.card.suit}"

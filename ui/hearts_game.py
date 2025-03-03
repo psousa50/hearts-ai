@@ -189,10 +189,6 @@ class HeartsGame:
         # Move to next player
         self.current_player = (player_idx + 1) % 4
         
-        # If trick is complete, determine winner
-        if len(self.current_trick) == 4:
-            self.complete_trick()
-            
         return card
 
     def complete_trick(self):
