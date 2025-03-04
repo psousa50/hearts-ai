@@ -19,20 +19,21 @@ logger.info("Starting AI service...")
 # Load the model at startup
 logger.info("Loading model...")
 model = tf.keras.models.load_model('models/latest.keras')
+model.summary()
 logger.info("Model loaded successfully")
 
 class TrainingTrick(BaseModel):
-    cards: List[Tuple[str, int]]  # List of (suit, rank) tuples
+    cards: List[Tuple[str, int]]
     winner: int
 
 class GameState(BaseModel):
     game_id: int
     trick_number: int
     previous_tricks: List[TrainingTrick]
-    current_trick_cards: List[Tuple[str, int]]  # List of (suit, rank) tuples
+    current_trick_cards: List[Tuple[str, int]]
     current_player_index: int
-    hand: List[Tuple[str, int]]  # List of (suit, rank) tuples
-    valid_moves: List[Tuple[str, int]]  # List of (suit, rank) tuples
+    hand: List[Tuple[str, int]]
+    valid_moves: List[Tuple[str, int]]
 
 @app.post("/predict")
 async def predict(state: GameState):
@@ -67,6 +68,8 @@ async def predict(state: GameState):
             sequence.reshape(1, -1),
             verbose=0
         )
+
+        print("Raw prediction:", prediction)
         
         # Find the valid move with highest prediction score among valid moves
         best_move_idx = 0
@@ -75,15 +78,20 @@ async def predict(state: GameState):
         for i, move in enumerate(state.valid_moves):
             suit, rank = move
             card = {'suit': suit, 'rank': rank}
-            card_idx = encode_card(card)
+            # Use raw card index (0-51) instead of token (17-68)
+            card_idx = encode_card(card)  # This gives us 0-51 index
             score = prediction[0][card_idx]
             if score > best_score:
                 best_score = score
                 best_move_idx = i
+
+        print("Best card index:", card_idx)
+        print("Best score:", best_score)
         
         chosen_move = state.valid_moves[best_move_idx]
         logger.info(f"Chosen move: {chosen_move}")
         logger.info("=" * 50)
+        print("chosen move:", chosen_move)
         return {"suit": chosen_move[0], "rank": chosen_move[1]}
     
     except Exception as e:
