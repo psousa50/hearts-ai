@@ -1,5 +1,7 @@
 use chrono::Utc;
-use hearts_game::{AggressiveStrategy, AvoidPointsStrategy, HeartsGame, RandomStrategy, Strategy, AIStrategy};
+use hearts_game::{
+    AIStrategy, AggressiveStrategy, AvoidPointsStrategy, HeartsGame, RandomStrategy, Strategy,
+};
 use serde_json;
 use std::fs::{self, File};
 use std::io::BufWriter;
@@ -21,7 +23,7 @@ pub fn generate_games(num_games: usize) {
     ];
 
     for game_id in 0..num_games {
-        let mut game = HeartsGame::new_with_strategies(&player_configs, game_id);
+        let mut game = HeartsGame::new(&player_configs, game_id);
         let result = game.play_game();
         results.push(result);
     }

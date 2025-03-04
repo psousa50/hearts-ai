@@ -1,0 +1,6607 @@
+[
+    {
+        "game_id": 0,
+        "trick_number": 0,
+        "previous_tricks": [],
+        "current_trick_cards": [],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 4
+            },
+            {
+                "suit": "C",
+                "rank": 7
+            },
+            {
+                "suit": "C",
+                "rank": 9
+            },
+            {
+                "suit": "C",
+                "rank": 13
+            },
+            {
+                "suit": "D",
+                "rank": 2
+            },
+            {
+                "suit": "D",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 4
+            },
+            {
+                "suit": "D",
+                "rank": 8
+            },
+            {
+                "suit": "D",
+                "rank": 10
+            },
+            {
+                "suit": "S",
+                "rank": 2
+            },
+            {
+                "suit": "S",
+                "rank": 4
+            },
+            {
+                "suit": "S",
+                "rank": 5
+            },
+            {
+                "suit": "C",
+                "rank": 2
+            }
+        ],
+        "played_card": {
+            "suit": "C",
+            "rank": 2
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 0,
+        "previous_tricks": [],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "C",
+                    "rank": 2
+                },
+                "player_index": 1
+            },
+            {
+                "card": {
+                    "suit": "C",
+                    "rank": 5
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "C",
+                    "rank": 12
+                },
+                "player_index": 3
+            }
+        ],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 5
+            },
+            {
+                "suit": "D",
+                "rank": 9
+            },
+            {
+                "suit": "H",
+                "rank": 3
+            },
+            {
+                "suit": "H",
+                "rank": 7
+            },
+            {
+                "suit": "H",
+                "rank": 8
+            },
+            {
+                "suit": "H",
+                "rank": 10
+            },
+            {
+                "suit": "H",
+                "rank": 11
+            },
+            {
+                "suit": "H",
+                "rank": 13
+            },
+            {
+                "suit": "H",
+                "rank": 14
+            },
+            {
+                "suit": "S",
+                "rank": 6
+            },
+            {
+                "suit": "S",
+                "rank": 14
+            },
+            {
+                "suit": "C",
+                "rank": 8
+            }
+        ],
+        "played_card": {
+            "suit": "C",
+            "rank": 8
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 1,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "D",
+                    "rank": 12
+                },
+                "player_index": 3
+            }
+        ],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 5
+            },
+            {
+                "suit": "H",
+                "rank": 3
+            },
+            {
+                "suit": "H",
+                "rank": 7
+            },
+            {
+                "suit": "H",
+                "rank": 8
+            },
+            {
+                "suit": "H",
+                "rank": 10
+            },
+            {
+                "suit": "H",
+                "rank": 11
+            },
+            {
+                "suit": "H",
+                "rank": 13
+            },
+            {
+                "suit": "H",
+                "rank": 14
+            },
+            {
+                "suit": "S",
+                "rank": 6
+            },
+            {
+                "suit": "S",
+                "rank": 14
+            },
+            {
+                "suit": "D",
+                "rank": 9
+            }
+        ],
+        "played_card": {
+            "suit": "D",
+            "rank": 9
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 1,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "D",
+                    "rank": 12
+                },
+                "player_index": 3
+            },
+            {
+                "card": {
+                    "suit": "D",
+                    "rank": 9
+                },
+                "player_index": 0
+            }
+        ],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 4
+            },
+            {
+                "suit": "C",
+                "rank": 7
+            },
+            {
+                "suit": "C",
+                "rank": 9
+            },
+            {
+                "suit": "C",
+                "rank": 13
+            },
+            {
+                "suit": "D",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 4
+            },
+            {
+                "suit": "D",
+                "rank": 8
+            },
+            {
+                "suit": "D",
+                "rank": 10
+            },
+            {
+                "suit": "S",
+                "rank": 2
+            },
+            {
+                "suit": "S",
+                "rank": 4
+            },
+            {
+                "suit": "S",
+                "rank": 5
+            },
+            {
+                "suit": "D",
+                "rank": 2
+            }
+        ],
+        "played_card": {
+            "suit": "D",
+            "rank": 2
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 2,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "S",
+                    "rank": 11
+                },
+                "player_index": 3
+            }
+        ],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 5
+            },
+            {
+                "suit": "H",
+                "rank": 3
+            },
+            {
+                "suit": "H",
+                "rank": 7
+            },
+            {
+                "suit": "H",
+                "rank": 8
+            },
+            {
+                "suit": "H",
+                "rank": 10
+            },
+            {
+                "suit": "H",
+                "rank": 11
+            },
+            {
+                "suit": "H",
+                "rank": 13
+            },
+            {
+                "suit": "H",
+                "rank": 14
+            },
+            {
+                "suit": "S",
+                "rank": 14
+            },
+            {
+                "suit": "S",
+                "rank": 6
+            }
+        ],
+        "played_card": {
+            "suit": "S",
+            "rank": 6
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 2,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "S",
+                    "rank": 11
+                },
+                "player_index": 3
+            },
+            {
+                "card": {
+                    "suit": "S",
+                    "rank": 6
+                },
+                "player_index": 0
+            }
+        ],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 4
+            },
+            {
+                "suit": "C",
+                "rank": 7
+            },
+            {
+                "suit": "C",
+                "rank": 9
+            },
+            {
+                "suit": "C",
+                "rank": 13
+            },
+            {
+                "suit": "D",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 4
+            },
+            {
+                "suit": "D",
+                "rank": 8
+            },
+            {
+                "suit": "D",
+                "rank": 10
+            },
+            {
+                "suit": "S",
+                "rank": 2
+            },
+            {
+                "suit": "S",
+                "rank": 4
+            },
+            {
+                "suit": "S",
+                "rank": 5
+            }
+        ],
+        "played_card": {
+            "suit": "S",
+            "rank": 5
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 3,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "D",
+                    "rank": 11
+                },
+                "player_index": 3
+            }
+        ],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 3
+            },
+            {
+                "suit": "H",
+                "rank": 3
+            },
+            {
+                "suit": "H",
+                "rank": 7
+            },
+            {
+                "suit": "H",
+                "rank": 8
+            },
+            {
+                "suit": "H",
+                "rank": 10
+            },
+            {
+                "suit": "H",
+                "rank": 11
+            },
+            {
+                "suit": "H",
+                "rank": 13
+            },
+            {
+                "suit": "H",
+                "rank": 14
+            },
+            {
+                "suit": "S",
+                "rank": 14
+            },
+            {
+                "suit": "D",
+                "rank": 5
+            }
+        ],
+        "played_card": {
+            "suit": "D",
+            "rank": 5
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 3,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "D",
+                    "rank": 11
+                },
+                "player_index": 3
+            },
+            {
+                "card": {
+                    "suit": "D",
+                    "rank": 5
+                },
+                "player_index": 0
+            }
+        ],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 4
+            },
+            {
+                "suit": "C",
+                "rank": 7
+            },
+            {
+                "suit": "C",
+                "rank": 9
+            },
+            {
+                "suit": "C",
+                "rank": 13
+            },
+            {
+                "suit": "D",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 4
+            },
+            {
+                "suit": "D",
+                "rank": 8
+            },
+            {
+                "suit": "S",
+                "rank": 2
+            },
+            {
+                "suit": "S",
+                "rank": 4
+            },
+            {
+                "suit": "D",
+                "rank": 10
+            }
+        ],
+        "played_card": {
+            "suit": "D",
+            "rank": 10
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 4,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "S",
+                    "rank": 7
+                },
+                "player_index": 3
+            }
+        ],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 3
+            },
+            {
+                "suit": "H",
+                "rank": 3
+            },
+            {
+                "suit": "H",
+                "rank": 7
+            },
+            {
+                "suit": "H",
+                "rank": 8
+            },
+            {
+                "suit": "H",
+                "rank": 10
+            },
+            {
+                "suit": "H",
+                "rank": 11
+            },
+            {
+                "suit": "H",
+                "rank": 13
+            },
+            {
+                "suit": "H",
+                "rank": 14
+            },
+            {
+                "suit": "S",
+                "rank": 14
+            }
+        ],
+        "played_card": {
+            "suit": "S",
+            "rank": 14
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 4,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "S",
+                    "rank": 7
+                },
+                "player_index": 3
+            },
+            {
+                "card": {
+                    "suit": "S",
+                    "rank": 14
+                },
+                "player_index": 0
+            }
+        ],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 4
+            },
+            {
+                "suit": "C",
+                "rank": 7
+            },
+            {
+                "suit": "C",
+                "rank": 9
+            },
+            {
+                "suit": "C",
+                "rank": 13
+            },
+            {
+                "suit": "D",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 4
+            },
+            {
+                "suit": "D",
+                "rank": 8
+            },
+            {
+                "suit": "S",
+                "rank": 4
+            },
+            {
+                "suit": "S",
+                "rank": 2
+            }
+        ],
+        "played_card": {
+            "suit": "S",
+            "rank": 2
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 5,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            }
+        ],
+        "current_trick_cards": [],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "H",
+                "rank": 3
+            },
+            {
+                "suit": "H",
+                "rank": 7
+            },
+            {
+                "suit": "H",
+                "rank": 8
+            },
+            {
+                "suit": "H",
+                "rank": 10
+            },
+            {
+                "suit": "H",
+                "rank": 11
+            },
+            {
+                "suit": "H",
+                "rank": 13
+            },
+            {
+                "suit": "H",
+                "rank": 14
+            },
+            {
+                "suit": "C",
+                "rank": 3
+            }
+        ],
+        "played_card": {
+            "suit": "C",
+            "rank": 3
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 5,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "C",
+                    "rank": 3
+                },
+                "player_index": 0
+            }
+        ],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 7
+            },
+            {
+                "suit": "C",
+                "rank": 9
+            },
+            {
+                "suit": "C",
+                "rank": 13
+            },
+            {
+                "suit": "D",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 4
+            },
+            {
+                "suit": "D",
+                "rank": 8
+            },
+            {
+                "suit": "S",
+                "rank": 4
+            },
+            {
+                "suit": "C",
+                "rank": 4
+            }
+        ],
+        "played_card": {
+            "suit": "C",
+            "rank": 4
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 6,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "S",
+                    "rank": 10
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "S",
+                    "rank": 12
+                },
+                "player_index": 3
+            }
+        ],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "H",
+                "rank": 3
+            },
+            {
+                "suit": "H",
+                "rank": 7
+            },
+            {
+                "suit": "H",
+                "rank": 10
+            },
+            {
+                "suit": "H",
+                "rank": 11
+            },
+            {
+                "suit": "H",
+                "rank": 13
+            },
+            {
+                "suit": "H",
+                "rank": 14
+            },
+            {
+                "suit": "H",
+                "rank": 8
+            }
+        ],
+        "played_card": {
+            "suit": "H",
+            "rank": 8
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 6,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "S",
+                    "rank": 10
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "S",
+                    "rank": 12
+                },
+                "player_index": 3
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 8
+                },
+                "player_index": 0
+            }
+        ],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 7
+            },
+            {
+                "suit": "C",
+                "rank": 9
+            },
+            {
+                "suit": "C",
+                "rank": 13
+            },
+            {
+                "suit": "D",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 4
+            },
+            {
+                "suit": "D",
+                "rank": 8
+            },
+            {
+                "suit": "S",
+                "rank": 4
+            }
+        ],
+        "played_card": {
+            "suit": "S",
+            "rank": 4
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 7,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 3
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "S",
+                    "rank": 3
+                },
+                "player_index": 3
+            }
+        ],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "H",
+                "rank": 7
+            },
+            {
+                "suit": "H",
+                "rank": 10
+            },
+            {
+                "suit": "H",
+                "rank": 11
+            },
+            {
+                "suit": "H",
+                "rank": 13
+            },
+            {
+                "suit": "H",
+                "rank": 14
+            },
+            {
+                "suit": "H",
+                "rank": 3
+            }
+        ],
+        "played_card": {
+            "suit": "H",
+            "rank": 3
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 7,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 3
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "S",
+                    "rank": 3
+                },
+                "player_index": 3
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 3
+                },
+                "player_index": 0
+            }
+        ],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 7
+            },
+            {
+                "suit": "C",
+                "rank": 9
+            },
+            {
+                "suit": "D",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 4
+            },
+            {
+                "suit": "D",
+                "rank": 8
+            },
+            {
+                "suit": "C",
+                "rank": 13
+            }
+        ],
+        "played_card": {
+            "suit": "C",
+            "rank": 13
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 8,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 3
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 13
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 2
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "C",
+                    "rank": 11
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 9
+                },
+                "player_index": 3
+            }
+        ],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "H",
+                "rank": 7
+            },
+            {
+                "suit": "H",
+                "rank": 10
+            },
+            {
+                "suit": "H",
+                "rank": 11
+            },
+            {
+                "suit": "H",
+                "rank": 14
+            },
+            {
+                "suit": "H",
+                "rank": 13
+            }
+        ],
+        "played_card": {
+            "suit": "H",
+            "rank": 13
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 8,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 3
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 13
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 2
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "C",
+                    "rank": 11
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 9
+                },
+                "player_index": 3
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 13
+                },
+                "player_index": 0
+            }
+        ],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 7
+            },
+            {
+                "suit": "D",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 4
+            },
+            {
+                "suit": "D",
+                "rank": 8
+            },
+            {
+                "suit": "C",
+                "rank": 9
+            }
+        ],
+        "played_card": {
+            "suit": "C",
+            "rank": 9
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 9,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 3
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 13
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 11
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 9
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 13
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 9
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "D",
+                    "rank": 13
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 6
+                },
+                "player_index": 3
+            }
+        ],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "H",
+                "rank": 7
+            },
+            {
+                "suit": "H",
+                "rank": 10
+            },
+            {
+                "suit": "H",
+                "rank": 11
+            },
+            {
+                "suit": "H",
+                "rank": 14
+            }
+        ],
+        "played_card": {
+            "suit": "H",
+            "rank": 14
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 9,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 3
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 13
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 11
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 9
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 13
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 9
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "D",
+                    "rank": 13
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 6
+                },
+                "player_index": 3
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 14
+                },
+                "player_index": 0
+            }
+        ],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "C",
+                "rank": 7
+            },
+            {
+                "suit": "D",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 4
+            },
+            {
+                "suit": "D",
+                "rank": 8
+            }
+        ],
+        "played_card": {
+            "suit": "D",
+            "rank": 8
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 10,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 3
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 13
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 11
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 9
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 13
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 9
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 8
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "C",
+                    "rank": 14
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 5
+                },
+                "player_index": 3
+            }
+        ],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "H",
+                "rank": 7
+            },
+            {
+                "suit": "H",
+                "rank": 11
+            },
+            {
+                "suit": "H",
+                "rank": 10
+            }
+        ],
+        "played_card": {
+            "suit": "H",
+            "rank": 10
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 10,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 3
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 13
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 11
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 9
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 13
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 9
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 8
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "C",
+                    "rank": 14
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 5
+                },
+                "player_index": 3
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 10
+                },
+                "player_index": 0
+            }
+        ],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "D",
+                "rank": 3
+            },
+            {
+                "suit": "D",
+                "rank": 4
+            },
+            {
+                "suit": "C",
+                "rank": 7
+            }
+        ],
+        "played_card": {
+            "suit": "C",
+            "rank": 7
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 11,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 3
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 13
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 11
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 9
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 13
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 9
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 8
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 14
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 5
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 10
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 7
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "D",
+                    "rank": 14
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 4
+                },
+                "player_index": 3
+            }
+        ],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "H",
+                "rank": 7
+            },
+            {
+                "suit": "H",
+                "rank": 11
+            }
+        ],
+        "played_card": {
+            "suit": "H",
+            "rank": 11
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 11,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 3
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 13
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 11
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 9
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 13
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 9
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 8
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 14
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 5
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 10
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 7
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "D",
+                    "rank": 14
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 4
+                },
+                "player_index": 3
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 11
+                },
+                "player_index": 0
+            }
+        ],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "D",
+                "rank": 4
+            },
+            {
+                "suit": "D",
+                "rank": 3
+            }
+        ],
+        "played_card": {
+            "suit": "D",
+            "rank": 3
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 12,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 3
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 13
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 11
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 9
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 13
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 9
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 8
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 14
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 5
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 10
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 7
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 14
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 4
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 11
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 3
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 12
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 2
+                },
+                "player_index": 3
+            }
+        ],
+        "current_player_index": 0,
+        "player_hand": [
+            {
+                "suit": "H",
+                "rank": 7
+            }
+        ],
+        "played_card": {
+            "suit": "H",
+            "rank": 7
+        }
+    },
+    {
+        "game_id": 0,
+        "trick_number": 12,
+        "previous_tricks": [
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 5
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 9
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 6
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 6
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 5
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 8
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 11
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 5
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 10
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 7
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 7
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 2
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 9
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 0
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 10
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 12
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 8
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 4
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 3
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 3
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 3
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 13
+                        },
+                        "player_index": 1
+                    },
+                    {
+                        "card": {
+                            "suit": "S",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 11
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 9
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 13
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 9
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 13
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 6
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 14
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 8
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 14
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 5
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 10
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "C",
+                            "rank": 7
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            },
+            {
+                "cards": [
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 14
+                        },
+                        "player_index": 2
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 4
+                        },
+                        "player_index": 3
+                    },
+                    {
+                        "card": {
+                            "suit": "H",
+                            "rank": 11
+                        },
+                        "player_index": 0
+                    },
+                    {
+                        "card": {
+                            "suit": "D",
+                            "rank": 3
+                        },
+                        "player_index": 1
+                    }
+                ],
+                "winner": 2
+            }
+        ],
+        "current_trick_cards": [
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 12
+                },
+                "player_index": 2
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 2
+                },
+                "player_index": 3
+            },
+            {
+                "card": {
+                    "suit": "H",
+                    "rank": 7
+                },
+                "player_index": 0
+            }
+        ],
+        "current_player_index": 1,
+        "player_hand": [
+            {
+                "suit": "D",
+                "rank": 4
+            }
+        ],
+        "played_card": {
+            "suit": "D",
+            "rank": 4
+        }
+    }
+]

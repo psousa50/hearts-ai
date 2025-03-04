@@ -43,7 +43,7 @@ pub struct HeartsGame {
 }
 
 impl HeartsGame {
-    pub fn new_with_strategies(player_configs: &[(&str, Strategy)], game_id: usize) -> Self {
+    pub fn new(player_configs: &[(&str, Strategy)], game_id: usize) -> Self {
         let mut deck = Deck::new();
         let hands = deck.deal(4);
         let players: Vec<Player> = player_configs

@@ -10,12 +10,18 @@ use std::io::BufWriter;
 use std::path::PathBuf;
 use std::time::Instant;
 
+#[derive(Serialize, Clone)]
+struct CardMove {
+    card: Card,
+    player_index: usize,
+}
+
 #[derive(Serialize)]
 struct TrainingDataItem {
     game_id: usize,
     trick_number: usize,
     previous_tricks: Vec<TrainingTrick>,
-    current_trick_cards: Vec<(Card, usize)>,
+    current_trick_cards: Vec<CardMove>,
     current_player_index: usize,
     player_hand: Vec<Card>,
     played_card: Card,
@@ -23,7 +29,7 @@ struct TrainingDataItem {
 
 #[derive(Serialize, Clone)]
 struct TrainingTrick {
-    cards: Vec<(Card, usize)>,
+    cards: Vec<CardMove>,
     winner: usize,
 }
 
@@ -44,7 +50,7 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
 
     for game_id in 0..num_games {
         // Play a full game and record its result
-        let mut game = HeartsGame::new_with_strategies(&player_configs, game_id);
+        let mut game = HeartsGame::new(&player_configs, game_id);
         let game_result = game.play_game();
 
         // Get players with more than 3 points in final score
@@ -70,7 +76,10 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
                 // Skip if player had bad final score
                 if bad_players.contains(&trick_card.player_index) {
                     excluded_moves += 1;
-                    current_trick_cards.push((trick_card.card.clone(), trick_card.player_index));
+                    current_trick_cards.push(CardMove {
+                        card: trick_card.card.clone(),
+                        player_index: trick_card.player_index,
+                    });
                     continue;
                 }
 
@@ -81,7 +90,10 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
                 // Skip if this move causes player to score more than 1 point
                 if trick_points[trick_card.player_index] > 1 {
                     excluded_moves += 1;
-                    current_trick_cards.push((trick_card.card.clone(), trick_card.player_index));
+                    current_trick_cards.push(CardMove {
+                        card: trick_card.card.clone(),
+                        player_index: trick_card.player_index,
+                    });
                     continue;
                 }
 
@@ -102,7 +114,10 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
                 training_data.push(training_item);
 
                 // Update current trick for next card
-                current_trick_cards.push((trick_card.card.clone(), trick_card.player_index));
+                current_trick_cards.push(CardMove {
+                    card: trick_card.card.clone(),
+                    player_index: trick_card.player_index,
+                });
             }
 
             // After processing all cards in the trick, add it to previous tricks
