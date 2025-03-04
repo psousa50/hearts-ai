@@ -4,7 +4,7 @@ import time
 import msgpack
 import numpy as np
 import tensorflow as tf
-from common import encode_card, encode_game_state
+from encoding import INPUT_SEQUENCE_LENGTH, encode_game_state
 from model import GameState
 from tensorflow.keras.callbacks import (
     Callback,
@@ -13,13 +13,12 @@ from tensorflow.keras.callbacks import (
     ModelCheckpoint,
 )
 from tensorflow.keras.layers import (
-    Concatenate,
     Dense,
-    Embedding,
-    GlobalAveragePooling1D,
+    Dropout,
     Input,
 )
 from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
 
 
 class TrainingProgressCallback(Callback):
@@ -47,71 +46,35 @@ class HeartsModel:
         self.model = None
 
     def build_model(self):
-        """Build the model architecture
+        # Input layer for the one-hot encoded sequence
+        sequence_input = Input(shape=(INPUT_SEQUENCE_LENGTH,), name="sequence_input")
 
-        vocab_size: Number of unique tokens
-            - 0-12: trick numbers
-            - 13-16: player indices
-            - 17-68: card tokens
-            - 69-72: winner tokens
-            - 52: empty token
-        sequence_length: Length of input sequence
-            - 2 tokens for trick number and player
-            - 13 tricks * 5 tokens = 65 (4 cards + winner)
-            - 4 tokens for current trick
-            - 13 tokens for hand
-            Total: 84 tokens
-        """
-
-        vocab_size = 73
-        embedding_dim = 64
-        sequence_length = 84
-
-        # Input layer for sequence
-        sequence_input = Input(shape=(sequence_length,), name="sequence_input")
-
-        # Embedding layer with larger dimension
-        x = Embedding(vocab_size, embedding_dim)(sequence_input)
-
-        # Process sequence with deeper network
-        # First process local context (current trick and hand)
-        x1 = Dense(128, activation="relu")(x)
-        x1 = Dense(64, activation="relu")(x1)
-
-        # Then process full sequence for global context
-        x2 = Dense(256, activation="relu")(x)
-        x2 = Dense(128, activation="relu")(x2)
-
-        # Combine local and global features
-        x = Concatenate()([GlobalAveragePooling1D()(x1), GlobalAveragePooling1D()(x2)])
-
-        # Dense layers with dropout for regularization
+        # Add layers with more capacity for larger input
+        x = Dense(1024, activation="relu")(sequence_input)
+        x = Dropout(0.3)(x)
         x = Dense(512, activation="relu")(x)
-        x = tf.keras.layers.Dropout(0.2)(x)
+        x = Dropout(0.3)(x)
         x = Dense(256, activation="relu")(x)
-        x = tf.keras.layers.Dropout(0.2)(x)
+        x = Dropout(0.2)(x)
         x = Dense(128, activation="relu")(x)
 
-        # Output layer (52 cards)
-        predictions = Dense(52, activation="softmax", name="predictions")(x)
+        # Output layer - 52 possible cards
+        outputs = Dense(52, activation="softmax", name="card_output")(x)
 
         # Create model
-        self.model = Model(inputs=sequence_input, outputs=predictions)
+        self.model = Model(inputs=sequence_input, outputs=outputs)
 
-        # Compile model with learning rate schedule
+        # Custom learning rate schedule
         initial_learning_rate = 0.001
         decay_steps = 1000
         decay_rate = 0.9
-
         learning_rate_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-            initial_learning_rate,
-            decay_steps=decay_steps,
-            decay_rate=decay_rate,
-            staircase=True,
+            initial_learning_rate, decay_steps, decay_rate
         )
 
+        # Compile model
         self.model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate_schedule),
+            optimizer=Adam(learning_rate=learning_rate_schedule),
             loss="categorical_crossentropy",
             metrics=["accuracy"],
         )
@@ -190,7 +153,7 @@ class HeartsModel:
                     {"card": convert_card(card), "player_index": idx}
                     for idx, card in enumerate(cards)
                 ],
-                "winner": winner
+                "winner": winner,
             }
 
         gameStates = []
@@ -262,18 +225,10 @@ class HeartsModel:
                 print(f"Processing example {i}/{total}...", flush=True)
 
             # Encode game state as sequence
-            sequence = encode_game_state(
-                gameState=gameState,
-            )
+            X_i, y_i = encode_game_state(gameState)
 
-            # One-hot encode target card
-            target = np.zeros(52)
-            card = gameState.played_card
-            idx = encode_card(card)
-            target[idx] = 1
-
-            X.append(sequence)
-            y.append(target)
+            X.append(X_i)
+            y.append(y_i)
 
         print("Converting to numpy arrays...", flush=True)
         X = np.array(X)

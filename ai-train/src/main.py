@@ -1,10 +1,12 @@
 import asyncio
 
+import numpy as np
+from encoding import decode_card, encode_game_state
 from model import Card, CardMove, GameState, Trick, load_model
 from predict import predict
 
 
-async def test_predict(model):
+def create_game_state():
     state = GameState(
         game_id=0,
         trick_number=1,
@@ -32,7 +34,21 @@ async def test_predict(model):
             Card(suit="S", rank=5),
             Card(suit="S", rank=12),
         ],
+        played_card=Card(suit="S", rank=14),
     )
+    return state
+
+
+def test_encode():
+    state = create_game_state()
+    X, y = encode_game_state(state)
+    best_card_index = np.argmax(y)
+    card = decode_card(best_card_index)
+    print(card)
+
+
+async def test_predict(model):
+    state = create_game_state()
     valid_moves = [
         Card(suit="S", rank=12),
         Card(suit="C", rank=13),
@@ -45,3 +61,4 @@ async def test_predict(model):
 if __name__ == "__main__":
     model = load_model("models/latest.keras")
     asyncio.run(test_predict(model))
+    # test_encode()

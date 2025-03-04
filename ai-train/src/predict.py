@@ -1,33 +1,21 @@
-from typing import List
+from typing import Dict, List
 
-from common import decode_card, encode_game_state
+from encoding import decode_card, encode_card, encode_game_state
 from model import Card, GameState
 
 
-async def predict(model, state: GameState, valid_moves: List[Card] = None):
-    print("State:", state)
-
+async def predict(model, game_state: GameState, valid_moves: List[Card]) -> Dict[str, any]:
     # Encode game state as sequence
-    sequence = encode_game_state(
-        gameState=state,
-    )
+    X, _ = encode_game_state(game_state)
 
-    print("Sequence:", sequence)
+    # Get model prediction for all cards
+    prediction = model.predict(X.reshape(1, -1), verbose=0)[0]
 
-    # Get model prediction
-    prediction = model.predict(sequence.reshape(1, -1), verbose=0)
-
-    print("Raw prediction:", prediction)
-
-    prediction_cards = [
-        (decode_card(card), idx) for card, idx in enumerate(prediction[0])
-    ]
-    sorted_prediction_cards = sorted(prediction_cards, key=lambda x: x[1], reverse=True)
-
-    for p in sorted_prediction_cards[:5]:
-        print(p)
-
-    valid_prediction_cards = [p for p in sorted_prediction_cards if p[0] in valid_moves]
-
-    chosen_move = valid_prediction_cards[0]
-    return chosen_move[0]
+    # Filter prediction to only valid moves
+    valid_indices = [encode_card(move) for move in valid_moves]
+    valid_probs = prediction[valid_indices]
+    best_valid_idx = valid_indices[valid_probs.argmax()]
+    
+    # Convert back to Card and return as dict
+    chosen_card = decode_card(best_valid_idx)
+    return {"suit": chosen_card.suit, "rank": chosen_card.rank}
