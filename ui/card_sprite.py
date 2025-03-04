@@ -2,7 +2,6 @@ import pygame
 import io
 from pathlib import Path
 from hearts_game import Card
-from cairosvg import svg2png
 
 # Constants
 CARD_WIDTH = 71
@@ -45,11 +44,12 @@ class CardSprite:
                 surf.blit(text, (10, 30))
                 self.image = surf
             else:
-                # Convert SVG to PNG in memory
-                png_data = svg2png(url=str(image_path), output_width=CARD_WIDTH, output_height=CARD_HEIGHT)
-                # Load PNG data into pygame surface
-                png_file = io.BytesIO(png_data)
-                self.image = pygame.image.load(png_file)
+                # Load SVG directly and scale if needed
+                original = pygame.image.load(str(image_path))
+                if original.get_size() != (CARD_WIDTH, CARD_HEIGHT):
+                    self.image = pygame.transform.smoothscale(original, (CARD_WIDTH, CARD_HEIGHT))
+                else:
+                    self.image = original
             
             # Cache the loaded image
             CardSprite.image_cache[card_key] = self.image
