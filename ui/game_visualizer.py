@@ -3,7 +3,8 @@ import json
 import sys
 import os
 from typing import List, Dict, Tuple, Optional
-from hearts_game import HeartsGame, Card, RandomStrategy, AvoidPointsStrategy, AggressiveStrategy, AIStrategy
+from hearts_game import HeartsGame, Card
+from strategies import RandomStrategy, AvoidPointsStrategy, AggressiveStrategy, AIStrategy
 from card_sprite import CardSprite, CARD_WIDTH, CARD_HEIGHT
 
 # Initialize Pygame
