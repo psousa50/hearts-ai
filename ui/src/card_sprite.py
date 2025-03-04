@@ -33,7 +33,7 @@ class CardSprite:
             self.image = CardSprite.image_cache[card_key]
         else:
             # Load SVG card image from assets folder using numeric format
-            image_path = Path(__file__).parent / 'assets' / 'cards' / f'{card_key}.svg'
+            image_path = Path(__file__).parent / '..' / 'assets' / 'cards' / f'{card_key}.svg'
             if not image_path.exists():
                 # Create a default card representation if image doesn't exist
                 surf = pygame.Surface((CARD_WIDTH, CARD_HEIGHT))
