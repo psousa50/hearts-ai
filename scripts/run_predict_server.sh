@@ -3,6 +3,6 @@
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 cd $SCRIPT_DIR/../ai-train
 
-sactivate
+source .venv/bin/activate
 conda run -n tf-env 
-uvicorn ai_service:app --reload 
+PYTHONPATH=src uvicorn src.ai_service:app --reload 
