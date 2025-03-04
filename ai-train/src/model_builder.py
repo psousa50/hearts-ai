@@ -1,8 +1,7 @@
-import json
 import os
 import time
-from typing import List
 
+import msgpack
 import numpy as np
 import tensorflow as tf
 from common import encode_card, encode_game_state
@@ -173,10 +172,52 @@ class HeartsModel:
             raise ValueError("Model not built. Call build_model() first.")
 
         # Load training data
-        with open(train_data_path, "r") as f:
-            gameStates_data = json.load(f)
+        print(f"Loading training data from {train_data_path}...", flush=True)
 
-        gameStates: List[GameState] = [GameState(**data) for data in gameStates_data]
+        with open(train_data_path, "rb") as f:
+            raw_data = msgpack.unpackb(f.read(), raw=False)
+
+        # Convert each card from [suit, rank] format to Card object format
+        def convert_card(card_data):
+            suit, rank = card_data
+            return {"suit": suit, "rank": rank}
+
+        def convert_trick(trick_data):
+            cards, winner = trick_data
+            # Create card moves with sequential player indices
+            return {
+                "cards": [
+                    {"card": convert_card(card), "player_index": idx}
+                    for idx, card in enumerate(cards)
+                ],
+                "winner": winner
+            }
+
+        gameStates = []
+        for data in raw_data:
+            (
+                game_id,
+                trick_number,
+                previous_tricks,
+                current_trick_cards,
+                current_player_index,
+                player_hand,
+                played_card,
+            ) = data
+
+            game_state = GameState(
+                game_id=game_id,
+                trick_number=trick_number,
+                previous_tricks=[convert_trick(t) for t in previous_tricks],
+                current_trick_cards=[
+                    {"card": convert_card(card), "player_index": idx}
+                    for idx, card in enumerate(current_trick_cards)
+                ],
+                current_player_index=current_player_index,
+                player_hand=[convert_card(c) for c in player_hand],
+                played_card=convert_card(played_card),
+            )
+            gameStates.append(game_state)
 
         num_examples = len(gameStates)
         print(f"Training on {num_examples} examples", flush=True)

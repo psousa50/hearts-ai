@@ -26,7 +26,6 @@ async def test_predict(model):
         ],
         current_player_index=3,
         player_hand=[
-            Card(suit="D", rank=1),
             Card(suit="D", rank=2),
             Card(suit="D", rank=3),
             Card(suit="D", rank=4),

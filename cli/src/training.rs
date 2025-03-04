@@ -1,9 +1,7 @@
 use chrono::Utc;
-use hearts_game::{
-    AggressiveStrategy, AvoidPointsStrategy, Card, HeartsGame, RandomStrategy, Strategy,
-};
+use hearts_game::{AggressiveStrategy, AvoidPointsStrategy, HeartsGame, RandomStrategy, Strategy};
+use rmp_serde;
 use serde::Serialize;
-use serde_json;
 use std::collections::HashSet;
 use std::fs::{self, File};
 use std::io::BufWriter;
@@ -11,27 +9,21 @@ use std::path::PathBuf;
 use std::time::Instant;
 
 #[derive(Serialize, Clone)]
-struct CardMove {
-    card: Card,
-    player_index: usize,
-}
-
-#[derive(Serialize)]
-struct TrainingDataItem {
-    game_id: usize,
-    trick_number: usize,
-    previous_tricks: Vec<TrainingTrick>,
-    current_trick_cards: Vec<CardMove>,
-    current_player_index: usize,
-    player_hand: Vec<Card>,
-    played_card: Card,
-}
+struct CompactCard(char, u8); // (suit, rank)
 
 #[derive(Serialize, Clone)]
-struct TrainingTrick {
-    cards: Vec<CardMove>,
-    winner: usize,
-}
+struct CompactTrick(Vec<CompactCard>, usize); // (cards, winner)
+
+#[derive(Serialize)]
+struct CompactTrainingData(
+    usize,             // game_id
+    usize,             // trick_number
+    Vec<CompactTrick>, // previous_tricks
+    Vec<CompactCard>,  // current_trick_cards
+    usize,             // current_player_index
+    Vec<CompactCard>,  // player_hand
+    CompactCard,       // played_card
+);
 
 pub fn generate_training_data(num_games: usize, save_games: bool) {
     let start = Instant::now();
@@ -49,6 +41,9 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
     let mut all_game_results = Vec::with_capacity(num_games);
 
     for game_id in 0..num_games {
+        if game_id % 1000 == 0 {
+            println!("\rGenerating game {} of {}", game_id + 1, num_games);
+        }
         // Play a full game and record its result
         let mut game = HeartsGame::new(&player_configs, game_id);
         let game_result = game.play_game();
@@ -76,10 +71,8 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
                 // Skip if player had bad final score
                 if bad_players.contains(&trick_card.player_index) {
                     excluded_moves += 1;
-                    current_trick_cards.push(CardMove {
-                        card: trick_card.card.clone(),
-                        player_index: trick_card.player_index,
-                    });
+                    current_trick_cards
+                        .push(CompactCard(trick_card.card.suit, trick_card.card.rank));
                     continue;
                 }
 
@@ -90,41 +83,37 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
                 // Skip if this move causes player to score more than 1 point
                 if trick_points[trick_card.player_index] > 1 {
                     excluded_moves += 1;
-                    current_trick_cards.push(CardMove {
-                        card: trick_card.card.clone(),
-                        player_index: trick_card.player_index,
-                    });
+                    current_trick_cards
+                        .push(CompactCard(trick_card.card.suit, trick_card.card.rank));
                     continue;
                 }
 
                 // Get player's hand at this point
-                let mut player_hand = trick_card.hand.clone();
-                player_hand.push(trick_card.card.clone()); // Add back the played card since it was in hand
+                let mut player_hand = trick_card
+                    .hand
+                    .iter()
+                    .map(|c| CompactCard(c.suit, c.rank))
+                    .collect::<Vec<_>>();
+                player_hand.push(CompactCard(trick_card.card.suit, trick_card.card.rank)); // Add back the played card
 
                 // Create a training example for this play
-                let training_item = TrainingDataItem {
+                let training_item = CompactTrainingData(
                     game_id,
                     trick_number,
-                    previous_tricks: previous_tricks.clone(),
-                    current_trick_cards: current_trick_cards.clone(),
-                    current_player_index: trick_card.player_index,
+                    previous_tricks.clone(),
+                    current_trick_cards.clone(),
+                    trick_card.player_index,
                     player_hand,
-                    played_card: trick_card.card.clone(),
-                };
+                    CompactCard(trick_card.card.suit, trick_card.card.rank),
+                );
                 training_data.push(training_item);
 
                 // Update current trick for next card
-                current_trick_cards.push(CardMove {
-                    card: trick_card.card.clone(),
-                    player_index: trick_card.player_index,
-                });
+                current_trick_cards.push(CompactCard(trick_card.card.suit, trick_card.card.rank));
             }
 
             // After processing all cards in the trick, add it to previous tricks
-            previous_tricks.push(TrainingTrick {
-                cards: current_trick_cards,
-                winner: trick.winner,
-            });
+            previous_tricks.push(CompactTrick(current_trick_cards.clone(), trick.winner));
         }
 
         if save_games {
@@ -137,27 +126,28 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
 
     // Generate timestamped filename and save training data
     let timestamp = Utc::now().format("%Y%m%d_%H%M%S");
-    let filename = format!("training_data_{}_{}_games.json", timestamp, num_games);
+    let filename = format!("training_data_{}_{}_games.msgpack", timestamp, num_games);
     let filepath = PathBuf::from("data").join(filename);
 
     let file = File::create(&filepath).expect("Failed to create file");
-    let writer = BufWriter::new(file);
-    serde_json::to_writer_pretty(writer, &training_data).expect("Failed to write JSON");
+    let mut writer = BufWriter::new(file);
+    rmp_serde::encode::write(&mut writer, &training_data).expect("Failed to write MessagePack");
 
     // Save game results if requested
     if save_games {
-        let filename = format!("game_results_{}_{}_games.json", timestamp, num_games);
+        let filename = format!("game_results_{}_{}_games.msgpack", timestamp, num_games);
         let filepath = PathBuf::from("data").join(filename);
 
         let file = File::create(&filepath).expect("Failed to create file");
-        let writer = BufWriter::new(file);
-        serde_json::to_writer_pretty(writer, &all_game_results).expect("Failed to write JSON");
+        let mut writer = BufWriter::new(file);
+        rmp_serde::encode::write(&mut writer, &all_game_results)
+            .expect("Failed to write MessagePack");
         println!("Game results saved to: {}", filepath.display());
     }
 
     let duration = start.elapsed();
     println!(
-        "Time to generate and save training data for {} games: {:?}",
+        "\nTime to generate and save training data for {} games: {:?}",
         num_games, duration
     );
     println!("Average time per game: {:?}", duration / num_games as u32);

@@ -1,36 +1,12 @@
-from enum import Enum
 from typing import List, Optional
 
 import tensorflow as tf
-from pydantic import BaseModel
-
-
-class Suit(Enum):
-    HEARTS = "H"
-    DIAMONDS = "D"
-    CLUBS = "C"
-    SPADES = "S"
-
-
-class Rank(Enum):
-    TWO = 2
-    THREE = 3
-    FOUR = 4
-    FIVE = 5
-    SIX = 6
-    SEVEN = 7
-    EIGHT = 8
-    NINE = 9
-    TEN = 10
-    JACK = 11
-    QUEEN = 12
-    KING = 13
-    ACE = 14
+from pydantic import BaseModel, Field
 
 
 class Card(BaseModel):
-    suit: str
-    rank: int
+    suit: str = Field(..., min_length=1, max_length=1)  # Single character suit
+    rank: int = Field(..., ge=2, le=14)  # Rank between 2-14
 
 
 class CardMove(BaseModel):
