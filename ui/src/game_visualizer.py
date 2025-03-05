@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import pygame
 from card_sprite import CARD_HEIGHT, CARD_WIDTH, CardSprite
