@@ -1,20 +1,25 @@
+import json
 import random
 from typing import List, Optional
-import json
 
 import requests
 from card import Card, CardMove
 
 
 class Strategy:
-    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Card:
+    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Optional[Card]:
         raise NotImplementedError
+
+
+class HumanStrategy(Strategy):
+    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Optional[Card]:
+        return None
 
 
 class RandomStrategy(Strategy):
     """Strategy that plays random valid moves"""
 
-    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Card:
+    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Optional[Card]:
         """Choose a random valid card to play"""
         if not valid_moves:
             return hand[0]  # If no valid moves, play any card
@@ -22,7 +27,7 @@ class RandomStrategy(Strategy):
 
 
 class AvoidPointsStrategy(Strategy):
-    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Card:
+    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Optional[Card]:
         # Play lowest value card, avoiding hearts and queen of spades
         return min(
             valid_moves,
@@ -33,7 +38,7 @@ class AvoidPointsStrategy(Strategy):
 
 
 class AggressiveStrategy(Strategy):
-    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Card:
+    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Optional[Card]:
         # Play highest value card, preferring hearts and queen of spades
         return max(
             valid_moves,
@@ -60,7 +65,9 @@ class AIStrategy(Strategy):
             # Convert current trick cards to proper format
             trick_cards = [
                 {"card": {"suit": suit, "rank": rank}, "player_index": player_idx}
-                for (suit, rank, player_idx) in self.current_trick_cards_raw[-4:]  # Only use the last 4 cards
+                for (suit, rank, player_idx) in self.current_trick_cards_raw[
+                    -4:
+                ]  # Only use the last 4 cards
             ]
 
             # Get only the last 3 tricks to prevent state from getting too large
@@ -92,20 +99,25 @@ class AIStrategy(Strategy):
 
             # Convert predicted move to Card
             if isinstance(result, dict) and "suit" in result and "rank" in result:
-                return Card(suit=result["suit"], rank=result["rank"])
+                predicted_card = Card(suit=result["suit"], rank=result["rank"])
+                # Verify the predicted card is in valid_moves
+                if predicted_card in valid_moves:
+                    return predicted_card
+                print(f"AI predicted invalid move: {predicted_card}")
+                raise ValueError("AI predicted invalid move")
 
             print(f"Invalid prediction format: {result}")
             raise ValueError("Invalid prediction format")
 
         except Exception as e:
-            print(f"AI service error: {str(e)}")
-            print("AI service unavailable, using fallback strategy:", str(e))
+            print(f"AI service error: {str(e)}, falling back to random strategy")
+            # Fall back to random strategy
             return self.fallback.choose_card(hand, valid_moves)
 
     def update_game_state(self, trick_completed: bool, winner: Optional[int] = None):
         """Update the game state after a trick is completed"""
         if trick_completed:
-            # Store completed trick
+            # Add the current trick to previous tricks
             self.previous_tricks.append(
                 {
                     "cards": [
@@ -113,16 +125,16 @@ class AIStrategy(Strategy):
                             "card": {"suit": suit, "rank": rank},
                             "player_index": player_idx,
                         }
-                        for (suit, rank, player_idx) in self.current_trick_cards_raw
+                        for (suit, rank, player_idx) in self.current_trick_cards_raw[
+                            -4:
+                        ]
                     ],
                     "winner": winner,
                 }
             )
-            # Clear current trick cards
+            self.trick_number += 1
             self.current_trick_cards = []
             self.current_trick_cards_raw = []
-            # Increment trick number
-            self.trick_number = len(self.previous_tricks)
 
 
 class ReplayStrategy(Strategy):
@@ -132,25 +144,21 @@ class ReplayStrategy(Strategy):
         self.fallback = RandomStrategy()  # Fallback to random if we run out of cards
 
     def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Card:
-        # If we've played all cards, use fallback
         if self.current_index >= len(self.cards):
-            print("ReplayStrategy: No more cards to replay, using fallback")
+            print("Warning: Replay strategy ran out of cards, falling back to random")
             return self.fallback.choose_card(hand, valid_moves)
 
-        # Get the next card we want to play
-        desired_card = self.cards[self.current_index]
+        card = self.cards[self.current_index]
         self.current_index += 1
 
-        # Check if the desired card is in valid moves
-        for card in valid_moves:
-            if card.suit == desired_card.suit and card.rank == desired_card.rank:
-                return card
+        # Verify the card is valid
+        if card not in valid_moves:
+            print(
+                f"Warning: Replay card {card} not in valid moves {valid_moves}, falling back to random"
+            )
+            return self.fallback.choose_card(hand, valid_moves)
 
-        # If desired card isn't valid, use fallback
-        print(
-            f"ReplayStrategy: Can't play {desired_card}, not in valid moves {valid_moves}"
-        )
-        return self.fallback.choose_card(hand, valid_moves)
+        return card
 
     def reset(self):
         """Reset the replay sequence back to the start"""

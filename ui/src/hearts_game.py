@@ -22,7 +22,7 @@ class HeartsGame:
         self.current_trick = []
         self.scores = [0] * 4
         self.hands = self.deal_cards()
-        self.current_player = self.find_starting_player()
+        self.current_player_index = self.find_starting_player()
 
     def deal_cards(self) -> List[List[Card]]:
         # Create a deck of cards
@@ -94,9 +94,13 @@ class HeartsGame:
         else:
             # Validate the chosen card
             if card not in valid_moves:
-                return None
+                return None, None
+
+        if card is None:
+            return None, None
 
         # Remove the card from hand
+        card_idx = self.hands[player_idx].index(card)
         self.hands[player_idx].remove(card)
 
         # Update game state
@@ -114,7 +118,7 @@ class HeartsGame:
         # Move to next player
         self.current_player = (player_idx + 1) % 4
 
-        return card
+        return card, card_idx
 
     def complete_trick(self):
         """Complete the current trick and determine the winner."""
@@ -160,7 +164,7 @@ class HeartsGame:
 
         # Reset for next trick
         self.current_trick = []
-        self.current_player = winner_idx  # Next trick starts with the winner
+        self.current_player_index = winner_idx  # Next trick starts with the winner
 
         # Update trick number and state for AI strategies
         for player in self.players:
