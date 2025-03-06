@@ -1,6 +1,6 @@
 import json
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, field, asdict
 from typing import Any, Dict, List, Optional
 
 import requests
@@ -11,7 +11,12 @@ from card import Card, CompletedTrick, Trick
 class TrickCard:
     card: Card
     player_index: int
-
+    
+    def __post_init__(self):
+        # Convert Card to dict for JSON serialization
+        if isinstance(self.card, Card):
+            self._card_dict = {"suit": self.card.suit, "rank": self.card.rank}
+    
     def to_dict(self) -> Dict[str, Any]:
         return {
             "card": {"suit": self.card.suit, "rank": self.card.rank},
@@ -28,37 +33,42 @@ class PredictionState:
     current_player_index: int
     player_hand: List[Card]
     played_card: Optional[Card] = None
-
+    
+    def __post_init__(self):
+        # Prepare data for JSON serialization
+        self._previous_tricks_json = [
+            {
+                "cards": [
+                    {
+                        "card": {"suit": card.suit, "rank": card.rank},
+                        "player_index": i,
+                    }
+                    for i, card in enumerate(trick.cards)
+                ],
+                "winner": trick.winner,
+            }
+            for trick in self.previous_tricks
+        ]
+        
+        self._player_hand_json = [
+            {"suit": card.suit, "rank": card.rank} for card in self.player_hand
+        ]
+        
+        self._played_card_json = (
+            {"suit": self.played_card.suit, "rank": self.played_card.rank}
+            if self.played_card
+            else None
+        )
+    
     def to_dict(self) -> Dict[str, Any]:
         return {
             "game_id": self.game_id,
             "trick_number": self.trick_number,
-            "previous_tricks": [
-                {
-                    "cards": [
-                        {
-                            "card": {"suit": card.suit, "rank": card.rank},
-                            "player_index": i,
-                        }
-                        for i, card in enumerate(trick.cards)
-                    ],
-                    "winner": trick.winner,
-                }
-                for trick in self.previous_tricks
-            ],
-            "current_trick_cards": [
-                card.to_dict() for card in self.current_trick_cards
-            ],
+            "previous_tricks": self._previous_tricks_json,
+            "current_trick_cards": [card.to_dict() for card in self.current_trick_cards],
             "current_player_index": self.current_player_index,
-            "player_hand": [
-                {"suit": card.suit, "rank": card.rank} for card in self.player_hand
-            ],
-            "played_card": {
-                "suit": self.played_card.suit,
-                "rank": self.played_card.rank,
-            }
-            if self.played_card
-            else None,
+            "player_hand": self._player_hand_json,
+            "played_card": self._played_card_json,
         }
 
 
@@ -66,14 +76,22 @@ class PredictionState:
 class PredictionRequest:
     state: PredictionState
     valid_moves: List[Card]
-
+    
+    def __post_init__(self):
+        # Prepare valid moves for JSON serialization
+        self._valid_moves_json = [
+            {"suit": card.suit, "rank": card.rank} for card in self.valid_moves
+        ]
+    
     def to_dict(self) -> Dict[str, Any]:
         return {
             "state": self.state.to_dict(),
-            "valid_moves": [
-                {"suit": card.suit, "rank": card.rank} for card in self.valid_moves
-            ],
+            "valid_moves": self._valid_moves_json,
         }
+        
+    def to_json(self) -> str:
+        """Convert the request to a JSON string"""
+        return json.dumps(self.to_dict())
 
 
 @dataclass
@@ -159,14 +177,14 @@ class AIStrategy(Strategy):
             # Create prediction request
             request = PredictionRequest(state=state, valid_moves=gameState.valid_moves)
 
-            # Prepare request data
-            data = request.to_dict()
-
-            print("Sending request to AI service:", json.dumps(data, indent=2))
+            # Prepare request data and convert to JSON
+            request_json = request.to_json()
+            
+            print("Sending request to AI service:", json.dumps(request.to_dict(), indent=2))
 
             # Send request to AI service
             response = requests.post(
-                "http://localhost:8000/predict", json=data, timeout=5
+                "http://localhost:8000/predict", json=request.to_dict(), timeout=5
             )
             response.raise_for_status()
             result = response.json()

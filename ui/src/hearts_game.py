@@ -123,9 +123,6 @@ class HeartsGame:
                 trick_cards, key=lambda card: card.rank if card.suit == lead_suit else 0
             )
         )
-        print(f"first player: {self.current_trick.first_player}")
-        print(f"Trick cards: {trick_cards}")
-        print(f"Winner: {winner_idx}")
 
         # Calculate points
         points = sum(1 for card in trick_cards if card.suit == "H")
