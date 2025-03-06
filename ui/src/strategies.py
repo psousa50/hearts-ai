@@ -4,77 +4,53 @@ from dataclasses import dataclass
 from typing import List, Optional, Dict, Any
 
 import requests
-from card import Card, CompletedTrick
+from card import Card, CompletedTrick, Trick
 
 
 @dataclass
-class CardJson:
-    suit: str
-    rank: int
-
-    @classmethod
-    def from_card(cls, card: Card) -> 'CardJson':
-        return cls(suit=card.suit, rank=card.rank)
-
-    def to_card(self) -> Card:
-        return Card(suit=self.suit, rank=self.rank)
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {"suit": self.suit, "rank": self.rank}
-
-@dataclass
-class TrickCardJson:
-    card: CardJson
+class TrickCard:
+    card: Card
     player_index: int
 
-    @classmethod
-    def from_raw_card(cls, suit: str, rank: int, player_index: int) -> 'TrickCardJson':
-        return cls(card=CardJson(suit=suit, rank=rank), player_index=player_index)
-
     def to_dict(self) -> Dict[str, Any]:
-        return {"card": self.card.to_dict(), "player_index": self.player_index}
+        return {"card": {"suit": self.card.suit, "rank": self.card.rank}, "player_index": self.player_index}
 
 @dataclass
-class CompletedTrickJson:
-    cards: List[TrickCardJson]
-    winner: int
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "cards": [card.to_dict() for card in self.cards],
-            "winner": self.winner
-        }
-
-@dataclass
-class PredictionStateJson:
+class PredictionState:
     game_id: int
     trick_number: int
-    previous_tricks: List[CompletedTrickJson]
-    current_trick_cards: List[TrickCardJson]
+    previous_tricks: List[CompletedTrick]
+    current_trick_cards: List[TrickCard]
     current_player_index: int
-    player_hand: List[CardJson]
-    played_card: Optional[CardJson] = None
+    player_hand: List[Card]
+    played_card: Optional[Card] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "game_id": self.game_id,
             "trick_number": self.trick_number,
-            "previous_tricks": [trick.to_dict() for trick in self.previous_tricks],
+            "previous_tricks": [{
+                "cards": [{
+                    "card": {"suit": card.suit, "rank": card.rank},
+                    "player_index": i
+                } for i, card in enumerate(trick.cards)],
+                "winner": trick.winner
+            } for trick in self.previous_tricks],
             "current_trick_cards": [card.to_dict() for card in self.current_trick_cards],
             "current_player_index": self.current_player_index,
-            "player_hand": [card.to_dict() for card in self.player_hand],
-            "played_card": self.played_card.to_dict() if self.played_card else None
+            "player_hand": [{"suit": card.suit, "rank": card.rank} for card in self.player_hand],
+            "played_card": {"suit": self.played_card.suit, "rank": self.played_card.rank} if self.played_card else None
         }
 
 @dataclass
 class PredictionRequest:
-    state: PredictionStateJson
-    valid_moves: List[CardJson]
+    state: PredictionState
+    valid_moves: List[Card]
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "state": self.state.to_dict(),
-            "valid_moves": [move.to_dict() for move in self.valid_moves]
+            "valid_moves": [{"suit": card.suit, "rank": card.rank} for card in self.valid_moves]
         }
 
 @dataclass
@@ -143,27 +119,35 @@ class AIStrategy(Strategy):
         try:
             # Convert current trick cards to proper format
             trick_cards = [
-                TrickCardJson.from_raw_card(suit, rank, player_idx)
+                TrickCard(card=Card(suit=suit, rank=rank), player_index=player_idx)
                 for (suit, rank, player_idx) in self.current_trick_cards_raw[-4:]
             ]
 
             # Get only the last 3 tricks to prevent state from getting too large
-            recent_tricks = [CompletedTrickJson(**trick) for trick in self.previous_tricks[-3:]] if self.previous_tricks else []
+            recent_tricks = [
+                CompletedTrick(
+                    cards=[Card(suit=c["card"]["suit"], rank=c["card"]["rank"]) for c in trick["cards"]],
+                    first_player=trick["cards"][0]["player_index"],
+                    winner=trick["winner"],
+                    score=0  # Score is not needed for prediction
+                )
+                for trick in self.previous_tricks[-3:]
+            ] if self.previous_tricks else []
 
             # Create prediction state
-            state = PredictionStateJson(
+            state = PredictionState(
                 game_id=self.game_id,
                 trick_number=self.trick_number,
                 previous_tricks=recent_tricks,
                 current_trick_cards=trick_cards,
                 current_player_index=3,  # AI is always player 3
-                player_hand=[CardJson.from_card(c) for c in gameState.player_hand]
+                player_hand=gameState.player_hand
             )
 
             # Create prediction request
             request = PredictionRequest(
                 state=state,
-                valid_moves=[CardJson.from_card(c) for c in gameState.valid_moves]
+                valid_moves=gameState.valid_moves
             )
 
             # Prepare request data
