@@ -3,9 +3,9 @@ from typing import List
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 from model import Card, GameState, load_model
 from predict import predict
+from pydantic import BaseModel
 
 # Configure logging
 logger = logging.getLogger("ai_service")
@@ -29,6 +29,7 @@ class PredictRequest(BaseModel):
 
 @app.post("/predict")
 async def predict_post(request: PredictRequest):
+    print("Received prediction request:", request)
     try:
         logger.info("=" * 50)
         logger.info(

@@ -172,7 +172,7 @@ class HeartsModel:
                 game_id=game_id,
                 trick_number=trick_number,
                 previous_tricks=[convert_trick(t) for t in previous_tricks],
-                current_trick_cards=[
+                current_trick=[
                     {"card": convert_card(card), "player_index": idx}
                     for idx, card in enumerate(current_trick_cards)
                 ],

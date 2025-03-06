@@ -21,7 +21,7 @@ def create_game_state():
                 winner=3,
             )
         ],
-        current_trick_cards=[
+        current_trick=[
             CardMove(card=Card(suit="S", rank=2), player_index=0),
             CardMove(card=Card(suit="D", rank=3), player_index=1),
             CardMove(card=Card(suit="D", rank=4), player_index=2),

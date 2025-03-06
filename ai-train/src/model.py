@@ -9,21 +9,23 @@ class Card(BaseModel):
     rank: int = Field(..., ge=2, le=14)  # Rank between 2-14
 
 
-class CardMove(BaseModel):
-    card: Card
-    player_index: int
-
-
 class Trick(BaseModel):
-    cards: List[CardMove]
+    cards: List[Optional[Card]]
+    first_player: int
+
+
+class CompletedTrick(BaseModel):
+    cards: List[Card]
+    first_player: int
     winner: int
+    score: int
 
 
 class GameState(BaseModel):
     game_id: int
     trick_number: int
-    previous_tricks: List[Trick]
-    current_trick_cards: List[CardMove]
+    previous_tricks: List[CompletedTrick]
+    current_trick: Trick
     current_player_index: int
     player_hand: List[Card]
     played_card: Optional[Card] = None

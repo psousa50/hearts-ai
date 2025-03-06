@@ -80,7 +80,7 @@ def encode_game_state(game_state: GameState) -> (np.ndarray, np.ndarray):
 
     # Encode current trick cards (up to 4)
     current_trick = np.zeros(4 * (TOTAL_CARDS + 4))
-    for i, move in enumerate(game_state.current_trick_cards):
+    for i, move in enumerate(game_state.current_trick):
         card_vec = one_hot_card(move.card)
         player_vec = one_hot_player(move.player_index)
         current_trick[i * (TOTAL_CARDS + 4) : (i + 1) * (TOTAL_CARDS + 4)] = (
