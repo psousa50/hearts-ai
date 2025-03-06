@@ -4,7 +4,7 @@ import pygame
 from animation_manager import AnimationManager
 from card_sprite import CARD_HEIGHT, CARD_WIDTH, CardSprite
 from game_state import GameState
-from hearts_game import Card
+from hearts_game import Card, HeartsGame
 from layout_manager import LayoutManager
 
 
@@ -115,7 +115,9 @@ class GameRenderer:
         for card in cards:
             self.screen.blit(card.image, card.rect)
 
-    def render_frame(self, game_state: GameState, animation_mgr: AnimationManager):
+    def render_frame(
+        self, game_state: GameState, game: HeartsGame, animation_mgr: AnimationManager
+    ):
         """Render a complete frame"""
         # Clear screen
         self.screen.fill(self.GREEN)
@@ -123,26 +125,21 @@ class GameRenderer:
         # Draw player hands and info
         for i in range(4):
             valid_moves = (
-                game_state.get_valid_moves(i)
-                if game_state.current_player_is_human
-                else None
+                game.get_valid_moves(i) if game.current_player_is_human else None
             )
-            self.draw_player_hand(i, game_state.hands[i], valid_moves)
+            self.draw_player_hand(i, game.hands[i], valid_moves)
             self.draw_player_info(
                 i,
-                game_state.players[i].name,
-                game_state.players[i].strategy.__class__.__name__,
-                game_state.scores[i],
+                game.current_player.name,
+                game.current_player.strategy.__class__.__name__,
+                game.scores[i],
             )
 
         # Draw cards in play
         self.draw_cards_in_play(animation_mgr.get_cards_in_play())
 
         # Draw UI elements
-        self.draw_game_info(
-            game_state.players[game_state.current_player_index].name,
-            len(game_state.current_trick_cards),
-        )
+        self.draw_game_info(game.current_player.name, game.current_trick.size)
         self.draw_controls()
         self.draw_debug_info(
             game_state.paused, game_state.trick_completed, game_state.auto_play

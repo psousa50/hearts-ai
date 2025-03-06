@@ -5,6 +5,7 @@ from typing import List, Optional
 
 import pygame
 from animation_manager import AnimationManager
+from card import Card
 from card_sprite import CardSprite
 from event_handler import EventHandler
 from game_renderer import GameRenderer
@@ -13,9 +14,9 @@ from hearts_game import HeartsGame, Player
 from layout_manager import LayoutManager
 from strategies import (
     AggressiveStrategy,
-    AIStrategy,
     AvoidPointsStrategy,
     HumanStrategy,
+    RandomStrategy,
     ReplayStrategy,
 )
 
@@ -38,14 +39,19 @@ class GameVisualizer:
 
         # Create game with appropriate players
         players = self._create_players(game_file)
-        game = HeartsGame(players)
+        self.game = HeartsGame(players)
 
         # Initialize managers
         self.layout = LayoutManager(WINDOW_WIDTH, WINDOW_HEIGHT)
-        self.game_state = GameState(game)
+        self.game_state = GameState(self.game)
         self.animation_mgr = AnimationManager()
         self.renderer = GameRenderer(self.screen, self.layout)
-        self.event_handler = EventHandler(self.game_state, self.layout)
+        self.event_handler = EventHandler(
+            self.game_state,
+            self.game,
+            self.layout,
+            lambda card: self.play_card(card),
+        )
 
     def _create_players(self, game_file: Optional[str]) -> List[Player]:
         if game_file:
@@ -54,7 +60,8 @@ class GameVisualizer:
             Player("You", HumanStrategy()),
             Player("Bob", AvoidPointsStrategy()),
             Player("Charlie", AggressiveStrategy()),
-            Player("AI", AIStrategy()),
+            Player("AI", RandomStrategy()),
+            # Player("AI", AIStrategy()),
         ]
 
     def _create_replay_players(self, game_file: str) -> List[Player]:
@@ -77,7 +84,13 @@ class GameVisualizer:
         ]
 
     def _handle_play(self):
-        """Handle AI player moves"""
+        if self.game.current_player_is_human:
+            return
+
+        played_card = self.game.choose_card(self.game.current_player_index)
+        self.play_card(played_card)
+
+    def play_card(self, played_card: Card):
         current_time = pygame.time.get_ticks()
 
         if current_time - self.game_state.last_auto_play <= AUTO_PLAY_DELAY:
@@ -86,76 +99,28 @@ class GameVisualizer:
         if self.animation_mgr.has_moving_cards():
             return
 
-        current_player_index = self.game_state.current_player_index
-        hand = self.game_state.hands[current_player_index]
-        print("current player", current_player_index)
-        print("hand", hand)
-
-        # Play the card
-        played_card, card_idx = self.game_state.play_card(current_player_index)
-        if played_card is not None:
-            # Create card animation
-            print("playing card", played_card.rank, played_card.suit)
-            start_pos = self.layout.get_hand_position(current_player_index, card_idx)
-            target_pos = self.layout.get_trick_position(current_player_index)
-
-            sprite = CardSprite(played_card)
-            self.animation_mgr.add_card_animation(sprite, start_pos, target_pos)
-            self.game_state.last_auto_play = current_time
-
-            # Update AI state
-            for player in self.game_state.players:
-                if isinstance(player.strategy, AIStrategy):
-                    player.strategy.current_trick_cards.append(
-                        (played_card.suit, played_card.rank)
-                    )
-                    player.strategy.current_trick_cards_raw.append(
-                        (played_card.suit, played_card.rank, current_player_index)
-                    )
-
-    def _handle_trick_completion(self):
-        """Handle completion of tricks"""
-        if len(self.game_state.current_trick_cards) == 4:
-            if self.animation_mgr.has_moving_cards():
-                return
-
-            # Calculate points
-            points = sum(
-                1
-                if card.suit == "H"
-                else 13
-                if card.suit == "S" and card.rank == 12
-                else 0
-                for card, _ in self.game_state.current_trick_cards
-            )
-
-            # Find winner
-            lead_suit = self.game_state.current_trick_cards[0][0].suit
-            followed_suit = [
-                (card, player)
-                for card, player in self.game_state.current_trick_cards
-                if card.suit == lead_suit
-            ]
-            highest_card = max(
-                followed_suit if followed_suit else self.game_state.current_trick_cards,
-                key=lambda x: x[0].rank,
-            )
-            winner = highest_card[1]
-
-            # Update AI state
-            for player in self.game_state.players:
-                if isinstance(player.strategy, AIStrategy):
-                    player.strategy.update_game_state(True, winner)
-
-            # Complete the trick
-            self.game_state.game.complete_trick()
+        if self.game.current_trick.is_empty:
             self.animation_mgr.clear_animations()
-            self.game_state.trick_completed = True
+
+        card_idx = self.game.hands[self.game.current_player_index].index(played_card)
+
+        start_pos = self.layout.get_hand_position(
+            self.game.current_player_index, card_idx
+        )
+        target_pos = self.layout.get_trick_position(self.game.current_player_index)
+
+        sprite = CardSprite(played_card)
+        self.animation_mgr.add_card_animation(sprite, start_pos, target_pos)
+        self.game_state.last_auto_play = current_time
+
+        self.game.play_card(played_card)
+
+        if self.game.current_trick.is_empty:
             self.game_state.paused = True
 
     def _handle_game_over(self):
         """Handle game over state"""
-        if not self.game_state.is_game_over():
+        if not self.game.is_game_over():
             return
 
         current_time = pygame.time.get_ticks()
@@ -166,31 +131,18 @@ class GameVisualizer:
         self.game_state.reset_game()
         self.animation_mgr.clear_animations()
 
-        # Reset AI game state
-        for player in self.game_state.players:
-            if isinstance(player.strategy, AIStrategy):
-                player.strategy.game_id += 1
-                player.strategy.trick_number = 0
-                player.strategy.previous_tricks = []
-                player.strategy.current_trick_cards = []
-
         self.game_state.last_auto_play = current_time
 
     def update(self):
-        """Update game state"""
+        self.animation_mgr.update_animations()
+
         if self.game_state.paused:
             return
-
-        # Handle trick completion
-        self._handle_trick_completion()
 
         self._handle_play()
 
         # Handle game over
         self._handle_game_over()
-
-        # Update animations
-        self.animation_mgr.update_animations()
 
     def run(self):
         """Main game loop"""
@@ -199,7 +151,7 @@ class GameVisualizer:
             self.clock.tick(FPS)
             running = self.event_handler.handle_events()
             self.update()
-            self.renderer.render_frame(self.game_state, self.animation_mgr)
+            self.renderer.render_frame(self.game_state, self.game, self.animation_mgr)
 
         pygame.quit()
 

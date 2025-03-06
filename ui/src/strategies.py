@@ -3,47 +3,61 @@ import random
 from typing import List, Optional
 
 import requests
-from card import Card, CardMove
+from card import Card, CompletedTrick
+
+
+class StrategyGameState:
+    def __init__(
+        self,
+        tricks: List[CompletedTrick],
+        current_trick: List[Card],
+        player_hand: List[Card],
+        valid_moves: List[Card],
+    ):
+        self.tricks = tricks
+        self.current_trick = current_trick
+        self.player_hand = player_hand
+        self.valid_moves = valid_moves
 
 
 class Strategy:
-    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Optional[Card]:
+    def choose_card(self, gameState: StrategyGameState) -> Card:
         raise NotImplementedError
 
 
 class HumanStrategy(Strategy):
-    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Optional[Card]:
-        return None
+    def choose_card(self, gameState: StrategyGameState) -> Card:
+        raise NotImplementedError
 
 
 class RandomStrategy(Strategy):
     """Strategy that plays random valid moves"""
 
-    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Optional[Card]:
+    def choose_card(self, gameState: StrategyGameState) -> Card:
         """Choose a random valid card to play"""
-        if not valid_moves:
-            return hand[0]  # If no valid moves, play any card
-        return random.choice(valid_moves)
+        if not gameState.valid_moves:
+            return gameState.player_hand[0]
+        return random.choice(gameState.valid_moves)
 
 
 class AvoidPointsStrategy(Strategy):
-    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Optional[Card]:
+    def choose_card(self, gameState: StrategyGameState) -> Card:
         # Play lowest value card, avoiding hearts and queen of spades
         return min(
-            valid_moves,
+            gameState.valid_moves,
             key=lambda card: card.rank + 13
-            if (card.suit == "H" or (card.suit == "S" and card.rank == 12))
+            if (card.suit == "H" or card == Card.QueenOfSpades)
             else card.rank,
         )
 
 
 class AggressiveStrategy(Strategy):
-    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Optional[Card]:
+    def choose_card(self, gameState: StrategyGameState) -> Card:
         # Play highest value card, preferring hearts and queen of spades
         return max(
-            valid_moves,
+            gameState.valid_moves,
             key=lambda card: card.rank + 13
-            if (card.suit == "H" or (card.suit == "S" and card.rank == 12))
+            if (card.suit == "H" or card == Card.QueenOfSpades)
             else card.rank,
         )
 
@@ -59,7 +73,7 @@ class AIStrategy(Strategy):
         self.current_trick_cards = []  # List of (card, player_index) tuples
         self.current_trick_cards_raw = []  # List of raw (suit, rank, player_index) tuples
 
-    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Card:
+    def choose_card(self, gameState: StrategyGameState) -> Card:
         """Choose a card to play using the AI model"""
         try:
             # Convert current trick cards to proper format
@@ -81,9 +95,13 @@ class AIStrategy(Strategy):
                     "previous_tricks": recent_tricks,
                     "current_trick_cards": trick_cards,
                     "current_player_index": 3,  # AI is always player 3
-                    "player_hand": [{"suit": c.suit, "rank": c.rank} for c in hand],
+                    "player_hand": [
+                        {"suit": c.suit, "rank": c.rank} for c in gameState.player_hand
+                    ],
                 },
-                "valid_moves": [{"suit": c.suit, "rank": c.rank} for c in valid_moves],
+                "valid_moves": [
+                    {"suit": c.suit, "rank": c.rank} for c in gameState.valid_moves
+                ],
             }
 
             print("Sending request to AI service:", json.dumps(data, indent=2))
@@ -101,7 +119,7 @@ class AIStrategy(Strategy):
             if isinstance(result, dict) and "suit" in result and "rank" in result:
                 predicted_card = Card(suit=result["suit"], rank=result["rank"])
                 # Verify the predicted card is in valid_moves
-                if predicted_card in valid_moves:
+                if predicted_card in gameState.valid_moves:
                     return predicted_card
                 print(f"AI predicted invalid move: {predicted_card}")
                 raise ValueError("AI predicted invalid move")
@@ -112,7 +130,7 @@ class AIStrategy(Strategy):
         except Exception as e:
             print(f"AI service error: {str(e)}, falling back to random strategy")
             # Fall back to random strategy
-            return self.fallback.choose_card(hand, valid_moves)
+            return self.fallback.choose_card(gameState)
 
     def update_game_state(self, trick_completed: bool, winner: Optional[int] = None):
         """Update the game state after a trick is completed"""
