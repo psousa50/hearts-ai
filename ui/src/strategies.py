@@ -1,7 +1,7 @@
 import json
 import random
 from dataclasses import dataclass
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
 
 import requests
 from card import Card, CompletedTrick, Trick
@@ -13,7 +13,11 @@ class TrickCard:
     player_index: int
 
     def to_dict(self) -> Dict[str, Any]:
-        return {"card": {"suit": self.card.suit, "rank": self.card.rank}, "player_index": self.player_index}
+        return {
+            "card": {"suit": self.card.suit, "rank": self.card.rank},
+            "player_index": self.player_index,
+        }
+
 
 @dataclass
 class PredictionState:
@@ -29,18 +33,34 @@ class PredictionState:
         return {
             "game_id": self.game_id,
             "trick_number": self.trick_number,
-            "previous_tricks": [{
-                "cards": [{
-                    "card": {"suit": card.suit, "rank": card.rank},
-                    "player_index": i
-                } for i, card in enumerate(trick.cards)],
-                "winner": trick.winner
-            } for trick in self.previous_tricks],
-            "current_trick_cards": [card.to_dict() for card in self.current_trick_cards],
+            "previous_tricks": [
+                {
+                    "cards": [
+                        {
+                            "card": {"suit": card.suit, "rank": card.rank},
+                            "player_index": i,
+                        }
+                        for i, card in enumerate(trick.cards)
+                    ],
+                    "winner": trick.winner,
+                }
+                for trick in self.previous_tricks
+            ],
+            "current_trick_cards": [
+                card.to_dict() for card in self.current_trick_cards
+            ],
             "current_player_index": self.current_player_index,
-            "player_hand": [{"suit": card.suit, "rank": card.rank} for card in self.player_hand],
-            "played_card": {"suit": self.played_card.suit, "rank": self.played_card.rank} if self.played_card else None
+            "player_hand": [
+                {"suit": card.suit, "rank": card.rank} for card in self.player_hand
+            ],
+            "played_card": {
+                "suit": self.played_card.suit,
+                "rank": self.played_card.rank,
+            }
+            if self.played_card
+            else None,
         }
+
 
 @dataclass
 class PredictionRequest:
@@ -50,8 +70,11 @@ class PredictionRequest:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "state": self.state.to_dict(),
-            "valid_moves": [{"suit": card.suit, "rank": card.rank} for card in self.valid_moves]
+            "valid_moves": [
+                {"suit": card.suit, "rank": card.rank} for card in self.valid_moves
+            ],
         }
+
 
 @dataclass
 class StrategyGameState:
@@ -107,48 +130,34 @@ class AIStrategy(Strategy):
     def __init__(self):
         super().__init__()
         self.endpoint = "http://localhost:8000/predict"
-        self.fallback = RandomStrategy()
         self.game_id = 0
-        self.trick_number = 0
-        self.previous_tricks = []
-        self.current_trick_cards = []  # List of (card, player_index) tuples
-        self.current_trick_cards_raw = []  # List of raw (suit, rank, player_index) tuples
 
     def choose_card(self, gameState: StrategyGameState) -> Card:
         """Choose a card to play using the AI model"""
         try:
             # Convert current trick cards to proper format
             trick_cards = [
-                TrickCard(card=Card(suit=suit, rank=rank), player_index=player_idx)
-                for (suit, rank, player_idx) in self.current_trick_cards_raw[-4:]
+                TrickCard(card=card, player_index=i)
+                for i, card in enumerate(gameState.current_trick.cards)
+                if card is not None
             ]
-
-            # Get only the last 3 tricks to prevent state from getting too large
-            recent_tricks = [
-                CompletedTrick(
-                    cards=[Card(suit=c["card"]["suit"], rank=c["card"]["rank"]) for c in trick["cards"]],
-                    first_player=trick["cards"][0]["player_index"],
-                    winner=trick["winner"],
-                    score=0  # Score is not needed for prediction
-                )
-                for trick in self.previous_tricks[-3:]
-            ] if self.previous_tricks else []
 
             # Create prediction state
             state = PredictionState(
                 game_id=self.game_id,
-                trick_number=self.trick_number,
-                previous_tricks=recent_tricks,
+                trick_number=len(
+                    gameState.tricks
+                ),  # Current trick number is the number of completed tricks
+                previous_tricks=gameState.tricks[-3:]
+                if gameState.tricks
+                else [],  # Get only the last 3 tricks
                 current_trick_cards=trick_cards,
                 current_player_index=3,  # AI is always player 3
-                player_hand=gameState.player_hand
+                player_hand=gameState.player_hand,
             )
 
             # Create prediction request
-            request = PredictionRequest(
-                state=state,
-                valid_moves=gameState.valid_moves
-            )
+            request = PredictionRequest(state=state, valid_moves=gameState.valid_moves)
 
             # Prepare request data
             data = request.to_dict()
@@ -177,53 +186,30 @@ class AIStrategy(Strategy):
             raise ValueError("Invalid prediction format")
 
         except Exception as e:
-            print(f"AI service error: {str(e)}, falling back to random strategy")
-            # Fall back to random strategy
-            return self.fallback.choose_card(gameState)
-
-    def update_game_state(self, trick_completed: bool, winner: Optional[int] = None):
-        """Update the game state after a trick is completed"""
-        if trick_completed:
-            # Add the current trick to previous tricks
-            self.previous_tricks.append(
-                {
-                    "cards": [
-                        {
-                            "card": {"suit": suit, "rank": rank},
-                            "player_index": player_idx,
-                        }
-                        for (suit, rank, player_idx) in self.current_trick_cards_raw[
-                            -4:
-                        ]
-                    ],
-                    "winner": winner,
-                }
+            raise ValueError(
+                f"AI service error: {str(e)}, falling back to random strategy"
             )
-            self.trick_number += 1
-            self.current_trick_cards = []
-            self.current_trick_cards_raw = []
+
+    def update_game_id(self, game_id: int):
+        """Update the game ID"""
+        self.game_id = game_id
 
 
 class ReplayStrategy(Strategy):
     def __init__(self, cards: List[Card]):
         self.cards = cards.copy()  # Make a copy to avoid modifying the original
         self.current_index = 0
-        self.fallback = RandomStrategy()  # Fallback to random if we run out of cards
 
     def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Card:
         if self.current_index >= len(self.cards):
-            print("Warning: Replay strategy ran out of cards, falling back to random")
-            return self.fallback.choose_card(hand, valid_moves)
+            raise ValueError("Replay strategy ran out of cards")
 
         card = self.cards[self.current_index]
         self.current_index += 1
 
         # Verify the card is valid
         if card not in valid_moves:
-            print(
-                f"Warning: Replay card {card} not in valid moves {valid_moves}, falling back to random"
-            )
-            return self.fallback.choose_card(hand, valid_moves)
+            raise ValueError("Replay strategy predicted invalid move")
 
         return card
 
