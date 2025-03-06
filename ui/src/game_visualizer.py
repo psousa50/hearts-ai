@@ -14,6 +14,7 @@ from hearts_game import HeartsGame, Player
 from layout_manager import LayoutManager
 from strategies import (
     AggressiveStrategy,
+    AIStrategy,
     AvoidPointsStrategy,
     HumanStrategy,
     RandomStrategy,
@@ -60,8 +61,8 @@ class GameVisualizer:
             Player("You", HumanStrategy()),
             Player("Bob", AvoidPointsStrategy()),
             Player("Charlie", AggressiveStrategy()),
-            Player("AI", RandomStrategy()),
-            # Player("AI", AIStrategy()),
+            # Player("AI", RandomStrategy()),
+            Player("AI", AIStrategy()),
         ]
 
     def _create_replay_players(self, game_file: str) -> List[Player]:
