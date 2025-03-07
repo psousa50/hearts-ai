@@ -21,7 +21,7 @@ enum Commands {
         #[arg(short, long, default_value_t = 1)]
         num_games: usize,
     },
-    
+
     /// Analyze existing game results
     AnalyzeResults {
         /// Input file containing game results
@@ -38,6 +38,10 @@ enum Commands {
         /// Also save game results to a separate file
         #[arg(short, long)]
         save_games: bool,
+
+        /// Also save training data to a separate file
+        #[arg(short = 'j', long)]
+        save_as_json: bool,
     },
 }
 
@@ -51,8 +55,12 @@ fn main() {
         Commands::AnalyzeResults { input } => {
             analyze::analyze_results(input);
         }
-        Commands::GenerateAiTrainingData { num_games, save_games } => {
-            training::generate_training_data(*num_games, *save_games);
+        Commands::GenerateAiTrainingData {
+            num_games,
+            save_games,
+            save_as_json,
+        } => {
+            training::generate_training_data(*num_games, *save_games, *save_as_json);
         }
     }
 }

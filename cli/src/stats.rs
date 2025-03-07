@@ -34,7 +34,7 @@ pub fn display_statistics(games: &[GameResult]) {
         let avg_score = *total_score as f64 / games.len() as f64;
 
         println!(
-            "{:<20} |    {:>5.1}% |     {:>5.1} |         {:>2}",
+            "{:<25} |    {:>5.1}% |     {:>5.1} |         {:>2}",
             format!("{} ({})", name, strategy),
             win_rate,
             avg_score,

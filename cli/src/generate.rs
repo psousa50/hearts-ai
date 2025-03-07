@@ -22,8 +22,8 @@ pub fn generate_games(num_games: usize) {
         ("David", Strategy::Aggressive(AggressiveStrategy)),
     ];
 
-    for game_id in 0..num_games {
-        let mut game = HeartsGame::new(&player_configs, game_id);
+    for _ in 0..num_games {
+        let mut game = HeartsGame::new(&player_configs);
         let result = game.play_game();
         results.push(result);
     }

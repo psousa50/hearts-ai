@@ -16,7 +16,7 @@ It should contain all the information needed to run the game, including:
 It should contain all the information needed to replay the game, including:
 
 - The game id
-- The players, their strategies and scores
+- The players (name, initial hand, strategy, score)
 - All the tricks
 - The winner
 
@@ -42,6 +42,7 @@ It should contain all the information about the current trick, including:
 It should contain all the information about a player, including:
 
 - The player name
+- The player initial hand
 - The player strategy
 - The player score
 
@@ -55,7 +56,7 @@ It should contain all the information needed to train the AI, including:
 - The previous tricks
 - The current trick cards
 - The current player
-- The player hand
+- The player hand at the time of the play
 - The played card
 
 

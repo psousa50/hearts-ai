@@ -1,11 +1,11 @@
-mod card;
 mod deck;
 mod game;
+mod models;
 mod player;
 mod strategy;
 
-pub use card::Card;
 pub use deck::Deck;
-pub use game::{GameResult, HeartsGame};
+pub use game::{GameResult, HeartsGame, PlayerInfo};
+pub use models::{Card, CompletedTrick, Trick};
 pub use player::Player;
-pub use strategy::{AggressiveStrategy, AvoidPointsStrategy, RandomStrategy, Strategy, AIStrategy};
+pub use strategy::{AIStrategy, AggressiveStrategy, AvoidPointsStrategy, RandomStrategy, Strategy};

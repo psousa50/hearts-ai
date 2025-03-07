@@ -1,17 +1,19 @@
-use crate::card::Card;
+use crate::models::Card;
 use crate::strategy::Strategy;
 
 pub struct Player {
     pub name: String,
+    pub initial_hand: Vec<Card>,
     pub hand: Vec<Card>,
     pub score: u8,
     strategy: Strategy,
 }
 
 impl Player {
-    pub fn with_strategy(name: &str, hand: Vec<Card>, strategy: Strategy) -> Self {
+    pub fn new(name: &str, hand: Vec<Card>, strategy: Strategy) -> Self {
         Self {
             name: name.to_string(),
+            initial_hand: hand.clone(),
             hand,
             score: 0,
             strategy,

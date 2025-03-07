@@ -1,4 +1,4 @@
-use crate::card::Card;
+use crate::models::Card;
 use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 
