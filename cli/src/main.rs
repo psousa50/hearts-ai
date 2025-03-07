@@ -1,5 +1,6 @@
 mod analyze;
 mod generate;
+mod models;
 mod stats;
 mod training;
 

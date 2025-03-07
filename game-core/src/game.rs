@@ -16,6 +16,7 @@ pub struct Trick {
     pub cards: Vec<TrickCard>,
     pub winner: usize,
     pub points: u8,
+    pub first_player: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -154,12 +155,16 @@ impl HeartsGame {
     }
 
     fn play_trick(&mut self) -> Trick {
-        let mut trick_cards = Vec::new();
-        let mut current_player = self.current_leader;
+        // Store the first player (leader) of this trick
+        let first_player = self.current_leader;
+        
+        // Play the trick in turn order
+        let mut played_cards = Vec::new();
+        let mut current_player = first_player;
         let mut lead_suit = None;
 
         for i in 0..4 {
-            let is_first_card = i == 0 && trick_cards.is_empty();
+            let is_first_card = i == 0;
             let valid_moves = self.get_valid_moves(
                 &self.players[current_player].hand,
                 lead_suit,
@@ -176,13 +181,23 @@ impl HeartsGame {
                 lead_suit = Some(played_card.suit);
             }
 
-            trick_cards.push(TrickCard {
+            // Store the card with player information
+            played_cards.push((current_player, TrickCard {
                 card: played_card,
                 player_index: current_player,
                 hand: self.players[current_player].hand.clone(),
-            });
+            }));
+            
             current_player = (current_player + 1) % 4;
         }
+        
+        // Sort the cards by player index (0-3) rather than the order played
+        played_cards.sort_by_key(|(player_idx, _)| *player_idx);
+        
+        // Extract just the TrickCard objects in player order
+        let trick_cards = played_cards.into_iter()
+            .map(|(_, card)| card)
+            .collect::<Vec<_>>();
 
         let lead_suit = lead_suit.unwrap();
         let winner = Self::determine_trick_winner(
@@ -206,6 +221,7 @@ impl HeartsGame {
             cards: trick_cards,
             winner,
             points,
+            first_player: self.current_leader,
         }
     }
 

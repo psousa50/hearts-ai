@@ -1,29 +1,13 @@
 use chrono::Utc;
 use hearts_game::{AggressiveStrategy, AvoidPointsStrategy, HeartsGame, RandomStrategy, Strategy};
 use rmp_serde;
-use serde::Serialize;
 use std::collections::HashSet;
 use std::fs::{self, File};
 use std::io::BufWriter;
 use std::path::PathBuf;
 use std::time::Instant;
 
-#[derive(Serialize, Clone)]
-struct CompactCard(char, u8); // (suit, rank)
-
-#[derive(Serialize, Clone)]
-struct CompactTrick(Vec<CompactCard>, usize); // (cards, winner)
-
-#[derive(Serialize)]
-struct CompactTrainingData(
-    usize,             // game_id
-    usize,             // trick_number
-    Vec<CompactTrick>, // previous_tricks
-    Vec<CompactCard>,  // current_trick_cards
-    usize,             // current_player_index
-    Vec<CompactCard>,  // player_hand
-    CompactCard,       // played_card
-);
+use crate::models::{Card, CompactTrainingData, CompletedTrick, Trick};
 
 pub fn generate_training_data(num_games: usize, save_games: bool) {
     let start = Instant::now();
@@ -61,7 +45,10 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
         let mut previous_tricks = Vec::new();
 
         for (trick_number, trick) in game_result.tricks.iter().enumerate() {
-            let mut current_trick_cards = Vec::new();
+            let mut current_trick = Trick::new();
+            current_trick.first_player = trick.first_player;
+            current_trick.winner = trick.winner;
+            current_trick.points = trick.points;
             let mut trick_points = vec![0; 4]; // Track points in current trick
 
             // For each card played in the trick
@@ -71,20 +58,30 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
                 // Skip if player had bad final score
                 if bad_players.contains(&trick_card.player_index) {
                     excluded_moves += 1;
-                    current_trick_cards
-                        .push(CompactCard(trick_card.card.suit, trick_card.card.rank));
+                    current_trick.push(Card {
+                        suit: trick_card.card.suit,
+                        rank: trick_card.card.rank,
+                    });
                     continue;
                 }
 
                 // Calculate points this card would add to the trick
-                let card_points = trick_card.card.score();
+                let card_points = if trick_card.card.suit == 'H' {
+                    1
+                } else if trick_card.card.suit == 'S' && trick_card.card.rank == 12 {
+                    13
+                } else {
+                    0
+                };
                 trick_points[trick_card.player_index] += card_points;
 
                 // Skip if this move causes player to score more than 1 point
                 if trick_points[trick_card.player_index] > 1 {
                     excluded_moves += 1;
-                    current_trick_cards
-                        .push(CompactCard(trick_card.card.suit, trick_card.card.rank));
+                    current_trick.push(Card {
+                        suit: trick_card.card.suit,
+                        rank: trick_card.card.rank,
+                    });
                     continue;
                 }
 
@@ -92,28 +89,45 @@ pub fn generate_training_data(num_games: usize, save_games: bool) {
                 let mut player_hand = trick_card
                     .hand
                     .iter()
-                    .map(|c| CompactCard(c.suit, c.rank))
+                    .map(|c| Card {
+                        suit: c.suit,
+                        rank: c.rank,
+                    })
                     .collect::<Vec<_>>();
-                player_hand.push(CompactCard(trick_card.card.suit, trick_card.card.rank)); // Add back the played card
+                player_hand.push(Card {
+                    suit: trick_card.card.suit,
+                    rank: trick_card.card.rank,
+                }); // Add back the played card
 
                 // Create a training example for this play
-                let training_item = CompactTrainingData(
+                let training_item = CompactTrainingData {
                     game_id,
                     trick_number,
-                    previous_tricks.clone(),
-                    current_trick_cards.clone(),
-                    trick_card.player_index,
+                    previous_tricks: previous_tricks.clone(),
+                    current_trick_cards: current_trick.cards.clone(),
+                    current_player_index: trick_card.player_index,
                     player_hand,
-                    CompactCard(trick_card.card.suit, trick_card.card.rank),
-                );
+                    played_card: Card {
+                        suit: trick_card.card.suit,
+                        rank: trick_card.card.rank,
+                    },
+                };
                 training_data.push(training_item);
 
                 // Update current trick for next card
-                current_trick_cards.push(CompactCard(trick_card.card.suit, trick_card.card.rank));
+                current_trick.push(Card {
+                    suit: trick_card.card.suit,
+                    rank: trick_card.card.rank,
+                });
             }
 
             // After processing all cards in the trick, add it to previous tricks
-            previous_tricks.push(CompactTrick(current_trick_cards.clone(), trick.winner));
+            previous_tricks.push(CompletedTrick {
+                cards: current_trick.cards.clone(),
+                first_player: trick.first_player,
+                score: trick.points,
+                winner: trick.winner,
+            });
         }
 
         if save_games {
