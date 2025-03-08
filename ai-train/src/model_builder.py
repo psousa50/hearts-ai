@@ -5,7 +5,7 @@ import msgpack
 import numpy as np
 import tensorflow as tf
 from encoding import INPUT_SEQUENCE_LENGTH, encode_game_state
-from model import GameState
+from model import Card, CompletedTrick, GameState, Trick
 from tensorflow.keras.callbacks import (
     Callback,
     CSVLogger,
@@ -140,49 +140,9 @@ class HeartsModel:
         with open(train_data_path, "rb") as f:
             raw_data = msgpack.unpackb(f.read(), raw=False)
 
-        # Convert each card from [suit, rank] format to Card object format
-        def convert_card(card_data):
-            suit, rank = card_data
-            return {"suit": suit, "rank": rank}
+        game_states = extract_game_states(raw_data)
 
-        def convert_trick(trick_data):
-            cards, winner = trick_data
-            # Create card moves with sequential player indices
-            return {
-                "cards": [
-                    {"card": convert_card(card), "player_index": idx}
-                    for idx, card in enumerate(cards)
-                ],
-                "winner": winner,
-            }
-
-        gameStates = []
-        for data in raw_data:
-            (
-                game_id,
-                trick_number,
-                previous_tricks,
-                current_trick_cards,
-                current_player_index,
-                player_hand,
-                played_card,
-            ) = data
-
-            game_state = GameState(
-                game_id=game_id,
-                trick_number=trick_number,
-                previous_tricks=[convert_trick(t) for t in previous_tricks],
-                current_trick=[
-                    {"card": convert_card(card), "player_index": idx}
-                    for idx, card in enumerate(current_trick_cards)
-                ],
-                current_player_index=current_player_index,
-                player_hand=[convert_card(c) for c in player_hand],
-                played_card=convert_card(played_card),
-            )
-            gameStates.append(game_state)
-
-        num_examples = len(gameStates)
+        num_examples = len(game_states)
         print(f"Training on {num_examples} examples", flush=True)
 
         # Calculate optimal parameters
@@ -219,8 +179,8 @@ class HeartsModel:
         y = []
 
         print("Loading training data...", flush=True)
-        total = len(gameStates)
-        for i, gameState in enumerate(gameStates, 1):
+        total = len(game_states)
+        for i, gameState in enumerate(game_states, 1):
             if i % 1000 == 0:
                 print(f"Processing example {i}/{total}...", flush=True)
 
@@ -275,3 +235,91 @@ class HeartsModel:
         self.model.save("models/latest.keras")  # Using native Keras format
 
         return history
+
+
+def extract_game_states(raw_data) -> list[GameState]:
+    # Convert each card from [suit, rank] format to Card object format
+    def convert_card(card_data):
+        if isinstance(card_data, list) and len(card_data) == 2:
+            suit, rank = card_data
+            return Card(suit=suit, rank=rank)
+        return None
+
+    # Convert each completed trick from the raw format to CompletedTrick object
+    def convert_completed_trick(trick_data):
+        if isinstance(trick_data, list) and len(trick_data) >= 2:
+            cards_data = trick_data[0] if len(trick_data) > 0 else []
+            winner = trick_data[1] if len(trick_data) > 1 else 0
+            # For first_player, we'll use a default of 0 if not provided
+            first_player = 0  # Default value
+            
+            cards = [convert_card(card) for card in cards_data if card is not None]
+            
+            return CompletedTrick(
+                cards=cards,
+                winner=winner,
+                score=0,  # Default value for score
+                first_player=first_player,
+            )
+        return CompletedTrick(cards=[], winner=0, score=0, first_player=0)
+
+    # Convert current trick from the raw format to Trick object
+    def convert_current_trick(trick_data):
+        if isinstance(trick_data, list) and len(trick_data) >= 2:
+            cards_data = trick_data[0] if len(trick_data) > 0 else []
+            first_player = trick_data[1] if len(trick_data) > 1 else 0
+            
+            cards = [convert_card(card) for card in cards_data if card is not None]
+            
+            return Trick(
+                cards=cards,
+                first_player=first_player,
+            )
+        return Trick(cards=[], first_player=0)
+
+    # Convert each game state from raw format to GameState object
+    def convert_game_state(game_state_data, index):
+        # Based on the debug output, the game state has 5 elements:
+        # [0]: Previous tricks (empty list in the example)
+        # [1]: Current trick data [[cards], player_index]
+        # [2]: Current player index
+        # [3]: Player hand (list of cards)
+        # [4]: Played card
+        
+        if not isinstance(game_state_data, list) or len(game_state_data) < 5:
+            # Return a default GameState if the data format is unexpected
+            return GameState(
+                game_id=index,
+                trick_number=0,
+                previous_tricks=[],
+                current_trick=Trick(cards=[], first_player=0),
+                current_player_index=0,
+                player_hand=[],
+                played_card=None,
+            )
+        
+        # Extract data from the list format
+        previous_tricks_data = game_state_data[0] if len(game_state_data) > 0 else []
+        current_trick_data = game_state_data[1] if len(game_state_data) > 1 else [[], 0]
+        current_player_index = game_state_data[2] if len(game_state_data) > 2 else 0
+        player_hand_data = game_state_data[3] if len(game_state_data) > 3 else []
+        played_card_data = game_state_data[4] if len(game_state_data) > 4 else None
+        
+        # Convert the data to the appropriate objects
+        previous_tricks = [convert_completed_trick(trick) for trick in previous_tricks_data]
+        current_trick = convert_current_trick(current_trick_data)
+        player_hand = [convert_card(card) for card in player_hand_data if card is not None]
+        played_card = convert_card(played_card_data) if played_card_data else None
+        
+        return GameState(
+            game_id=index,  # Use index as game_id since it's not in the data
+            trick_number=len(previous_tricks),  # Derive trick number from previous tricks
+            previous_tricks=previous_tricks,
+            current_trick=current_trick,
+            current_player_index=current_player_index,
+            player_hand=player_hand,
+            played_card=played_card,
+        )
+
+    # Convert each game state from raw format to GameState object
+    return [convert_game_state(game_state, i) for i, game_state in enumerate(raw_data)]

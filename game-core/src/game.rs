@@ -173,6 +173,8 @@ impl HeartsGame {
             first_player,
         };
 
+        self.players[completed_trick.winner].score += completed_trick.points;
+
         self.tricks.push(completed_trick);
         self.current_trick = Trick::new();
     }

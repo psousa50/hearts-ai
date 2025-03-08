@@ -1,9 +1,10 @@
 import argparse
+import json
 import os
 import signal
 import sys
 
-from model_builder import HeartsModel
+from model_builder import HeartsModel, extract_game_states
 
 
 def signal_handler(sig, frame):
@@ -14,7 +15,7 @@ def signal_handler(sig, frame):
 def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="Train Hearts AI model on game data")
-    parser.add_argument("json_file", help="Path to the training data JSON file")
+    parser.add_argument("training_data_file", help="Path to the training data file")
     parser.add_argument(
         "--batch-size", type=int, help="Override automatic batch size calculation"
     )
@@ -27,15 +28,30 @@ def main():
     args = parser.parse_args()
 
     print("Training parameters:")
-    print(f"- JSON file: {args.json_file}", flush=True)
+    print(f"- Training data file: {args.training_data_file}", flush=True)
     print(f"- Batch size: {args.batch_size}", flush=True)
     print(f"- Epochs: {args.epochs}", flush=True)
     print(f"- Validation split: {args.validation_split}\n", flush=True)
 
     # Check if file exists
-    if not os.path.exists(args.json_file):
-        print(f"Error: File {args.json_file} not found!", flush=True)
+    if not os.path.exists(args.training_data_file):
+        print(f"Error: File {args.training_data_file} not found!", flush=True)
         return
+
+    import msgpack
+
+    with open(args.training_data_file, "rb") as f:
+        raw_data = msgpack.unpackb(f.read(), raw=False)
+
+    print(f"Number of game states in raw data: {len(raw_data)}", flush=True)
+
+    # Extract game states from raw data
+    game_states = extract_game_states(raw_data)
+    for game_state in game_states:
+        print(game_state)
+    game_states_json = [game_state.model_dump() for game_state in game_states]
+    open("game_states.json", "w").write(json.dumps(game_states_json))
+    exit(0)
 
     # Register signal handler for graceful interruption
     signal.signal(signal.SIGINT, signal_handler)
@@ -53,7 +69,7 @@ def main():
     try:
         print("Starting training...", flush=True)
         model.train(
-            train_data_path=args.json_file,
+            train_data_path=args.training_data_file,
             epochs=args.epochs,  # Will be None if not specified
             batch_size=args.batch_size,  # Will be None if not specified
             validation_split=args.validation_split,

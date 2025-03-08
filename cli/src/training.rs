@@ -49,13 +49,12 @@ pub fn generate_training_data(num_games: usize, save_games: bool, save_as_json: 
         let mut writer = BufWriter::new(file);
         serde_json::to_writer_pretty(&mut writer, &training_data).expect("Failed to write JSON");
         println!("Training data saved to: {}", filepath.display());
-    } else {
-        let filename = format!("training_data_{}_{}_games.msgpack", timestamp, num_games);
-        let filepath = PathBuf::from("data").join(filename);
-        let file = File::create(&filepath).expect("Failed to create file");
-        let mut writer = BufWriter::new(file);
-        rmp_serde::encode::write(&mut writer, &training_data).expect("Failed to write MessagePack");
     }
+    let filename = format!("training_data_{}_{}_games.msgpack", timestamp, num_games);
+    let filepath = PathBuf::from("data").join(filename);
+    let file = File::create(&filepath).expect("Failed to create file");
+    let mut writer = BufWriter::new(file);
+    rmp_serde::encode::write(&mut writer, &training_data).expect("Failed to write MessagePack");
 
     // Save game results if requested
     if save_games {
@@ -118,21 +117,29 @@ fn extract_training_data(game_result: &CompletedHeartsGame) -> Vec<CompactTraini
         current_trick.first_player = trick.first_player;
 
         // For each card played in the trick
+        let mut current_trick = Trick::new();
         for (player_index, trick_card) in trick.cards.iter().enumerate() {
             let card_idx = hands[player_index]
                 .iter()
                 .position(|c| c == trick_card)
                 .unwrap();
             hands[player_index].remove(card_idx);
+            current_trick.add_card(trick_card.clone(), player_index);
 
-            if true || include_move(&bad_players, player_index, trick_card) {
+            let cc = current_trick
+                .cards
+                .iter()
+                .map(|c| c.map(|c| CompactCard(c.suit, c.rank)))
+                .collect();
+
+            if include_move(&bad_players, player_index, trick_card) {
                 let training_item = CompactTrainingData {
                     previous_tricks: previous_tricks.clone(),
                     current_trick: CompactTrick {
-                        cards: trick
+                        cards: current_trick
                             .cards
                             .iter()
-                            .map(|c| CompactCard(c.suit, c.rank))
+                            .map(|c| c.map(|c| CompactCard(c.suit, c.rank)))
                             .collect(),
                         first_player: trick.first_player,
                     },
