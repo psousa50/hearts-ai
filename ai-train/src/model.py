@@ -22,8 +22,6 @@ class CompletedTrick(BaseModel):
 
 
 class GameState(BaseModel):
-    game_id: int
-    trick_number: int
     previous_tricks: List[CompletedTrick]
     current_trick: Trick
     current_player_index: int

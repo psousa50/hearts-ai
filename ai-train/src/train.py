@@ -45,14 +45,6 @@ def main():
 
     print(f"Number of game states in raw data: {len(raw_data)}", flush=True)
 
-    # Extract game states from raw data
-    game_states = extract_game_states(raw_data)
-    for game_state in game_states:
-        print(game_state)
-    game_states_json = [game_state.model_dump() for game_state in game_states]
-    open("game_states.json", "w").write(json.dumps(game_states_json))
-    exit(0)
-
     # Register signal handler for graceful interruption
     signal.signal(signal.SIGINT, signal_handler)
 

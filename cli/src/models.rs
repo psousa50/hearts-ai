@@ -5,7 +5,7 @@ pub struct CompactCard(pub char, pub u8);
 
 #[derive(Clone, Serialize)]
 pub struct CompactTrick {
-    pub cards: Vec<CompactCard>,
+    pub cards: Vec<Option<CompactCard>>,
     pub first_player: usize,
 }
 
@@ -17,7 +17,7 @@ pub struct CompactCompletedTrick {
     pub first_player: usize,
 }
 
-#[derive(Serialize)]
+#[derive(Clone, Serialize)]
 pub struct CompactTrainingData {
     pub previous_tricks: Vec<CompactCompletedTrick>,
     pub current_trick: CompactTrick,

@@ -252,9 +252,8 @@ def extract_game_states(raw_data) -> list[GameState]:
             winner = trick_data[1] if len(trick_data) > 1 else 0
             # For first_player, we'll use a default of 0 if not provided
             first_player = 0  # Default value
-            
             cards = [convert_card(card) for card in cards_data if card is not None]
-            
+
             return CompletedTrick(
                 cards=cards,
                 winner=winner,
@@ -268,9 +267,9 @@ def extract_game_states(raw_data) -> list[GameState]:
         if isinstance(trick_data, list) and len(trick_data) >= 2:
             cards_data = trick_data[0] if len(trick_data) > 0 else []
             first_player = trick_data[1] if len(trick_data) > 1 else 0
-            
+
             cards = [convert_card(card) for card in cards_data if card is not None]
-            
+
             return Trick(
                 cards=cards,
                 first_player=first_player,
@@ -285,35 +284,28 @@ def extract_game_states(raw_data) -> list[GameState]:
         # [2]: Current player index
         # [3]: Player hand (list of cards)
         # [4]: Played card
-        
+
         if not isinstance(game_state_data, list) or len(game_state_data) < 5:
-            # Return a default GameState if the data format is unexpected
-            return GameState(
-                game_id=index,
-                trick_number=0,
-                previous_tricks=[],
-                current_trick=Trick(cards=[], first_player=0),
-                current_player_index=0,
-                player_hand=[],
-                played_card=None,
-            )
-        
+            raise ValueError(f"Invalid game state format: {game_state_data}")
+
         # Extract data from the list format
         previous_tricks_data = game_state_data[0] if len(game_state_data) > 0 else []
         current_trick_data = game_state_data[1] if len(game_state_data) > 1 else [[], 0]
         current_player_index = game_state_data[2] if len(game_state_data) > 2 else 0
         player_hand_data = game_state_data[3] if len(game_state_data) > 3 else []
         played_card_data = game_state_data[4] if len(game_state_data) > 4 else None
-        
+
         # Convert the data to the appropriate objects
-        previous_tricks = [convert_completed_trick(trick) for trick in previous_tricks_data]
+        previous_tricks = [
+            convert_completed_trick(trick) for trick in previous_tricks_data
+        ]
         current_trick = convert_current_trick(current_trick_data)
-        player_hand = [convert_card(card) for card in player_hand_data if card is not None]
+        player_hand = [
+            convert_card(card) for card in player_hand_data if card is not None
+        ]
         played_card = convert_card(played_card_data) if played_card_data else None
-        
+
         return GameState(
-            game_id=index,  # Use index as game_id since it's not in the data
-            trick_number=len(previous_tricks),  # Derive trick number from previous tricks
             previous_tricks=previous_tricks,
             current_trick=current_trick,
             current_player_index=current_player_index,

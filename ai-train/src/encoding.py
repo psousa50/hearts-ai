@@ -1,7 +1,7 @@
 from typing import List
 
 import numpy as np
-from model import Card, GameState, Trick
+from model import Card, CompletedTrick, GameState
 
 INPUT_SEQUENCE_LENGTH = 3173
 
@@ -34,7 +34,8 @@ def decode_card(idx: int) -> Card:
 def one_hot_card(card: Card) -> np.ndarray:
     """Return a 52-dimensional one-hot encoded vector for a card."""
     one_hot = np.zeros(TOTAL_CARDS)
-    one_hot[encode_card(card)] = 1
+    if card is not None:
+        one_hot[encode_card(card)] = 1
     return one_hot
 
 
@@ -45,12 +46,12 @@ def one_hot_player(player_index: int) -> np.ndarray:
     return one_hot
 
 
-def encode_trick(trick: Trick) -> np.ndarray:
+def encode_complete_trick(trick: CompletedTrick) -> np.ndarray:
     """Encode a trick with up to 4 moves (pad with zeros if fewer)."""
     trick_vector = np.zeros(4 * (TOTAL_CARDS + 4 + 4))  # (Card + Player + Winner) * 4
-    for i, move in enumerate(trick.cards):
-        card_vec = one_hot_card(move.card)
-        player_vec = one_hot_player(move.player_index)
+    for i, card in enumerate(trick.cards):
+        card_vec = one_hot_card(card)
+        player_vec = one_hot_player(trick.first_player)
         winner_vec = one_hot_player(trick.winner)
         trick_vector[i * (TOTAL_CARDS + 4 + 4) : (i + 1) * (TOTAL_CARDS + 4 + 4)] = (
             np.concatenate([card_vec, player_vec, winner_vec])
@@ -69,20 +70,21 @@ def encode_hand(hand: List[Card]) -> np.ndarray:
 def encode_game_state(game_state: GameState) -> (np.ndarray, np.ndarray):
     """Convert GameState to feature vector (X) and output vector (y)."""
 
-    trick_number = one_hot_trick_number(game_state.trick_number)
+    trick_number = len(game_state.previous_tricks)
+    trick_number_hot = one_hot_trick_number(trick_number)
 
     # Encode last 12 tricks (pad if fewer)
     previous_tricks = np.zeros(12 * 4 * (TOTAL_CARDS + 4 + 4))  # (12 max tricks)
     for i, trick in enumerate(game_state.previous_tricks[-12:]):  # Last 12
         previous_tricks[
             i * 4 * (TOTAL_CARDS + 4 + 4) : (i + 1) * 4 * (TOTAL_CARDS + 4 + 4)
-        ] = encode_trick(trick)
+        ] = encode_complete_trick(trick)
 
     # Encode current trick cards (up to 4)
     current_trick = np.zeros(4 * (TOTAL_CARDS + 4))
-    for i, move in enumerate(game_state.current_trick):
-        card_vec = one_hot_card(move.card)
-        player_vec = one_hot_player(move.player_index)
+    for i, card in enumerate(game_state.current_trick.cards):
+        card_vec = one_hot_card(card)
+        player_vec = one_hot_player(game_state.current_trick.first_player)
         current_trick[i * (TOTAL_CARDS + 4) : (i + 1) * (TOTAL_CARDS + 4)] = (
             np.concatenate([card_vec, player_vec])
         )
@@ -95,7 +97,7 @@ def encode_game_state(game_state: GameState) -> (np.ndarray, np.ndarray):
 
     # Concatenate all feature vectors
     X = np.concatenate(
-        [trick_number, previous_tricks, current_trick, current_player, hand_vector]
+        [trick_number_hot, previous_tricks, current_trick, current_player, hand_vector]
     )
 
     # Encode output (played card as one-hot)

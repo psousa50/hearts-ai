@@ -1,8 +1,8 @@
 use crate::models::CompactCard;
 use chrono::Utc;
 use hearts_game::{
-    AggressiveStrategy, AvoidPointsStrategy, Card, CompletedHeartsGame, HeartsGame, RandomStrategy,
-    Strategy, Trick,
+    AggressiveStrategy, AvoidPointsStrategy, Card, CompletedHeartsGame, CompletedTrick, HeartsGame,
+    RandomStrategy, Strategy, Trick,
 };
 use rmp_serde;
 use std::collections::HashSet;
@@ -93,10 +93,10 @@ pub fn generate_training_data(num_games: usize, save_games: bool, save_as_json: 
     println!("Training examples generated: {}", training_data.len());
 }
 
-fn extract_training_data(game_result: &CompletedHeartsGame) -> Vec<CompactTrainingData> {
+fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTrainingData> {
     let mut training_data = Vec::new();
     // Get players with more than 3 points in final score
-    let bad_players: HashSet<_> = game_result
+    let bad_players: HashSet<_> = completed_game
         .players
         .iter()
         .enumerate()
@@ -104,20 +104,18 @@ fn extract_training_data(game_result: &CompletedHeartsGame) -> Vec<CompactTraini
         .map(|(i, _)| i)
         .collect();
 
-    // Process each trick to create training data
     let mut previous_tricks = Vec::new();
 
-    let mut hands: Vec<Vec<Card>> = game_result
+    let mut hands: Vec<Vec<Card>> = completed_game
         .players
         .iter()
         .map(|p| p.initial_hand.clone())
         .collect();
-    for trick in game_result.tricks.iter() {
+
+    for trick in completed_game.tricks.iter() {
         let mut current_trick = Trick::new();
         current_trick.first_player = trick.first_player;
 
-        // For each card played in the trick
-        let mut current_trick = Trick::new();
         for (player_index, trick_card) in trick.cards.iter().enumerate() {
             let card_idx = hands[player_index]
                 .iter()
@@ -126,13 +124,7 @@ fn extract_training_data(game_result: &CompletedHeartsGame) -> Vec<CompactTraini
             hands[player_index].remove(card_idx);
             current_trick.add_card(trick_card.clone(), player_index);
 
-            let cc = current_trick
-                .cards
-                .iter()
-                .map(|c| c.map(|c| CompactCard(c.suit, c.rank)))
-                .collect();
-
-            if include_move(&bad_players, player_index, trick_card) {
+            if include_move(&bad_players, player_index, trick) {
                 let training_item = CompactTrainingData {
                     previous_tricks: previous_tricks.clone(),
                     current_trick: CompactTrick {
@@ -153,11 +145,9 @@ fn extract_training_data(game_result: &CompletedHeartsGame) -> Vec<CompactTraini
                 training_data.push(training_item);
             }
 
-            // Update current trick for next card
             current_trick.add_card(trick_card.clone(), player_index);
         }
 
-        // After processing all cards in the trick, add it to previous tricks
         previous_tricks.push(CompactCompletedTrick {
             cards: trick
                 .cards
@@ -172,7 +162,7 @@ fn extract_training_data(game_result: &CompletedHeartsGame) -> Vec<CompactTraini
     training_data
 }
 
-fn include_move(bad_players: &HashSet<usize>, player_index: usize, trick_card: &Card) -> bool {
+fn include_move(bad_players: &HashSet<usize>, player_index: usize, trick: &CompletedTrick) -> bool {
     // Skip if player had bad final score or this move causes player to score more than 1 point
-    !bad_players.contains(&player_index) && trick_card.score() <= 1
+    !bad_players.contains(&player_index) && (trick.points <= 1 || trick.winner != player_index)
 }
