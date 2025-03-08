@@ -4,18 +4,23 @@ curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{
     "state": {
-      "game_id": 1,
-      "trick_number": 0,
       "previous_tricks": [
-        {
-          "cards": [
-            { "card": {"suit": "H", "rank": 6}, "player_index": 3 },
-            { "card": {"suit": "H", "rank": 7}, "player_index": 0 }
-          ],
-          "winner": 3
-        }
+      {
+        "cards": [
+          { "suit": "H", "rank": 6 },
+          { "suit": "H", "rank": 7 }
+        ],
+        "first_player_index": 3,
+        "winner": 3,
+        "score": 5
+      }
       ],
-      "current_trick_cards": [],
+      "current_trick": {
+        "cards": [
+          {"suit": "H", "rank": 3}
+        ],
+        "first_player_index": 3
+      },
       "current_player_index": 3,
       "player_hand": [
         {"suit": "H", "rank": 2},

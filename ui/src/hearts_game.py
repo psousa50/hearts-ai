@@ -18,13 +18,14 @@ class HeartsGame:
 
     def reset_game(self):
         self.hearts_broken = False
-        self.tricks: List[CompletedTrick] = []
+        self.previous_tricks: List[CompletedTrick] = []
         self.current_trick = Trick()
         self.scores = [0] * 4
         self.hands = self.deal_cards()
         self.current_player_index = self.find_starting_player()
 
         self.current_trick.reset()
+        self.current_trick.first_player_index = self.current_player_index
 
     @property
     def current_player(self) -> Player:
@@ -65,7 +66,7 @@ class HeartsGame:
         hand = self.hands[player_idx]
 
         # First card of first trick must be 2 of clubs
-        if not self.tricks and self.current_trick.is_empty:
+        if not self.previous_tricks and self.current_trick.is_empty:
             return [c for c in hand if c.suit == "C" and c.rank == 2]
 
         # If a suit was led, must follow suit if possible
@@ -76,7 +77,7 @@ class HeartsGame:
                 return same_suit
 
         # On first trick, can't play hearts or queen of spades
-        if not self.tricks:
+        if not self.previous_tricks:
             safe_cards = [
                 c for c in hand if not (c.suit == "H" or c == Card.QueenOfSpades)
             ]
@@ -94,7 +95,11 @@ class HeartsGame:
     def choose_card(self, player_idx: int) -> Card:
         valid_moves = self.get_valid_moves(player_idx)
         gameState = StrategyGameState(
-            self.tricks, self.current_trick, self.hands[player_idx], valid_moves
+            previous_tricks=self.previous_tricks,
+            current_trick=self.current_trick,
+            current_player_index=player_idx,
+            player_hand=self.hands[player_idx],
+            valid_moves=valid_moves,
         )
         card = self.players[player_idx].strategy.choose_card(gameState)
         return card if card in valid_moves else None
@@ -115,7 +120,7 @@ class HeartsGame:
         else:
             self.current_player_index = (player_idx + 1) % 4
 
-    def complete_trick(self):
+    def complete_trick(self) -> int:
         lead_suit = self.current_trick.lead_suit
         trick_cards = self.current_trick.cards
         winner_idx = trick_cards.index(
@@ -132,16 +137,18 @@ class HeartsGame:
         self.scores[winner_idx] += points
 
         # Save completed trick
-        self.tricks.append(
+        self.previous_tricks.append(
             CompletedTrick(
                 cards=self.current_trick.cards,
-                first_player=self.current_trick.first_player,
+                first_player_index=self.current_trick.first_player_index,
                 winner=winner_idx,
                 score=points,
             )
         )
 
         self.current_trick.reset()
+        self.current_trick.first_player_index = winner_idx
+        self.current_player_index = winner_idx
 
         return winner_idx
 

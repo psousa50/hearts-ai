@@ -1,7 +1,7 @@
 from typing import List
 
 import numpy as np
-from model import Card, CompletedTrick, GameState
+from predict_request import Card, CompletedTrick, GameState
 
 INPUT_SEQUENCE_LENGTH = 3173
 
@@ -51,7 +51,7 @@ def encode_complete_trick(trick: CompletedTrick) -> np.ndarray:
     trick_vector = np.zeros(4 * (TOTAL_CARDS + 4 + 4))  # (Card + Player + Winner) * 4
     for i, card in enumerate(trick.cards):
         card_vec = one_hot_card(card)
-        player_vec = one_hot_player(trick.first_player)
+        player_vec = one_hot_player(trick.first_player_index)
         winner_vec = one_hot_player(trick.winner)
         trick_vector[i * (TOTAL_CARDS + 4 + 4) : (i + 1) * (TOTAL_CARDS + 4 + 4)] = (
             np.concatenate([card_vec, player_vec, winner_vec])
@@ -84,7 +84,7 @@ def encode_game_state(game_state: GameState) -> (np.ndarray, np.ndarray):
     current_trick = np.zeros(4 * (TOTAL_CARDS + 4))
     for i, card in enumerate(game_state.current_trick.cards):
         card_vec = one_hot_card(card)
-        player_vec = one_hot_player(game_state.current_trick.first_player)
+        player_vec = one_hot_player(game_state.current_trick.first_player_index)
         current_trick[i * (TOTAL_CARDS + 4) : (i + 1) * (TOTAL_CARDS + 4)] = (
             np.concatenate([card_vec, player_vec])
         )

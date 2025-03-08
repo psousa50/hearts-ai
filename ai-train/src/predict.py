@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 from encoding import decode_card, encode_card, encode_game_state
-from model import Card, GameState
+from predict_request import Card, GameState
 
 
 async def predict(
@@ -12,8 +12,10 @@ async def predict(
 
     # Get model prediction for all cards
     prediction = model.predict(X.reshape(1, -1), verbose=0)[0]
-    for p in prediction:
-        card = decode_card(encode_card(p))
+    
+    # Debug output - print probabilities for each card
+    for i, p in enumerate(prediction):
+        card = decode_card(i)
         print(f"{card}: {p}")
 
     # Filter prediction to only valid moves

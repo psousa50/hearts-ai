@@ -1,74 +1,18 @@
 import json
 import random
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from dataclasses import asdict, dataclass
+from typing import List
 
 import requests
 from card import Card, CompletedTrick, Trick
-
-
-@dataclass
-class GameState:
-    game_id: int
-    trick_number: int
-    previous_tricks: List[CompletedTrick]
-    current_trick: Trick
-    current_player_index: int
-    player_hand: List[Card]
-    played_card: Optional[Card] = None
-
-    def __post_init__(self):
-        # Prepare data for JSON serialization
-        self._previous_tricks_json = [
-            {
-                "cards": [
-                    {
-                        "card": {"suit": card.suit, "rank": card.rank},
-                        "player_index": i,
-                    }
-                    for i, card in enumerate(trick.cards)
-                ],
-                "winner": trick.winner,
-            }
-            for trick in self.previous_tricks
-        ]
-
-        self._player_hand_json = [
-            {"suit": card.suit, "rank": card.rank} for card in self.player_hand
-        ]
-
-        self._played_card_json = (
-            {"suit": self.played_card.suit, "rank": self.played_card.rank}
-            if self.played_card
-            else None
-        )
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "game_id": self.game_id,
-            "trick_number": self.trick_number,
-            "previous_tricks": self._previous_tricks_json,
-            "current_trick": self.current_trick,
-            "current_player_index": self.current_player_index,
-            "player_hand": self._player_hand_json,
-            "played_card": self._played_card_json,
-        }
-
-
-@dataclass
-class PredictRequest:
-    state: GameState
-    valid_moves: List[Card]
-
-    def to_json(self) -> str:
-        """Convert the request to a JSON string"""
-        return json.dumps(self.to_dict())
+from predict_request import GameState, PredictRequest
 
 
 @dataclass
 class StrategyGameState:
-    tricks: List[CompletedTrick]
-    current_trick: List[Card]
+    previous_tricks: List[CompletedTrick]
+    current_trick: Trick
+    current_player_index: int
     player_hand: List[Card]
     valid_moves: List[Card]
 
@@ -119,54 +63,37 @@ class AIStrategy(Strategy):
     def __init__(self):
         super().__init__()
         self.endpoint = "http://localhost:8000/predict"
-        self.game_id = 0
 
-    def choose_card(self, gameState: StrategyGameState) -> Card:
+    def choose_card(self, game_state: StrategyGameState) -> Card:
         """Choose a card to play using the AI model"""
         try:
-            # Convert current trick cards to proper format
-            trick_cards = [
-                TrickCard(card=card, player_index=i)
-                for i, card in enumerate(gameState.current_trick.cards)
-                if card is not None
-            ]
-
-            # Create prediction state
             state = GameState(
-                game_id=self.game_id,
-                trick_number=len(
-                    gameState.tricks
-                ),  # Current trick number is the number of completed tricks
-                previous_tricks=gameState.tricks[-3:]
-                if gameState.tricks
-                else [],  # Get only the last 3 tricks
-                current_trick=trick_cards,
-                current_player_index=3,  # AI is always player 3
-                player_hand=gameState.player_hand,
+                previous_tricks=game_state.previous_tricks,
+                current_trick=game_state.current_trick,
+                current_player_index=game_state.current_player_index,
+                player_hand=game_state.player_hand,
             )
+            print("State:", game_state.current_trick)
 
             # Create prediction request
-            request = PredictRequest(state=state, valid_moves=gameState.valid_moves)
-
-            # Prepare request data and convert to JSON
-            request_json = request.to_json()
-
-            # print("Sending request to AI service:", json.dumps(request.to_dict(), indent=2))
+            predict_request = PredictRequest(
+                state=state, valid_moves=game_state.valid_moves
+            )
+            json_data = asdict(predict_request)
+            print("Sending prediction request:", json.dumps(json_data, indent=2))
 
             # Send request to AI service
-            response = requests.post(
-                "http://localhost:8000/predict", json=request.to_dict(), timeout=5
-            )
+            response = requests.post(self.endpoint, json=json_data, timeout=5)
             response.raise_for_status()
             result = response.json()
 
-            # print("Received response from AI service:", json.dumps(result, indent=2))
+            print("Received response from AI service:", json.dumps(result, indent=2))
 
             # Convert predicted move to Card
             if isinstance(result, dict) and "suit" in result and "rank" in result:
                 predicted_card = Card(suit=result["suit"], rank=result["rank"])
                 # Verify the predicted card is in valid_moves
-                if predicted_card in gameState.valid_moves:
+                if predicted_card in game_state.valid_moves:
                     return predicted_card
                 print(f"AI predicted invalid move: {predicted_card}")
                 raise ValueError("AI predicted invalid move")
@@ -175,13 +102,7 @@ class AIStrategy(Strategy):
             raise ValueError("Invalid prediction format")
 
         except Exception as e:
-            raise ValueError(
-                f"AI service error: {str(e)}, falling back to random strategy"
-            )
-
-    def update_game_id(self, game_id: int):
-        """Update the game ID"""
-        self.game_id = game_id
+            raise ValueError(f"AI service error: {str(e)}")
 
 
 class ReplayStrategy(Strategy):

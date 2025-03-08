@@ -5,7 +5,7 @@ import msgpack
 import numpy as np
 import tensorflow as tf
 from encoding import INPUT_SEQUENCE_LENGTH, encode_game_state
-from model import Card, CompletedTrick, GameState, Trick
+from predict_request import Card, CompletedTrick, GameState, Trick
 from tensorflow.keras.callbacks import (
     Callback,
     CSVLogger,
@@ -258,9 +258,9 @@ def extract_game_states(raw_data) -> list[GameState]:
                 cards=cards,
                 winner=winner,
                 score=0,  # Default value for score
-                first_player=first_player,
+                first_player_index=first_player,
             )
-        return CompletedTrick(cards=[], winner=0, score=0, first_player=0)
+        return CompletedTrick(cards=[], winner=0, score=0, first_player_index=0)
 
     # Convert current trick from the raw format to Trick object
     def convert_current_trick(trick_data):
@@ -272,9 +272,9 @@ def extract_game_states(raw_data) -> list[GameState]:
 
             return Trick(
                 cards=cards,
-                first_player=first_player,
+                first_player_index=first_player,
             )
-        return Trick(cards=[], first_player=0)
+        return Trick(cards=[], first_player_index=0)
 
     # Convert each game state from raw format to GameState object
     def convert_game_state(game_state_data, index):
@@ -315,3 +315,8 @@ def extract_game_states(raw_data) -> list[GameState]:
 
     # Convert each game state from raw format to GameState object
     return [convert_game_state(game_state, i) for i, game_state in enumerate(raw_data)]
+
+
+def load_model(model_path):
+    model = tf.keras.models.load_model(model_path)
+    return model

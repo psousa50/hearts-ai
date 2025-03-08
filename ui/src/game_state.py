@@ -1,8 +1,5 @@
-from typing import List, Optional, Tuple
-
 import pygame
-from hearts_game import Card, HeartsGame, Player
-from strategies import HumanStrategy
+from hearts_game import HeartsGame
 
 
 class GameState:

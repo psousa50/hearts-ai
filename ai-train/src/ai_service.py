@@ -3,9 +3,10 @@ from typing import List
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
-from model import Card, GameState, load_model
+from model_builder import load_model
 from predict import predict
-from pydantic import BaseModel
+from predict_request import PredictRequest
+from pydantic import parse_obj_as
 
 # Configure logging
 logger = logging.getLogger("ai_service")
@@ -22,23 +23,21 @@ model.summary()
 logger.info("Model loaded successfully")
 
 
-class PredictRequest(BaseModel):
-    state: GameState
-    valid_moves: List[Card]
-
-
 @app.post("/predict")
-async def predict_post(request: PredictRequest):
+async def predict_post(request: dict):
     print("Received prediction request:", request)
+    predictRequest = PredictRequest.model_validate(request)
+
+    print("Received prediction request:", predictRequest)
     try:
         logger.info("=" * 50)
-        logger.info(
-            f"Prediction request - Game: {request.state.game_id}, Trick: {request.state.trick_number}"
-        )
-        logger.info(f"Hand: {request.state.player_hand}")
-        logger.info(f"Valid moves: {request.valid_moves}")
+        logger.info(f"Prediction request - Game: {predictRequest.state}")
+        logger.info(f"Hand: {predictRequest.state.player_hand}")
+        logger.info(f"Valid moves: {predictRequest.valid_moves}")
 
-        chosen_move = await predict(model, request.state, request.valid_moves)
+        chosen_move = await predict(
+            model, predictRequest.state, predictRequest.valid_moves
+        )
         logger.info(f"Chosen move: {chosen_move}")
         logger.info("=" * 50)
         print("chosen move:", chosen_move)

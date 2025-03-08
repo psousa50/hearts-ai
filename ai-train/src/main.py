@@ -2,8 +2,9 @@ import asyncio
 
 import numpy as np
 from encoding import decode_card, encode_game_state
-from model import Card, CardMove, GameState, Trick, load_model
+from model_builder import load_model
 from predict import predict
+from predict_request import Card, GameState, Trick
 
 
 def create_game_state():
@@ -13,18 +14,18 @@ def create_game_state():
         previous_tricks=[
             Trick(
                 cards=[
-                    CardMove(card=Card(suit="C", rank=5), player_index=0),
-                    CardMove(card=Card(suit="D", rank=6), player_index=1),
-                    CardMove(card=Card(suit="S", rank=7), player_index=2),
-                    CardMove(card=Card(suit="H", rank=8), player_index=3),
+                    Card(suit="C", rank=5),
+                    Card(suit="D", rank=6),
+                    Card(suit="S", rank=7),
+                    Card(suit="H", rank=8),
                 ],
                 winner=3,
             )
         ],
         current_trick=[
-            CardMove(card=Card(suit="S", rank=2), player_index=0),
-            CardMove(card=Card(suit="D", rank=3), player_index=1),
-            CardMove(card=Card(suit="D", rank=4), player_index=2),
+            Card(suit="S", rank=2),
+            Card(suit="D", rank=3),
+            Card(suit="D", rank=4),
         ],
         current_player_index=3,
         player_hand=[

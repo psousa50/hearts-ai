@@ -19,7 +19,7 @@ Card.QueenOfSpades = Card("S", 12)
 @dataclass
 class Trick:
     cards: List[Optional[Card]] = field(init=False)
-    first_player: int = field(init=False)
+    first_player_index: int = field(init=False)
 
     def __post_init__(self):
         self.reset()
@@ -38,7 +38,7 @@ class Trick:
 
     @property
     def first_card(self):
-        return self.cards[self.first_player]
+        return self.cards[self.first_player_index]
 
     @property
     def lead_suit(self):
@@ -46,17 +46,17 @@ class Trick:
 
     def add_card(self, player_index: int, card: Card):
         if self.is_empty:
-            self.first_player = player_index
+            self.first_player_index = player_index
         self.cards[player_index] = card
 
     def reset(self):
         self.cards = [None, None, None, None]
-        self.first_player = None
+        self.first_player_index = None
 
 
 @dataclass
 class CompletedTrick:
     cards: List[Card]
-    first_player: int
+    first_player_index: int
     winner: int
     score: int
