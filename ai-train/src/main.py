@@ -4,29 +4,32 @@ import numpy as np
 from encoding import decode_card, encode_game_state
 from model_builder import load_model
 from predict import predict
-from predict_request import Card, GameState, Trick
+from predict_request import Card, CompletedTrick, GameState, Trick
 
 
 def create_game_state():
     state = GameState(
-        game_id=0,
-        trick_number=1,
         previous_tricks=[
-            Trick(
+            CompletedTrick(
                 cards=[
                     Card(suit="C", rank=5),
                     Card(suit="D", rank=6),
                     Card(suit="S", rank=7),
                     Card(suit="H", rank=8),
                 ],
+                first_player_index=3,
                 winner=3,
+                score=13,
             )
         ],
-        current_trick=[
-            Card(suit="S", rank=2),
-            Card(suit="D", rank=3),
-            Card(suit="D", rank=4),
-        ],
+        current_trick=Trick(
+            cards=[
+                Card(suit="S", rank=2),
+                Card(suit="D", rank=3),
+                Card(suit="D", rank=4),
+            ],
+            first_player_index=3,
+        ),
         current_player_index=3,
         player_hand=[
             Card(suit="D", rank=2),
@@ -35,7 +38,6 @@ def create_game_state():
             Card(suit="S", rank=5),
             Card(suit="S", rank=12),
         ],
-        played_card=Card(suit="S", rank=14),
     )
     return state
 

@@ -12,7 +12,8 @@ async def predict(
 
     # Get model prediction for all cards
     prediction = model.predict(X.reshape(1, -1), verbose=0)[0]
-    
+    print("Prediction:", prediction)
+
     # Debug output - print probabilities for each card
     for i, p in enumerate(prediction):
         card = decode_card(i)

@@ -25,13 +25,17 @@ def main():
     parser.add_argument(
         "--validation-split", type=float, default=0.2, help="Validation split ratio"
     )
+    parser.add_argument(
+        "--model-path", type=str, help="Path to a pre-trained model to continue training"
+    )
     args = parser.parse_args()
 
     print("Training parameters:")
     print(f"- Training data file: {args.training_data_file}", flush=True)
     print(f"- Batch size: {args.batch_size}", flush=True)
     print(f"- Epochs: {args.epochs}", flush=True)
-    print(f"- Validation split: {args.validation_split}\n", flush=True)
+    print(f"- Validation split: {args.validation_split}", flush=True)
+    print(f"- Pre-trained model: {args.model_path if args.model_path else 'None'}\n", flush=True)
 
     # Check if file exists
     if not os.path.exists(args.training_data_file):
@@ -51,11 +55,32 @@ def main():
     # Initialize model
     print("Initializing model...", flush=True)
     model = HeartsModel()
-    model.build_model()
-    print("Model initialized!\n", flush=True)
-
-    # Load latest checkpoint if exists
-    initial_epoch, _ = model.load_latest_checkpoint()
+    
+    initial_epoch = 0
+    
+    if args.model_path:
+        # Load specified pre-trained model
+        print(f"Loading pre-trained model from {args.model_path}", flush=True)
+        import tensorflow as tf
+        model.model = tf.keras.models.load_model(args.model_path)
+        model.compile_model()  # Recompile to ensure metrics are built
+        print("Pre-trained model loaded successfully!", flush=True)
+        
+        # Extract epoch number from filename if possible
+        if "epoch_" in args.model_path:
+            try:
+                epoch_str = args.model_path.split("epoch_")[1].split(".")[0]
+                initial_epoch = int(epoch_str) + 1
+                print(f"Continuing from epoch {initial_epoch}", flush=True)
+            except (IndexError, ValueError):
+                initial_epoch = 0
+    else:
+        # Build new model from scratch
+        model.build_model()
+        print("New model initialized!", flush=True)
+        
+        # Load latest checkpoint if exists and no specific model was provided
+        initial_epoch, _ = model.load_latest_checkpoint()
 
     # Train model
     try:
