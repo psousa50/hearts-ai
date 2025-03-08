@@ -1,21 +1,15 @@
-use crate::models::Card;
+use crate::models::{Card, GameState};
 use reqwest::blocking::Client;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 pub trait PlayingStrategy {
-    fn choose_card(&self, hand: &[Card], valid_moves: &[Card]) -> Card;
+    fn choose_card(&self, valid_moves: &[Card], game_state: Option<GameState>) -> Card;
 }
 
 #[derive(Clone)]
 pub struct AIStrategy {
     client: Client,
     endpoint: String,
-}
-
-#[derive(Serialize)]
-struct GameState {
-    hand: Vec<(char, u8)>,
-    valid_moves: Vec<(char, u8)>,
 }
 
 #[derive(Deserialize)]
@@ -28,7 +22,7 @@ struct PredictResponse {
 pub struct RandomStrategy;
 
 impl PlayingStrategy for RandomStrategy {
-    fn choose_card(&self, _hand: &[Card], valid_moves: &[Card]) -> Card {
+    fn choose_card(&self, valid_moves: &[Card], _game_state: Option<GameState>) -> Card {
         use rand::seq::SliceRandom;
         let mut rng = rand::thread_rng();
         valid_moves
@@ -42,13 +36,13 @@ impl PlayingStrategy for RandomStrategy {
 pub struct AvoidPointsStrategy;
 
 impl PlayingStrategy for AvoidPointsStrategy {
-    fn choose_card(&self, _hand: &[Card], valid_moves: &[Card]) -> Card {
+    fn choose_card(&self, valid_moves: &[Card], _game_state: Option<GameState>) -> Card {
         // Play lowest value card
         *valid_moves
             .iter()
             .min_by_key(|card| {
                 // Prioritize low hearts and queen of spades
-                if card.suit == 'H' || (card.suit == 'S' && card.rank == 12) {
+                if card.is_penalty() {
                     card.rank + 13 // Make hearts and queen of spades less desirable
                 } else {
                     card.rank
@@ -62,13 +56,13 @@ impl PlayingStrategy for AvoidPointsStrategy {
 pub struct AggressiveStrategy;
 
 impl PlayingStrategy for AggressiveStrategy {
-    fn choose_card(&self, _hand: &[Card], valid_moves: &[Card]) -> Card {
+    fn choose_card(&self, valid_moves: &[Card], _game_state: Option<GameState>) -> Card {
         // Play highest value card
         *valid_moves
             .iter()
             .max_by_key(|card| {
                 // Prioritize hearts and queen of spades
-                if card.suit == 'H' || (card.suit == 'S' && card.rank == 12) {
+                if card.is_penalty() {
                     card.rank + 13 // Make hearts and queen of spades more desirable
                 } else {
                     card.rank
@@ -88,15 +82,12 @@ impl AIStrategy {
 }
 
 impl PlayingStrategy for AIStrategy {
-    fn choose_card(&self, hand: &[Card], valid_moves: &[Card]) -> Card {
+    fn choose_card(&self, valid_moves: &[Card], game_state: Option<GameState>) -> Card {
         // Convert cards to the format expected by the Python service
-        let state = GameState {
-            hand: hand.iter().map(|c| (c.suit, c.rank)).collect(),
-            valid_moves: valid_moves.iter().map(|c| (c.suit, c.rank)).collect(),
-        };
+        let game_state = game_state.unwrap();
 
         // Make request to Python service
-        match self.client.post(&self.endpoint).json(&state).send() {
+        match self.client.post(&self.endpoint).json(&game_state).send() {
             Ok(response) => {
                 if let Ok(prediction) = response.json::<PredictResponse>() {
                     // Find the card in valid_moves that matches the prediction
@@ -106,11 +97,13 @@ impl PlayingStrategy for AIStrategy {
                         .copied()
                         .unwrap_or(valid_moves[0])
                 } else {
+                    println!("Failed to parse response from AI service");
                     // Fallback to first valid move if can't parse response
                     valid_moves[0]
                 }
             }
             Err(_) => {
+                println!("Failed to make request to AI service");
                 // Fallback to first valid move if request fails
                 valid_moves[0]
             }
@@ -127,12 +120,21 @@ pub enum Strategy {
 }
 
 impl Strategy {
-    pub fn choose_card(&self, hand: &[Card], valid_moves: &[Card]) -> Card {
+    pub fn choose_card(&self, valid_moves: &[Card], game_state: Option<GameState>) -> Card {
         match self {
-            Strategy::Random(s) => s.choose_card(hand, valid_moves),
-            Strategy::AvoidPoints(s) => s.choose_card(hand, valid_moves),
-            Strategy::Aggressive(s) => s.choose_card(hand, valid_moves),
-            Strategy::AI(s) => s.choose_card(hand, valid_moves),
+            Strategy::Random(s) => s.choose_card(valid_moves, game_state),
+            Strategy::AvoidPoints(s) => s.choose_card(valid_moves, game_state),
+            Strategy::Aggressive(s) => s.choose_card(valid_moves, game_state),
+            Strategy::AI(s) => s.choose_card(valid_moves, game_state),
+        }
+    }
+
+    pub fn needs_game_state(&self) -> bool {
+        match self {
+            Strategy::Random(_) => false,
+            Strategy::AvoidPoints(_) => false,
+            Strategy::Aggressive(_) => false,
+            Strategy::AI(_) => true,
         }
     }
 }

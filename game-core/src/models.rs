@@ -1,3 +1,4 @@
+use crate::player::PlayerInfo;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
@@ -85,4 +86,24 @@ impl Trick {
     pub fn is_first_card(&self) -> bool {
         self.cards.iter().all(|c| c.is_none())
     }
+
+    pub fn is_completed(&self) -> bool {
+        self.cards.iter().all(|c| c.is_some())
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct CompletedHeartsGame {
+    pub players: Vec<PlayerInfo>,
+    pub tricks: Vec<CompletedTrick>,
+    pub hearts_broken: bool,
+    pub winner_index: usize,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct GameState {
+    pub tricks: Vec<CompletedTrick>,
+    pub current_trick: Trick,
+    pub current_player: usize,
+    pub hearts_broken: bool,
 }

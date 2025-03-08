@@ -1,4 +1,3 @@
-mod analyze;
 mod generate;
 mod models;
 mod stats;
@@ -20,13 +19,6 @@ enum Commands {
         /// Number of games to simulate
         #[arg(short, long, default_value_t = 1)]
         num_games: usize,
-    },
-
-    /// Analyze existing game results
-    AnalyzeResults {
-        /// Input file containing game results
-        #[arg(short, long, default_value = "game_results.json")]
-        input: String,
     },
 
     /// Generate AI training data from simulated games
@@ -51,9 +43,6 @@ fn main() {
     match &cli.command {
         Commands::GenerateGames { num_games } => {
             generate::generate_games(*num_games);
-        }
-        Commands::AnalyzeResults { input } => {
-            analyze::analyze_results(input);
         }
         Commands::GenerateAiTrainingData {
             num_games,

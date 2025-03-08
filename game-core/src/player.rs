@@ -1,12 +1,22 @@
-use crate::models::Card;
+use crate::models::{Card, GameState};
 use crate::strategy::Strategy;
+use serde::{Deserialize, Serialize};
 
+#[derive(Clone, Serialize, Deserialize)]
+pub struct PlayerInfo {
+    pub name: String,
+    pub initial_hand: Vec<Card>,
+    pub score: u8,
+    pub strategy: String,
+}
+
+#[derive(Clone)]
 pub struct Player {
     pub name: String,
     pub initial_hand: Vec<Card>,
     pub hand: Vec<Card>,
     pub score: u8,
-    strategy: Strategy,
+    pub strategy: Strategy,
 }
 
 impl Player {
@@ -20,8 +30,8 @@ impl Player {
         }
     }
 
-    pub fn play_card(&mut self, valid_moves: &[Card]) -> Card {
-        let chosen_card = self.strategy.choose_card(&self.hand, valid_moves);
+    pub fn play_card(&mut self, valid_moves: &[Card], game_state: Option<GameState>) -> Card {
+        let chosen_card = self.strategy.choose_card(valid_moves, game_state);
         self.hand.retain(|c| *c != chosen_card);
         chosen_card
     }

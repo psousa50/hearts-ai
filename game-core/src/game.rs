@@ -1,30 +1,14 @@
 use crate::deck::Deck;
-use crate::models::{Card, CompletedTrick, Trick};
-use crate::player::Player;
+use crate::models::{Card, CompletedHeartsGame, CompletedTrick, GameState, Trick};
+use crate::player::{Player, PlayerInfo};
 use crate::strategy::Strategy;
-use serde::{Deserialize, Serialize};
 
 pub struct HeartsGame {
-    players: Vec<Player>,
-    current_leader: usize,
-    tricks: Vec<CompletedTrick>,
-    current_trick: Trick,
-    hearts_broken: bool,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PlayerInfo {
-    pub name: String,
-    pub initial_hand: Vec<Card>,
-    pub score: u8,
-    pub strategy: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GameResult {
-    pub players: Vec<PlayerInfo>,
+    pub players: Vec<Player>,
     pub tricks: Vec<CompletedTrick>,
-    pub winner: usize,
+    pub current_trick: Trick,
+    pub current_player_index: usize,
+    pub hearts_broken: bool,
 }
 
 impl HeartsGame {
@@ -37,11 +21,11 @@ impl HeartsGame {
             .map(|((name, strategy), hand)| Player::new(name, hand, strategy.clone()))
             .collect();
 
-        let current_leader = Self::find_starting_player(&players);
+        let current_player = Self::find_starting_player(&players);
         Self {
             players,
             hearts_broken: false,
-            current_leader,
+            current_player_index: current_player,
             tricks: Vec::new(),
             current_trick: Trick::new(),
         }
@@ -135,86 +119,100 @@ impl HeartsGame {
             .unwrap_or(0)
     }
 
-    fn play_trick(&mut self) -> CompletedTrick {
-        // Store the first player (leader) of this trick
-        let first_player = self.current_leader;
-
-        // Play the trick in turn order
-        let mut current_trick: Trick = Trick::new();
-        current_trick.first_player = first_player;
-        let mut current_player = first_player;
-
-        for i in 0..4 {
-            let valid_moves = self.get_valid_moves(i);
-
-            let played_card = self.players[i].play_card(&valid_moves);
-            if played_card.suit == 'H' {
-                self.hearts_broken = true;
-            }
-
-            // Store the card with player information
-            current_trick.add_card(played_card, i);
-
-            current_player = (current_player + 1) % 4;
+    fn play_trick(&mut self) {
+        if self.current_trick.is_first_card() {
+            self.current_trick.first_player = self.current_player_index;
         }
 
-        let trick_cards = current_trick
+        let valid_moves = self.get_valid_moves(self.current_player_index);
+
+        let game_state = if self.players[self.current_player_index]
+            .strategy
+            .needs_game_state()
+        {
+            Some(self.fetch_game_state())
+        } else {
+            None
+        };
+        let played_card =
+            self.players[self.current_player_index].play_card(&valid_moves, game_state);
+
+        if played_card.is_hearts() {
+            self.hearts_broken = true;
+        }
+
+        // Store the card with player information
+        self.current_trick
+            .add_card(played_card, self.current_player_index);
+
+        if self.current_trick.is_completed() {
+            self.complete_trick();
+        } else {
+            self.current_player_index = (self.current_player_index + 1) % 4;
+        }
+    }
+
+    fn complete_trick(&mut self) {
+        let first_player = self.current_trick.first_player;
+        let trick_cards = self
+            .current_trick
             .cards
             .iter()
             .map(|c| c.unwrap().clone())
             .collect();
 
         let winner = Self::determine_trick_winner(&trick_cards, first_player);
-        self.current_leader = winner;
+        self.current_player_index = winner;
 
-        // Calculate points for the trick
         let points = trick_cards.iter().map(|card| card.score()).sum();
 
-        CompletedTrick {
+        let completed_trick = CompletedTrick {
             cards: trick_cards,
             winner,
             points,
             first_player,
+        };
+
+        self.tricks.push(completed_trick);
+        self.current_trick = Trick::new();
+    }
+
+    pub fn fetch_game_state(&self) -> GameState {
+        GameState {
+            tricks: self.tricks.clone(),
+            current_trick: self.current_trick.clone(),
+            hearts_broken: self.hearts_broken,
+            current_player: self.current_player_index,
         }
     }
 
-    pub fn play_game(&mut self) -> GameResult {
-        let mut scores = vec![0u8; 4];
-        let mut tricks = Vec::new();
-
-        // Play all 13 tricks
-        for _ in 0..13 {
-            let trick = self.play_trick();
-            let trick_score = trick.points;
-            scores[trick.winner] += trick_score;
-            tricks.push(trick);
-        }
-
-        // Create final scores with player names
-        let players: Vec<PlayerInfo> = self
+    pub fn completed_game(&mut self) -> CompletedHeartsGame {
+        let players = self
             .players
             .iter()
-            .enumerate()
-            .map(|(idx, player)| PlayerInfo {
-                name: player.name.clone(),
-                initial_hand: player.initial_hand.clone(),
-                score: scores[idx],
-                strategy: player.strategy_name().to_string(),
+            .map(|p| PlayerInfo {
+                name: p.name.clone(),
+                initial_hand: p.initial_hand.clone(),
+                score: p.score,
+                strategy: p.strategy_name().to_string(),
             })
             .collect();
 
-        // Find winner (player with lowest score)
-        let winner_idx = scores
-            .iter()
-            .enumerate()
-            .min_by_key(|(_, score)| *score)
-            .map(|(idx, _)| idx)
-            .unwrap();
-
-        GameResult {
+        CompletedHeartsGame {
+            tricks: self.tricks.clone(),
             players,
-            tricks,
-            winner: winner_idx,
+            hearts_broken: self.hearts_broken,
+            winner_index: self.current_player_index,
         }
+    }
+
+    pub fn play_game(&mut self) {
+        while !self.game_is_over() && !self.current_trick.is_completed() {
+            self.play_trick();
+        }
+    }
+
+    fn game_is_over(&self) -> bool {
+        self.tricks.len() == 13
     }
 }

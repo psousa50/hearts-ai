@@ -1,7 +1,7 @@
-use hearts_game::GameResult;
+use hearts_game::CompletedHeartsGame;
 use std::collections::HashMap;
 
-pub fn display_statistics(games: &[GameResult]) {
+pub fn display_statistics(games: &[CompletedHeartsGame]) {
     let mut total_scores = HashMap::new();
     let mut total_wins = HashMap::new();
 
@@ -16,7 +16,7 @@ pub fn display_statistics(games: &[GameResult]) {
         }
 
         // Update win counts
-        let winner = &game.players[game.winner];
+        let winner = &game.players[game.winner_index];
         let entry = total_wins
             .entry((&winner.name, &winner.strategy))
             .or_insert(0);

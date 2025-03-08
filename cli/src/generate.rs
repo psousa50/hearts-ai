@@ -1,7 +1,5 @@
 use chrono::Utc;
-use hearts_game::{
-    AIStrategy, AggressiveStrategy, AvoidPointsStrategy, HeartsGame, RandomStrategy, Strategy,
-};
+use hearts_game::{AggressiveStrategy, AvoidPointsStrategy, HeartsGame, RandomStrategy, Strategy};
 use serde_json;
 use std::fs::{self, File};
 use std::io::BufWriter;
@@ -14,18 +12,19 @@ pub fn generate_games(num_games: usize) {
     let start = Instant::now();
     let mut results = Vec::with_capacity(num_games);
 
-    let ai_strategy = AIStrategy::new("http://localhost:8000/predict".to_string());
+    // let ai_strategy = AIStrategy::new("http://localhost:8000/predict".to_string());
     let player_configs = [
         ("Alice", Strategy::Random(RandomStrategy)),
-        ("Bob", Strategy::AI(ai_strategy)),
+        ("Bob", Strategy::Random(RandomStrategy)),
+        // ("Bob", Strategy::AI(ai_strategy)),
         ("Charlie", Strategy::AvoidPoints(AvoidPointsStrategy)),
         ("David", Strategy::Aggressive(AggressiveStrategy)),
     ];
 
     for _ in 0..num_games {
         let mut game = HeartsGame::new(&player_configs);
-        let result = game.play_game();
-        results.push(result);
+        game.play_game();
+        results.push(game.completed_game());
     }
 
     // Create data directory if it doesn't exist

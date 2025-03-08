@@ -5,7 +5,7 @@ mod player;
 mod strategy;
 
 pub use deck::Deck;
-pub use game::{GameResult, HeartsGame, PlayerInfo};
-pub use models::{Card, CompletedTrick, Trick};
-pub use player::Player;
+pub use game::HeartsGame;
+pub use models::{Card, CompletedHeartsGame, CompletedTrick, GameState, Trick};
+pub use player::{Player, PlayerInfo};
 pub use strategy::{AIStrategy, AggressiveStrategy, AvoidPointsStrategy, RandomStrategy, Strategy};

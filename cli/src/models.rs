@@ -1,26 +1,27 @@
-use hearts_game::{Card, CompletedTrick, Trick};
 use serde::Serialize;
 
 #[derive(Serialize, Clone)]
-pub struct CompactCard {
-    pub suit: char,
-    pub rank: u8,
+pub struct CompactCard(pub char, pub u8);
+
+#[derive(Clone, Serialize)]
+pub struct CompactTrick {
+    pub cards: Vec<CompactCard>,
+    pub first_player: usize,
 }
 
-#[derive(Serialize)]
-pub struct GameState {
-    pub previous_tricks: Vec<CompletedTrick>,
-    pub current_trick: Trick,
-    pub current_player_index: usize,
-    pub player_hand: Vec<Card>,
-    pub played_card: Card,
+#[derive(Clone, Serialize)]
+pub struct CompactCompletedTrick {
+    pub cards: Vec<CompactCard>,
+    pub winner: usize,
+    pub points: u8,
+    pub first_player: usize,
 }
 
 #[derive(Serialize)]
 pub struct CompactTrainingData {
-    pub previous_tricks: Vec<CompletedTrick>,
-    pub current_trick: Trick,
+    pub previous_tricks: Vec<CompactCompletedTrick>,
+    pub current_trick: CompactTrick,
     pub current_player_index: usize,
-    pub player_hand: Vec<Card>,
-    pub played_card: Card,
+    pub player_hand: Vec<CompactCard>,
+    pub played_card: CompactCard,
 }
