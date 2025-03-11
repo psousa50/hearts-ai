@@ -124,13 +124,6 @@ class HeartsModel:
         validation_split: float = 0.2,
         initial_epoch: int = 0,
     ):
-        """Train the model with automatically derived parameters based on dataset size
-
-        Parameters are calculated as follows:
-        - batch_size: sqrt(N) where N is number of examples, capped between 32 and 128
-        - epochs: 100,000/N with minimum of 20 and maximum of 200
-        - early stopping patience: epochs/10 with minimum of 3
-        """
         if self.model is None:
             raise ValueError("Model not built. Call build_model() first.")
 
@@ -277,7 +270,7 @@ def extract_game_states(raw_data) -> list[GameState]:
         return Trick(cards=[], first_player_index=0)
 
     # Convert each game state from raw format to GameState object
-    def convert_game_state(game_state_data, index):
+    def convert_game_state(game_state_data):
         # Based on the debug output, the game state has 5 elements:
         # [0]: Previous tricks (empty list in the example)
         # [1]: Current trick data [[cards], player_index]
