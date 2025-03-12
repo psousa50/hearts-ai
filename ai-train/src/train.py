@@ -3,7 +3,8 @@ import os
 import signal
 import sys
 
-from model_builder import HeartsModel
+import tensorflow as tf
+from transformer_model import HeartsTransformerModel
 
 
 def signal_handler(sig, frame):
@@ -51,31 +52,14 @@ def main():
 
     # Initialize model
     print("Initializing model...", flush=True)
-    model = HeartsModel()
-
-    initial_epoch = 0
+    model = HeartsTransformerModel()
 
     if args.model_path:
-        # Load specified pre-trained model
         print(f"Loading pre-trained model from {args.model_path}", flush=True)
-        import tensorflow as tf
-
-        model.model = tf.keras.models.load_model(args.model_path)
-        model.compile_model()  # Recompile to ensure metrics are built
-        print("Pre-trained model loaded successfully!", flush=True)
-
-        # Extract epoch number from filename if possible
-        if "epoch_" in args.model_path:
-            try:
-                epoch_str = args.model_path.split("epoch_")[1].split(".")[0]
-                initial_epoch = int(epoch_str) + 1
-                print(f"Continuing from epoch {initial_epoch}", flush=True)
-            except (IndexError, ValueError):
-                initial_epoch = 0
+        model.load(args.model_path)
     else:
-        # Build new model from scratch
-        model.build_model()
         print("New model initialized!", flush=True)
+        model.build()
 
         # Load latest checkpoint if exists and no specific model was provided
         initial_epoch, _ = model.load_latest_checkpoint()

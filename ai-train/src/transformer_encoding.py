@@ -15,6 +15,10 @@ def encode_card(card: Card):
     return SUITS.index(card.suit) * 13 + (card.rank - 2)
 
 
+def decode_card(card_idx: int) -> Card:
+    return Card(suit=SUITS[card_idx // 13], rank=card_idx % 13 + 2)
+
+
 def build_input_sequence(game_state: GameState) -> np.ndarray:
     # flatten previous tricks mvoes in the right order
     previous_moves = []

@@ -3,8 +3,8 @@ import random
 
 import numpy as np
 from predict_request import Card, GameState, Trick
-from transformer_encoding import SUITS, build_input_sequence
-from transformer_model import build_model, train_model
+from transformer_encoding import decode_card
+from transformer_model import HeartsTransformerModel
 
 
 def build_trick():
@@ -18,7 +18,7 @@ def build_trick():
 
 def train_model_test():
     game_states = []
-    for _ in range(1000):
+    for _ in range(10):
         cards = random.choices(range(2, 11), k=4)
         current_trick = Trick(
             cards=[Card(suit="S", rank=card) for card in cards[:3]],
@@ -33,18 +33,20 @@ def train_model_test():
         )
         game_states.append(game_state)
 
-    model = build_model()
-    model.summary()
+    model = HeartsTransformerModel()
+    model.build()
+    model.model.summary()
 
-    train_model(model, game_states, epochs=50, batch_size=16)
+    model.train(game_states, epochs=50, batch_size=16)
 
     model.save_weights("models/hearts.weights.h5")
 
 
 def predict_model_test():
-    model = build_model()
+    model = HeartsTransformerModel()
+    model.build()
     model.load_weights("models/hearts.weights.h5")
-    model.summary()
+    model.model.summary()
 
     cards = random.choices(range(2, 11), k=4)
     current_trick = Trick(
@@ -59,15 +61,9 @@ def predict_model_test():
         played_card=Card(suit="S", rank=cards[3]),
     )
 
-    input_sequence = build_input_sequence(game_state)
-    input_sequence = np.expand_dims(input_sequence, axis=0)
-
-    predictions = model.predict(input_sequence)
+    predictions = model.predict(game_state)
     predicted_card_idx = np.argmax(predictions[0])
-
-    suit_idx = predicted_card_idx // 13
-    rank = (predicted_card_idx % 13) + 2
-    predicted_card = Card(suit=SUITS[suit_idx], rank=rank)
+    predicted_card = decode_card(predicted_card_idx)
 
     print(f"Predicted card: {predicted_card.suit}{predicted_card.rank}")
 
@@ -79,9 +75,7 @@ def predict_model_test():
 
     print("\nTop most probable cards:")
     for i, idx in enumerate(top_indices):
-        suit_idx = idx // 13
-        rank = (idx % 13) + 2
-        card = Card(suit=SUITS[suit_idx], rank=rank)
+        card = decode_card(idx)
         if card.suit == "S":
             print(f"{card.suit}{card.rank} - {probs[idx] * 100:.2f}%")
 
