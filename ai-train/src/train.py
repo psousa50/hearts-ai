@@ -3,7 +3,9 @@ import os
 import signal
 import sys
 
+import msgpack
 import tensorflow as tf
+from model_builder import extract_game_states
 from transformer_model import HeartsTransformerModel
 
 
@@ -62,18 +64,17 @@ def main():
         model.build()
 
         # Load latest checkpoint if exists and no specific model was provided
-        initial_epoch, _ = model.load_latest_checkpoint()
+        model.load_latest_checkpoint()
+
+    with open(args.training_data_file, "rb") as f:
+        raw_data = msgpack.unpackb(f.read(), raw=False)
+
+    game_states = extract_game_states(raw_data)
 
     # Train model
     try:
         print("Starting training...", flush=True)
-        model.train(
-            train_data_path=args.training_data_file,
-            epochs=args.epochs,  # Will be None if not specified
-            batch_size=args.batch_size,  # Will be None if not specified
-            validation_split=args.validation_split,
-            initial_epoch=initial_epoch,
-        )
+        model.train(game_states)
 
         print("Training completed!", flush=True)
 

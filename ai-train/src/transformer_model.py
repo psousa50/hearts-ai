@@ -91,7 +91,7 @@ class HeartsTransformerModel:
             except (IndexError, ValueError):
                 self.initial_epoch = 0
 
-    def train(self, game_state: List[GameState], epochs=50, batch_size=16):
+    def train(self, game_states: List[GameState], epochs=50, batch_size=16):
         os.makedirs("models", exist_ok=True)
 
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -108,7 +108,7 @@ class HeartsTransformerModel:
             verbose=1,
         )
 
-        X, y = build_train_data(game_state)
+        X, y = build_train_data(game_states)
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42
         )
