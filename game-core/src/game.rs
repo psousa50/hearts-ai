@@ -121,7 +121,7 @@ impl HeartsGame {
 
     fn play_trick(&mut self) {
         if self.current_trick.is_first_card() {
-            self.current_trick.first_player = self.current_player_index;
+            self.current_trick.first_player_index = self.current_player_index;
         }
 
         let valid_moves = self.get_valid_moves(self.current_player_index);
@@ -153,7 +153,7 @@ impl HeartsGame {
     }
 
     fn complete_trick(&mut self) {
-        let first_player = self.current_trick.first_player;
+        let first_player_index = self.current_trick.first_player_index;
         let trick_cards = self
             .current_trick
             .cards
@@ -161,7 +161,7 @@ impl HeartsGame {
             .map(|c| c.unwrap().clone())
             .collect();
 
-        let winner = Self::determine_trick_winner(&trick_cards, first_player);
+        let winner = Self::determine_trick_winner(&trick_cards, first_player_index);
         self.current_player_index = winner;
 
         let points = trick_cards.iter().map(|card| card.score()).sum();
@@ -170,7 +170,7 @@ impl HeartsGame {
             cards: trick_cards,
             winner,
             points,
-            first_player,
+            first_player_index,
         };
 
         self.players[completed_trick.winner].score += completed_trick.points;

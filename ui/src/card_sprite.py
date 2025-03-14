@@ -1,8 +1,8 @@
 import io
 from pathlib import Path
 
-import pygame
 import cairosvg
+import pygame
 from hearts_game import Card
 
 # Constants
@@ -15,13 +15,15 @@ class CardSprite:
     # Class-level cache for card images
     image_cache = {}
 
-    def __init__(self, card: Card):
+    def __init__(self, card: Card, player_index: int = -1):
         self.card = card
+        self.player_index = player_index
         self.image = None
         self.rect = None
         self.target_pos = None
         self.current_pos = None
         self.moving = False
+        self.good_move = None
         self.load_image()
 
     def __str__(self):
@@ -55,9 +57,9 @@ class CardSprite:
                 png_data = cairosvg.svg2png(
                     url=str(image_path),
                     output_width=CARD_WIDTH,
-                    output_height=CARD_HEIGHT
+                    output_height=CARD_HEIGHT,
                 )
-                
+
                 # Convert PNG data to pygame surface
                 png_file = io.BytesIO(png_data)
                 self.image = pygame.image.load(png_file)

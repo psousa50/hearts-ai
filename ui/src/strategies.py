@@ -73,7 +73,6 @@ class AIStrategy(Strategy):
                 current_player_index=game_state.current_player_index,
                 player_hand=game_state.player_hand,
             )
-            print("State:", game_state.current_trick)
 
             # Create prediction request
             predict_request = PredictRequest(
@@ -110,7 +109,7 @@ class ReplayStrategy(Strategy):
         self.cards = cards.copy()  # Make a copy to avoid modifying the original
         self.current_index = 0
 
-    def choose_card(self, hand: List[Card], valid_moves: List[Card]) -> Card:
+    def choose_card(self, game_state: StrategyGameState) -> Card:
         if self.current_index >= len(self.cards):
             raise ValueError("Replay strategy ran out of cards")
 
@@ -118,7 +117,7 @@ class ReplayStrategy(Strategy):
         self.current_index += 1
 
         # Verify the card is valid
-        if card not in valid_moves:
+        if card not in game_state.valid_moves:
             raise ValueError("Replay strategy predicted invalid move")
 
         return card

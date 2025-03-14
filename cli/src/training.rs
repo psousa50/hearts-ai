@@ -96,11 +96,11 @@ pub fn generate_training_data(num_games: usize, save_games: bool, save_as_json: 
 fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTrainingData> {
     let mut training_data = Vec::new();
     // Get players with more than 3 points in final score
-    let bad_players: HashSet<_> = completed_game
+    let good_players: HashSet<_> = completed_game
         .players
         .iter()
         .enumerate()
-        .filter(|(_, p)| p.score > 3)
+        .filter(|(_, p)| p.score < 3)
         .map(|(i, _)| i)
         .collect();
 
@@ -114,7 +114,7 @@ fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTra
 
     for trick in completed_game.tricks.iter() {
         let mut current_trick = Trick::new();
-        current_trick.first_player = trick.first_player;
+        current_trick.first_player_index = trick.first_player_index;
 
         for (player_index, trick_card) in trick.cards.iter().enumerate() {
             let card_idx = hands[player_index]
@@ -124,7 +124,7 @@ fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTra
             hands[player_index].remove(card_idx);
             current_trick.add_card(trick_card.clone(), player_index);
 
-            if include_move(&bad_players, player_index, trick) {
+            if include_move(&good_players, player_index, trick) {
                 let training_item = CompactTrainingData {
                     previous_tricks: previous_tricks.clone(),
                     current_trick: CompactTrick {
@@ -133,7 +133,7 @@ fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTra
                             .iter()
                             .map(|c| c.map(|c| CompactCard(c.suit, c.rank)))
                             .collect(),
-                        first_player: trick.first_player,
+                        first_player: trick.first_player_index,
                     },
                     current_player_index: player_index,
                     player_hand: hands[player_index]
@@ -156,13 +156,17 @@ fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTra
                 .collect(),
             winner: trick.winner,
             points: trick.points,
-            first_player: trick.first_player,
+            first_player_index: trick.first_player_index,
         });
     }
     training_data
 }
 
-fn include_move(bad_players: &HashSet<usize>, player_index: usize, trick: &CompletedTrick) -> bool {
-    // Skip if player had bad final score or this move causes player to score more than 1 point
-    !bad_players.contains(&player_index) && (trick.points <= 1 || trick.winner != player_index)
+fn include_move(
+    good_players: &HashSet<usize>,
+    player_index: usize,
+    trick: &CompletedTrick,
+) -> bool {
+    // include if player is good or if the move doesn't cause the player to score more than 1 point
+    good_players.contains(&player_index) || (trick.points <= 1 || trick.winner != player_index)
 }

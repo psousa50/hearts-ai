@@ -12,6 +12,7 @@ class GameRenderer:
     # Colors
     WHITE = (255, 255, 255)
     GREEN = (34, 139, 34)
+    RED = (255, 0, 0)
     BLACK = (0, 0, 0)
     DARK_GREEN = (0, 100, 0)
     YELLOW = (255, 255, 0)
@@ -93,26 +94,23 @@ class GameRenderer:
                 control_text, (10, self.layout.window_height - 20 * (len(controls) - i))
             )
 
-    def draw_debug_info(self, paused: bool, trick_completed: bool, auto_play: bool):
-        """Draw debug information"""
-        debug_info = [
-            f"Paused: {paused}",
-            f"Trick Completed: {trick_completed}",
-            f"Auto Play: {auto_play}",
-        ]
-
-        for i, info in enumerate(debug_info):
-            debug_text = self.small_font.render(info, True, self.WHITE)
-            debug_rect = debug_text.get_rect()
-            debug_rect.right = self.layout.window_width - 10
-            debug_rect.bottom = (
-                self.layout.window_height - (len(debug_info) - 1 - i) * 15
-            )
-            self.screen.blit(debug_text, debug_rect)
-
     def draw_cards_in_play(self, cards: List[CardSprite]):
         """Draw cards currently in play"""
         for card in cards:
+            color = (
+                None
+                if card.good_move is None
+                else self.DARK_GREEN
+                if card.good_move
+                else self.RED
+            )
+            if color:
+                pygame.draw.rect(
+                    self.screen,
+                    color,
+                    (card.rect.x - 3, card.rect.y - 3, CARD_WIDTH + 6, CARD_HEIGHT + 6),
+                )
+
             self.screen.blit(card.image, card.rect)
 
     def render_frame(
@@ -141,9 +139,6 @@ class GameRenderer:
         # Draw UI elements
         self.draw_game_info(game.current_player.name, game.current_trick.size)
         self.draw_controls()
-        self.draw_debug_info(
-            game_state.paused, game_state.trick_completed, game_state.auto_play
-        )
 
         # Update display
         pygame.display.flip()

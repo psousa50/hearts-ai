@@ -1,6 +1,6 @@
 import msgpack
 import numpy as np
-from game_state_reader import extract_game_states
+from game_state_extractor import extract_game_states
 from tensorflow.keras.utils import Sequence
 from transformer_encoding import build_train_data
 

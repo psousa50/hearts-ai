@@ -44,7 +44,7 @@ pub struct CompletedTrick {
     pub cards: Vec<Card>,
     pub winner: usize,
     pub points: u8,
-    pub first_player: usize,
+    pub first_player_index: usize,
 }
 
 impl CompletedTrick {
@@ -53,21 +53,21 @@ impl CompletedTrick {
     }
 
     pub fn first_card(&self) -> Card {
-        self.cards[self.first_player]
+        self.cards[self.first_player_index]
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Trick {
     pub cards: Vec<Option<Card>>,
-    pub first_player: usize,
+    pub first_player_index: usize,
 }
 
 impl Trick {
     pub fn new() -> Self {
         Self {
             cards: vec![None; 4],
-            first_player: 0,
+            first_player_index: 0,
         }
     }
 
@@ -76,7 +76,7 @@ impl Trick {
     }
 
     pub fn first_card(&self) -> Option<Card> {
-        self.cards.get(self.first_player).cloned().unwrap()
+        self.cards.get(self.first_player_index).cloned().unwrap()
     }
 
     pub fn lead_suit(&self) -> Option<char> {

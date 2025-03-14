@@ -6,9 +6,10 @@ from strategies import HumanStrategy, Strategy, StrategyGameState
 
 
 class Player:
-    def __init__(self, name: str, strategy: Strategy):
+    def __init__(self, name: str, strategy: Strategy, initial_hand: List[Card] = []):
         self.name = name
         self.strategy = strategy
+        self.initial_hand = initial_hand
 
 
 class HeartsGame:
@@ -22,6 +23,9 @@ class HeartsGame:
         self.current_trick = Trick()
         self.scores = [0] * 4
         self.hands = self.deal_cards()
+        for i, player in enumerate(self.players):
+            if len(player.initial_hand) > 0:
+                self.hands[i] = player.initial_hand
         self.current_player_index = self.find_starting_player()
 
         self.current_trick.reset()

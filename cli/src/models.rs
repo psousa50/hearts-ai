@@ -14,7 +14,7 @@ pub struct CompactCompletedTrick {
     pub cards: Vec<CompactCard>,
     pub winner: usize,
     pub points: u8,
-    pub first_player: usize,
+    pub first_player_index: usize,
 }
 
 #[derive(Clone, Serialize)]
