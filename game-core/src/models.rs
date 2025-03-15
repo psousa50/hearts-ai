@@ -95,7 +95,7 @@ impl Trick {
 #[derive(Clone, Serialize, Deserialize)]
 pub struct CompletedHeartsGame {
     pub players: Vec<PlayerInfo>,
-    pub tricks: Vec<CompletedTrick>,
+    pub previous_tricks: Vec<CompletedTrick>,
     pub hearts_broken: bool,
     pub winner_index: usize,
 }

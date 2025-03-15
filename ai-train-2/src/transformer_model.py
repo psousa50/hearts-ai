@@ -36,7 +36,7 @@ class HeartsTransformerModel:
         self.model = None
         self.initial_epoch = 0
 
-    def build(self):
+    def build(self, embeddings=None):
         sequence_input = Input(shape=(INPUT_SEQUENCE_LENGTH,), name="sequence_input")
 
         x = Embedding(input_dim=NUM_CARDS, output_dim=EMBED_DIM)(sequence_input)

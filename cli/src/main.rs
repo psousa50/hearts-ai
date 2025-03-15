@@ -1,3 +1,4 @@
+mod game_moves_filter;
 mod generate;
 mod models;
 mod stats;

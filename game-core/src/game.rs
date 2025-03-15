@@ -188,7 +188,7 @@ impl HeartsGame {
         }
     }
 
-    pub fn completed_game(&mut self) -> CompletedHeartsGame {
+    pub fn completed_game(&self) -> CompletedHeartsGame {
         let players = self
             .players
             .iter()
@@ -201,7 +201,7 @@ impl HeartsGame {
             .collect();
 
         CompletedHeartsGame {
-            tricks: self.tricks.clone(),
+            previous_tricks: self.tricks.clone(),
             players,
             hearts_broken: self.hearts_broken,
             winner_index: self.current_player_index,

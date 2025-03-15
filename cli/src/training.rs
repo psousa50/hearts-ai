@@ -1,15 +1,16 @@
 use crate::models::CompactCard;
 use chrono::Utc;
 use hearts_game::{
-    AggressiveStrategy, AvoidPointsStrategy, Card, CompletedHeartsGame, CompletedTrick, HeartsGame,
-    RandomStrategy, Strategy, Trick,
+    AggressiveStrategy, AvoidPointsStrategy, Card, CompletedHeartsGame, HeartsGame, RandomStrategy,
+    Strategy, Trick,
 };
 use rmp_serde;
-use std::collections::HashSet;
 use std::fs::{self, File};
 use std::io::BufWriter;
 use std::path::PathBuf;
 use std::time::Instant;
+
+use crate::game_moves_filter::GameMovesFilter;
 
 use crate::models::{CompactCompletedTrick, CompactTrainingData, CompactTrick};
 
@@ -95,14 +96,8 @@ pub fn generate_training_data(num_games: usize, save_games: bool, save_as_json: 
 
 fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTrainingData> {
     let mut training_data = Vec::new();
-    // Get players with more than 3 points in final score
-    let good_players: HashSet<_> = completed_game
-        .players
-        .iter()
-        .enumerate()
-        .filter(|(_, p)| p.score < 3)
-        .map(|(i, _)| i)
-        .collect();
+
+    let game_moves_filter = GameMovesFilter::new(completed_game);
 
     let mut previous_tricks = Vec::new();
 
@@ -112,7 +107,7 @@ fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTra
         .map(|p| p.initial_hand.clone())
         .collect();
 
-    for trick in completed_game.tricks.iter() {
+    for trick in completed_game.previous_tricks.iter() {
         let mut current_trick = Trick::new();
         current_trick.first_player_index = trick.first_player_index;
 
@@ -124,7 +119,7 @@ fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTra
             hands[player_index].remove(card_idx);
             current_trick.add_card(trick_card.clone(), player_index);
 
-            if include_move(&good_players, player_index, trick) {
+            if game_moves_filter.filter(player_index, trick) {
                 let training_item = CompactTrainingData {
                     previous_tricks: previous_tricks.clone(),
                     current_trick: CompactTrick {
@@ -160,13 +155,4 @@ fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTra
         });
     }
     training_data
-}
-
-fn include_move(
-    good_players: &HashSet<usize>,
-    player_index: usize,
-    trick: &CompletedTrick,
-) -> bool {
-    // include if player is good or if the move doesn't cause the player to score more than 1 point
-    good_players.contains(&player_index) || (trick.points <= 1 || trick.winner != player_index)
 }

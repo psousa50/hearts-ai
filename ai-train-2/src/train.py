@@ -71,9 +71,11 @@ def train():
     game_states = extract_game_states(raw_data)
 
     # Train model
+    epochs = args.epochs if args.epochs else 50
+    batch_size = args.batch_size if args.batch_size else 16
     try:
         print("Starting training...", flush=True)
-        model.train(game_states, epochs=args.epochs, batch_size=args.batch_size)
+        model.train(game_states, epochs=epochs, batch_size=batch_size)
         model.save(len(game_states))
         model.save()
 

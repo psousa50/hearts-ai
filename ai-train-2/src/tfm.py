@@ -283,5 +283,5 @@ if __name__ == "__main__":
 
     embeddings_path = f"embeddings/card_embeddings_{sys.argv[2]}.txt"
 
-    # train_embeddings(train_data_path, embeddings_path)
+    train_embeddings(train_data_path, embeddings_path)
     load_and_visualize_embeddings(embeddings_path)
