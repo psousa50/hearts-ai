@@ -73,7 +73,9 @@ def train():
     # Train model
     try:
         print("Starting training...", flush=True)
-        model.train(game_states)
+        model.train(game_states, epochs=args.epochs, batch_size=args.batch_size)
+        model.save(len(game_states))
+        model.save()
 
         print("Training completed!", flush=True)
 

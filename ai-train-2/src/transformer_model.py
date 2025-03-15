@@ -91,7 +91,7 @@ class HeartsTransformerModel:
             except (IndexError, ValueError):
                 self.initial_epoch = 0
 
-    def train(self, game_states: List[GameState], epochs=50, batch_size=16):
+    def train(self, game_states: List[GameState], epochs, batch_size):
         os.makedirs("models", exist_ok=True)
 
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -161,6 +161,13 @@ class HeartsTransformerModel:
         input_sequence = np.expand_dims(input_sequence, axis=0)
         predictions = self.model.predict(input_sequence)
         return predictions
+
+    def save(self, number_of_game_states: int = 0):
+        path = "models/latest.keras"
+        if number_of_game_states > 0:
+            timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+            path = f"models/model_{timestamp}_{number_of_game_states}.keras"
+        self.model.save(path)
 
     def save_weights(self, path):
         self.model.save_weights(path)

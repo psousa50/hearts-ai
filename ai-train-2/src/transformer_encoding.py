@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 from game_classes import Card, GameState
 
-INPUT_SEQUENCE_LENGTH = 13  # Number of past moves considered
+INPUT_SEQUENCE_LENGTH = 52  # Max number of past moves considered
 SUITS = ["C", "D", "H", "S"]
 
 
@@ -20,18 +20,15 @@ def decode_card(card_idx: int) -> Card:
 
 
 def build_input_sequence(game_state: GameState) -> np.ndarray:
-    # flatten previous tricks mvoes in the right order
     previous_moves = []
     for trick in game_state.previous_tricks:
-        ordered_cards = []
-        card_idx = trick.first_player_index
-        for _ in range(4):
-            ordered_cards.append(trick.cards[card_idx])
-            card_idx = (card_idx + 1) % 4
-        previous_moves.extend([encode_card(card) for card in ordered_cards])
+        previous_moves.extend([encode_card(card) for card in trick.ordered_cards()])
+    previous_moves.extend(
+        [encode_card(card) for card in game_state.current_trick.ordered_cards()]
+    )
     previous_moves = pad_sequence(previous_moves)
 
-    X = np.array(previous_moves)
+    X = np.array(previous_moves, dtype=np.int32).reshape(INPUT_SEQUENCE_LENGTH)
     return X
 
 

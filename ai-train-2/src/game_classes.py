@@ -32,6 +32,15 @@ class CompletedTrick(BaseModel):
     winner: int
     score: int
 
+    def ordered_cards(self):
+        return [
+            card
+            for card in (
+                self.cards[self.first_player_index :]
+                + self.cards[: self.first_player_index]
+            )
+        ]
+
 
 class GameState(BaseModel):
     previous_tricks: List[CompletedTrick]

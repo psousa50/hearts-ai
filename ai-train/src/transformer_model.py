@@ -97,7 +97,9 @@ class HeartsTransformerModel:
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
         # Define checkpoint path with versioning
-        checkpoint_path = f"checkpoints/model_{timestamp}.keras"
+        checkpoint_path = (
+            f"models/checkpoints/model_epoch_{{epochs:02d}}{timestamp}.keras"
+        )
 
         # Create a new checkpoint callback
         versioned_checkpoint_callback = ModelCheckpoint(
