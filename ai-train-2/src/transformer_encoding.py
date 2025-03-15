@@ -2,6 +2,7 @@ from typing import List
 
 import numpy as np
 from game_classes import Card, GameState
+from tensorflow.keras.utils import to_categorical
 
 INPUT_SEQUENCE_LENGTH = 52  # Max number of past moves considered
 SUITS = ["C", "D", "H", "S"]
@@ -43,4 +44,7 @@ def build_train_data(game_states: List[GameState]) -> (np.ndarray, np.ndarray):
     X = np.array(X)  # Convert list to NumPy array (N, INPUT_SEQUENCE_LENGTH)
     y = np.array(y)  # Convert list to NumPy array (N,)
 
-    return X, y
+    # One-hot encode the target values
+    y_one_hot = to_categorical(y, num_classes=52)
+
+    return X, y_one_hot

@@ -56,7 +56,7 @@ class HeartsTransformerModel:
         # Compile model
         self.model.compile(
             optimizer=Adam(learning_rate=1e-4),
-            loss="sparse_categorical_crossentropy",
+            loss="categorical_crossentropy",
             metrics=["accuracy"],
         )
 
@@ -97,7 +97,9 @@ class HeartsTransformerModel:
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
         # Define checkpoint path with versioning
-        checkpoint_path = f"checkpoints/model_{timestamp}.keras"
+        checkpoint_path = (
+            f"models/checkpoints/model_epoch_{{epoch:03d}}_{timestamp}.keras"
+        )
 
         # Create a new checkpoint callback
         versioned_checkpoint_callback = ModelCheckpoint(
@@ -117,6 +119,7 @@ class HeartsTransformerModel:
             y_train,
             validation_data=(X_test, y_test),
             epochs=epochs,
+            initial_epoch=self.initial_epoch,
             batch_size=batch_size,
             callbacks=[versioned_checkpoint_callback],
         )
@@ -129,7 +132,7 @@ class HeartsTransformerModel:
 
     def load_latest_checkpoint(self):
         """Load the latest checkpoint if it exists"""
-        checkpoint_dir = "models"
+        checkpoint_dir = "models/checkpoints"
         self.initial_epoch = 0
         if not os.path.exists(checkpoint_dir):
             return
