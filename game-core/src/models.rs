@@ -42,9 +42,9 @@ impl Card {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CompletedTrick {
     pub cards: Vec<Card>,
-    pub winner: usize,
-    pub points: u8,
     pub first_player_index: usize,
+    pub winner_index: usize,
+    pub score: u8,
 }
 
 impl CompletedTrick {
@@ -102,8 +102,8 @@ pub struct CompletedHeartsGame {
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct GameState {
-    pub tricks: Vec<CompletedTrick>,
+    pub previous_tricks: Vec<CompletedTrick>,
     pub current_trick: Trick,
-    pub current_player: usize,
-    pub hearts_broken: bool,
+    pub current_player_index: usize,
+    pub player_hand: Vec<Card>,
 }

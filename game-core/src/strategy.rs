@@ -1,6 +1,12 @@
 use crate::models::{Card, GameState};
 use reqwest::blocking::Client;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize)]
+struct PredictRequest {
+    state: GameState,
+    valid_moves: Vec<Card>,
+}
 
 pub trait PlayingStrategy {
     fn choose_card(&self, valid_moves: &[Card], game_state: Option<GameState>) -> Card;
@@ -83,11 +89,14 @@ impl AIStrategy {
 
 impl PlayingStrategy for AIStrategy {
     fn choose_card(&self, valid_moves: &[Card], game_state: Option<GameState>) -> Card {
-        // Convert cards to the format expected by the Python service
         let game_state = game_state.unwrap();
+        let request = PredictRequest {
+            state: game_state,
+            valid_moves: valid_moves.to_vec(),
+        };
 
         // Make request to Python service
-        match self.client.post(&self.endpoint).json(&game_state).send() {
+        match self.client.post(&self.endpoint).json(&request).send() {
             Ok(response) => {
                 if let Ok(prediction) = response.json::<PredictResponse>() {
                     // Find the card in valid_moves that matches the prediction
@@ -102,8 +111,8 @@ impl PlayingStrategy for AIStrategy {
                     valid_moves[0]
                 }
             }
-            Err(_) => {
-                println!("Failed to make request to AI service");
+            Err(e) => {
+                println!("Failed to make request to AI service: {}", e);
                 // Fallback to first valid move if request fails
                 valid_moves[0]
             }

@@ -20,11 +20,11 @@ def extract_game_states(raw_data) -> list[GameState]:
 
             return CompletedTrick(
                 cards=cards,
-                winner=winner,
+                winner_index=winner,
                 score=0,  # Default value for score
                 first_player_index=first_player,
             )
-        return CompletedTrick(cards=[], winner=0, score=0, first_player_index=0)
+        return CompletedTrick(cards=[], winner_index=0, score=0, first_player_index=0)
 
     # Convert current trick from the raw format to Trick object
     def convert_current_trick(trick_data):

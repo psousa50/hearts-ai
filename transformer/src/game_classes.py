@@ -29,7 +29,7 @@ class Trick(BaseModel):
 class CompletedTrick(BaseModel):
     cards: List[Card]
     first_player_index: int
-    winner: int
+    winner_index: int
     score: int
 
     def ordered_cards(self):

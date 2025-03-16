@@ -23,7 +23,7 @@ impl GameMovesFilter {
 
     pub fn filter(&self, player_index: usize, trick: &CompletedTrick) -> bool {
         self.good_players.contains(&player_index)
-            && (trick.points <= 1 || trick.winner != player_index)
+            && (trick.score <= 1 || trick.winner_index != player_index)
     }
 }
 

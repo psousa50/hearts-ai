@@ -149,8 +149,8 @@ fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTra
                 .iter()
                 .map(|c| CompactCard(c.suit, c.rank))
                 .collect(),
-            winner: trick.winner,
-            points: trick.points,
+            winner: trick.winner_index,
+            points: trick.score,
             first_player_index: trick.first_player_index,
         });
     }

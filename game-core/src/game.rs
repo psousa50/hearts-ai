@@ -168,12 +168,12 @@ impl HeartsGame {
 
         let completed_trick = CompletedTrick {
             cards: trick_cards,
-            winner,
-            points,
+            winner_index: winner,
+            score: points,
             first_player_index,
         };
 
-        self.players[completed_trick.winner].score += completed_trick.points;
+        self.players[completed_trick.winner_index].score += completed_trick.score;
 
         self.tricks.push(completed_trick);
         self.current_trick = Trick::new();
@@ -181,10 +181,10 @@ impl HeartsGame {
 
     pub fn fetch_game_state(&self) -> GameState {
         GameState {
-            tricks: self.tricks.clone(),
+            previous_tricks: self.tricks.clone(),
             current_trick: self.current_trick.clone(),
-            hearts_broken: self.hearts_broken,
-            current_player: self.current_player_index,
+            player_hand: self.players[self.current_player_index].hand.clone(),
+            current_player_index: self.current_player_index,
         }
     }
 
