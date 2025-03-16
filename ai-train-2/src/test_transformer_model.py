@@ -1,8 +1,7 @@
-import os
 import random
 
 import numpy as np
-from predict_request import Card, GameState, Trick
+from game_classes import Card, GameState, Trick
 from transformer_encoding import decode_card
 from transformer_model import HeartsTransformerModel
 
@@ -39,13 +38,13 @@ def train_model_test():
 
     model.train(game_states, epochs=50, batch_size=16)
 
-    model.save_weights("models/hearts.weights.h5")
+    model.save_weights("models/test_hearts.weights.h5")
 
 
 def predict_model_test():
     model = HeartsTransformerModel()
     model.build()
-    model.load_weights("models/hearts.weights.h5")
+    model.load_weights("models/test_hearts.weights.h5")
     model.model.summary()
 
     cards = random.choices(range(2, 11), k=4)
@@ -58,7 +57,6 @@ def predict_model_test():
         current_trick=current_trick,
         current_player_index=3,
         player_hand=[],
-        played_card=Card(suit="S", rank=cards[3]),
     )
 
     predictions = model.predict(game_state)
@@ -81,6 +79,6 @@ def predict_model_test():
 
 
 if __name__ == "__main__":
-    # train_model_test()
+    train_model_test()
 
     predict_model_test()
