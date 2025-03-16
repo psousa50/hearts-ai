@@ -5,6 +5,7 @@ from typing import List
 import numpy as np
 import tensorflow as tf
 from game_classes import GameState
+from gensim.models import KeyedVectors
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.layers import (
@@ -23,6 +24,7 @@ from transformer_encoding import (
     INPUT_SEQUENCE_LENGTH,
     build_input_sequence,
     build_train_data,
+    decode_card,
 )
 
 NUM_CARDS = 52
@@ -32,17 +34,74 @@ FEED_FORWARD_DIM = 64
 
 
 class HeartsTransformerModel:
-    def __init__(self):
+    def __init__(self, pretrained_embeddings_path=None, trainable_embeddings=True):
         self.model = None
         self.initial_epoch = 0
+        self.pretrained_embeddings = None
+        self.trainable_embeddings = trainable_embeddings
 
-    def build(self, embeddings=None):
+        if pretrained_embeddings_path:
+            self.load_pretrained_embeddings(pretrained_embeddings_path)
+
+    def load_pretrained_embeddings(self, embeddings_path):
+        """Load pretrained embeddings from Word2Vec format file"""
+        try:
+            print(f"Loading pretrained embeddings from {embeddings_path}")
+            embedding_model = KeyedVectors.load_word2vec_format(
+                embeddings_path, binary=False
+            )
+
+            # Get the embedding dimension from the loaded model
+            embedding_dim = embedding_model.vector_size
+
+            # Initialize embedding matrix
+            embedding_matrix = np.zeros((NUM_CARDS, embedding_dim))
+
+            # Map card tokens to their embeddings
+            for i in range(NUM_CARDS):
+                # Convert token index to card representation
+                # This mapping needs to match the one used in the original embedding training
+                card_key = self._token_to_card_key(i)
+
+                if card_key in embedding_model:
+                    embedding_matrix[i] = embedding_model[card_key]
+                else:
+                    print(f"Warning: Card key '{card_key}' not found in embeddings")
+
+            self.pretrained_embeddings = embedding_matrix
+            print(f"Loaded pretrained embeddings with shape {embedding_matrix.shape}")
+
+            # Update EMBED_DIM to match the pretrained embeddings
+            global EMBED_DIM
+            EMBED_DIM = embedding_dim
+
+        except Exception as e:
+            print(f"Error loading pretrained embeddings: {e}")
+            self.pretrained_embeddings = None
+
+    def _token_to_card_key(self, token_idx):
+        card = decode_card(token_idx)
+        return f"{card.suit}{card.rank}"
+
+    def build(self):
         sequence_input = Input(shape=(INPUT_SEQUENCE_LENGTH,), name="sequence_input")
 
-        x = Embedding(input_dim=NUM_CARDS, output_dim=EMBED_DIM)(sequence_input)
+        # Use pretrained embeddings if available
+        if self.pretrained_embeddings is not None:
+            embedding_layer = Embedding(
+                input_dim=NUM_CARDS,
+                output_dim=self.pretrained_embeddings.shape[1],
+                weights=[self.pretrained_embeddings],
+                trainable=self.trainable_embeddings,
+                name="card_embedding",
+            )(sequence_input)
+        else:
+            embedding_layer = Embedding(
+                input_dim=NUM_CARDS, output_dim=EMBED_DIM, name="card_embedding"
+            )(sequence_input)
 
         # Transformer Encoder
-        x = self.transformer_encoder(x)
+        x = self.transformer_encoder(embedding_layer)
 
         # Global average pooling for final representation
         x = GlobalAveragePooling1D()(x)
@@ -54,21 +113,20 @@ class HeartsTransformerModel:
         self.model = Model(inputs=sequence_input, outputs=outputs)
 
         # Compile model
-        self.model.compile(
-            optimizer=Adam(learning_rate=1e-4),
-            loss="categorical_crossentropy",
-            metrics=["accuracy"],
-        )
+        self.compile_model()
 
     def transformer_encoder(self, inputs):
-        attn_output = MultiHeadAttention(num_heads=NUM_HEADS, key_dim=EMBED_DIM)(
-            inputs, inputs
-        )
+        # Get the embedding dimension from the inputs
+        embed_dim = inputs.shape[-1]
+
+        attn_output = MultiHeadAttention(
+            num_heads=NUM_HEADS, key_dim=embed_dim // NUM_HEADS
+        )(inputs, inputs)
         attn_output = Dropout(0.3)(attn_output)
         attn_output = LayerNormalization(epsilon=1e-6)(Add()([inputs, attn_output]))
 
         ffn = Dense(FEED_FORWARD_DIM, activation="relu")(attn_output)
-        ffn = Dense(EMBED_DIM)(ffn)
+        ffn = Dense(embed_dim)(ffn)
         ffn = Dropout(0.3)(ffn)
 
         output = LayerNormalization(epsilon=1e-6)(Add()([attn_output, ffn]))
@@ -78,8 +136,6 @@ class HeartsTransformerModel:
         self.model = tf.keras.models.load_model(model_path)
         self.compile_model()  # Recompile to ensure metrics are built
         print("Pre-trained model loaded successfully!", flush=True)
-
-        self.compile_model()
 
         self.initial_epoch = 0
         # Extract epoch number from filename if possible
@@ -93,6 +149,7 @@ class HeartsTransformerModel:
 
     def train(self, game_states: List[GameState], epochs, batch_size):
         os.makedirs("models", exist_ok=True)
+        os.makedirs("models/checkpoints", exist_ok=True)
 
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
@@ -127,7 +184,9 @@ class HeartsTransformerModel:
     def compile_model(self):
         """Compile the model with optimizer and metrics"""
         self.model.compile(
-            optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"]
+            optimizer=Adam(learning_rate=1e-4),
+            loss="categorical_crossentropy",
+            metrics=["accuracy"],
         )
 
     def load_latest_checkpoint(self):
@@ -177,3 +236,30 @@ class HeartsTransformerModel:
 
     def load_weights(self, path):
         self.model.load_weights(path)
+
+    def get_embedding_weights(self):
+        """Extract the embedding weights from the model"""
+        for layer in self.model.layers:
+            if isinstance(layer, Embedding):
+                return layer.get_weights()[0]
+        return None
+
+    def save_embeddings(self, output_path):
+        """Save the current embeddings in Word2Vec format for visualization or transfer"""
+        embedding_weights = self.get_embedding_weights()
+        if embedding_weights is None:
+            print("No embedding weights found in the model")
+            return
+
+        # Create the output file in Word2Vec format
+        with open(output_path, "w") as f:
+            # Header: number of vectors and vector size
+            f.write(f"{NUM_CARDS} {embedding_weights.shape[1]}\n")
+
+            # Write each vector
+            for i in range(NUM_CARDS):
+                card_key = self._token_to_card_key(i)
+                vector_str = " ".join([str(val) for val in embedding_weights[i]])
+                f.write(f"{card_key} {vector_str}\n")
+
+        print(f"Embeddings saved to {output_path}")

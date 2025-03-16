@@ -31,6 +31,16 @@ def train():
         type=str,
         help="Path to a pre-trained model to continue training",
     )
+    parser.add_argument(
+        "--embeddings-path",
+        type=str,
+        help="Path to pretrained embeddings in Word2Vec format",
+    )
+    parser.add_argument(
+        "--trainable-embeddings",
+        action="store_true",
+        help="Make the pretrained embeddings trainable",
+    )
     args = parser.parse_args()
 
     print("Training parameters:")
@@ -42,10 +52,23 @@ def train():
         f"- Pre-trained model: {args.model_path if args.model_path else 'None'}\n",
         flush=True,
     )
+    print(
+        f"- Pretrained embeddings: {args.embeddings_path if args.embeddings_path else 'None'}\n",
+        flush=True,
+    )
+    print(
+        f"- Trainable embeddings: {args.trainable_embeddings}\n",
+        flush=True,
+    )
 
     # Check if file exists
     if not os.path.exists(args.training_data_file):
         print(f"Error: File {args.training_data_file} not found!", flush=True)
+        return
+
+    # Check if embeddings file exists if specified
+    if args.embeddings_path and not os.path.exists(args.embeddings_path):
+        print(f"Error: Embeddings file {args.embeddings_path} not found!", flush=True)
         return
 
     # Register signal handler for graceful interruption
@@ -53,7 +76,10 @@ def train():
 
     # Initialize model
     print("Initializing model...", flush=True)
-    model = HeartsTransformerModel()
+    model = HeartsTransformerModel(
+        pretrained_embeddings_path=args.embeddings_path,
+        trainable_embeddings=args.trainable_embeddings
+    )
 
     if args.model_path:
         print(f"Loading pre-trained model from {args.model_path}", flush=True)
@@ -78,6 +104,13 @@ def train():
         model.train(game_states, epochs=epochs, batch_size=batch_size)
         model.save(len(game_states))
         model.save()
+        
+        # Save the trained embeddings for future use or visualization
+        if args.embeddings_path:
+            embeddings_output_path = "embeddings/trained_embeddings.txt"
+            os.makedirs("embeddings", exist_ok=True)
+            model.save_embeddings(embeddings_output_path)
+            print(f"Trained embeddings saved to {embeddings_output_path}", flush=True)
 
         print("Training completed!", flush=True)
 
