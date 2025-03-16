@@ -57,6 +57,7 @@ class GameVisualizer:
             self.layout,
             lambda card: self.play_card(card),
         )
+        self.good_player_indexes = []
 
     def _create_players(self) -> List[Player]:
         return [

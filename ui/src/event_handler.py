@@ -39,6 +39,8 @@ class EventHandler:
             rect = pygame.Rect(x, start_y, CARD_WIDTH, CARD_HEIGHT)
 
             if rect.collidepoint(pos):
+                print(f"Clicked on card {card}")
+                print(f"Valid moves: {valid_moves}")
                 if card in valid_moves:
                     self.play_card_handler(card)
                 else:

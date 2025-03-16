@@ -79,14 +79,14 @@ class AIStrategy(Strategy):
                 state=state, valid_moves=game_state.valid_moves
             )
             json_data = asdict(predict_request)
-            print("Sending prediction request:", json.dumps(json_data, indent=2))
+            # print("Sending prediction request:", json.dumps(json_data, indent=2))
 
             # Send request to AI service
             response = requests.post(self.endpoint, json=json_data, timeout=5)
             response.raise_for_status()
             result = response.json()
 
-            print("Received response from AI service:", json.dumps(result, indent=2))
+            # print("Received response from AI service:", json.dumps(result, indent=2))
 
             # Convert predicted move to Card
             if isinstance(result, dict) and "suit" in result and "rank" in result:

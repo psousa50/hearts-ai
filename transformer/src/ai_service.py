@@ -1,12 +1,19 @@
 import logging
 from typing import List
 
+import numpy as np
 import uvicorn
 from fastapi import FastAPI, HTTPException
-from model_builder import load_model
-from predict import predict
-from predict_request import PredictRequest
-from pydantic import parse_obj_as
+from game_classes import Card, GameState
+from pydantic import BaseModel
+from transformer_encoding import decode_card
+from transformer_model import HeartsTransformerModel
+
+
+class PredictRequest(BaseModel):
+    state: GameState
+    valid_moves: List[Card]
+
 
 # Configure logging
 logger = logging.getLogger("ai_service")
@@ -18,8 +25,8 @@ logger.info("Starting AI service...")
 
 # Load the model at startup
 logger.info("Loading model...")
-model = load_model("models/latest.keras")
-model.summary()
+model = HeartsTransformerModel()
+model.load("models/latest.keras")
 logger.info("Model loaded successfully")
 
 
@@ -35,14 +42,22 @@ async def predict_post(request: dict):
         logger.info(f"Hand: {predictRequest.state.player_hand}")
         logger.info(f"Valid moves: {predictRequest.valid_moves}")
 
-        chosen_move = await predict(
-            model, predictRequest.state, predictRequest.valid_moves
+        predictions = model.predict(predictRequest.state)
+        ordered_predicted_cards = [
+            decode_card(i) for i in np.argsort(predictions[0])[-52:][::-1]
+        ]
+        chosen_valid_move = next(
+            (
+                card
+                for card in ordered_predicted_cards
+                if card in predictRequest.valid_moves
+            ),
+            None,
         )
-        logger.info(f"Chosen move: {chosen_move}")
-        logger.info("=" * 50)
-        print("chosen move:", chosen_move)
 
-        return chosen_move
+        logger.info(f"Chosen move: {chosen_valid_move}")
+
+        return chosen_valid_move
 
     except Exception as e:
         logger.error(f"Error in prediction: {e}")
