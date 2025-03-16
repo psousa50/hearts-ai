@@ -79,7 +79,11 @@ class HeartsGame:
             same_suit = [c for c in hand if c.suit == lead_suit]
             if same_suit:
                 return same_suit
+            # If can't follow suit, can play any card including hearts
+            return hand.copy()
 
+        # Leading a trick (current_trick is empty)
+        
         # On first trick, can't play hearts or queen of spades
         if not self.previous_tricks:
             safe_cards = [

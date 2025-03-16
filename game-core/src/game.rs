@@ -74,7 +74,7 @@ impl HeartsGame {
             .collect()
     }
 
-    fn get_valid_moves(&self, player_index: usize) -> Vec<Card> {
+    pub fn get_valid_moves(&self, player_index: usize) -> Vec<Card> {
         let hand = &self.players[player_index].hand;
         if self.current_trick.is_first_card() && self.tricks.is_empty() {
             let two_clubs = Self::get_two_of_clubs(hand);
@@ -90,8 +90,12 @@ impl HeartsGame {
             if !same_suit.is_empty() {
                 return same_suit;
             }
+            // If can't follow suit, can play any card including hearts
+            return hand.to_vec();
         }
 
+        // Leading a trick (current_trick is empty or is first card)
+        
         // On first trick, can't play hearts or queen of spades
         if self.tricks.is_empty() {
             return Self::avoid_penalties(hand);
