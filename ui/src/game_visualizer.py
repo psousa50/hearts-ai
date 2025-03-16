@@ -39,9 +39,10 @@ class GameVisualizer:
         self.clock = pygame.time.Clock()
 
         # Create game with appropriate players
+        self.replaying_games = game_file is not None
         players = (
             self._create_players()
-            if not game_file
+            if not self.replaying_games
             else self._create_replay_players(game_file)
         )
         self.game = HeartsGame(players)
@@ -134,11 +135,11 @@ class GameVisualizer:
 
         if self.game.current_trick.is_empty:
             previous_trick = self.game.previous_tricks[-1]
-            for card in self.animation_mgr.get_cards_in_play():
-                card.good_move = self.is_good_move(card.player_index, previous_trick)
-                print(
-                    f"player {card.player_index} card {card.card} good move {card.good_move}"
-                )
+            if self.replaying_games:
+                for card in self.animation_mgr.get_cards_in_play():
+                    card.good_move = self.is_good_move(
+                        card.player_index, previous_trick
+                    )
             self.game_state.paused = True
 
     def is_good_move(self, player_index: int, trick: CompletedTrick) -> bool:

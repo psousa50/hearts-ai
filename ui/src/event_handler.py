@@ -32,19 +32,15 @@ class EventHandler:
 
         valid_moves = self.game.get_valid_moves(self.game.current_player_index)
 
-        # Check cards from right to left
         for i in range(len(hand) - 1, -1, -1):
             card = hand[i]
             x = start_x + (i * offset_x)
             rect = pygame.Rect(x, start_y, CARD_WIDTH, CARD_HEIGHT)
 
             if rect.collidepoint(pos):
-                print(f"Clicked on card {card}")
-                print(f"Valid moves: {valid_moves}")
                 if card in valid_moves:
                     self.play_card_handler(card)
-                else:
-                    break
+                return
 
     def handle_key(self, key: int) -> bool:
         if key == pygame.K_SPACE:

@@ -32,10 +32,8 @@ logger.info("Model loaded successfully")
 
 @app.post("/predict")
 async def predict_post(request: dict):
-    print("Received prediction request:", request)
     predictRequest = PredictRequest.model_validate(request)
 
-    print("Received prediction request:", predictRequest)
     try:
         logger.info("=" * 50)
         logger.info(f"Prediction request - Game: {predictRequest.state}")
@@ -46,14 +44,15 @@ async def predict_post(request: dict):
         ordered_predicted_cards = [
             decode_card(i) for i in np.argsort(predictions[0])[-52:][::-1]
         ]
-        chosen_valid_move = next(
-            (
-                card
-                for card in ordered_predicted_cards
-                if card in predictRequest.valid_moves
-            ),
-            None,
-        )
+        valid_predicted_cards = [
+            card
+            for card in ordered_predicted_cards
+            if card in predictRequest.valid_moves
+        ]
+        print("\nTop most probable cards:")
+        for card in valid_predicted_cards[:5]:
+            print(f"Card: {card}")
+        chosen_valid_move = valid_predicted_cards[0]
 
         logger.info(f"Chosen move: {chosen_valid_move}")
 

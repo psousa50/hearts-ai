@@ -15,12 +15,22 @@ pub fn display_statistics(games: &[CompletedHeartsGame]) {
             *entry += player.score;
         }
 
-        // Update win counts
-        let winner = &game.players[game.winner_index];
-        let entry = total_wins
-            .entry((&winner.name, &winner.strategy))
-            .or_insert(0);
-        *entry += 1;
+        // Find the player with the lowest score in this game (the actual winner)
+        if !game.players.is_empty() {
+            let min_score = game.players.iter().map(|p| p.score).min().unwrap_or(0);
+            let winners: Vec<_> = game.players.iter()
+                .enumerate()
+                .filter(|(_, p)| p.score == min_score)
+                .collect();
+
+            // In case of a tie, all players with the minimum score get a win
+            for (_, winner) in winners {
+                let entry = total_wins
+                    .entry((&winner.name, &winner.strategy))
+                    .or_insert(0);
+                *entry += 1;
+            }
+        }
     }
 
     // Calculate and display statistics
