@@ -58,5 +58,5 @@ class Trick:
 class CompletedTrick:
     cards: List[Card]
     first_player_index: int
-    winner: int
+    winner_index: int
     score: int

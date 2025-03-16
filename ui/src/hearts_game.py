@@ -145,7 +145,7 @@ class HeartsGame:
             CompletedTrick(
                 cards=self.current_trick.cards,
                 first_player_index=self.current_trick.first_player_index,
-                winner=winner_idx,
+                winner_index=winner_idx,
                 score=points,
             )
         )

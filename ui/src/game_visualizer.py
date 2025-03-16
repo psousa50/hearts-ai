@@ -63,10 +63,12 @@ class GameVisualizer:
     def _create_players(self) -> List[Player]:
         return [
             Player("You", HumanStrategy()),
-            Player("Bob", AvoidPointsStrategy()),
-            Player("Charlie", AggressiveStrategy()),
-            # Player("AI", RandomStrategy()),
+            Player("Bob", AIStrategy()),
+            Player("Charlie", AIStrategy()),
             Player("AI", AIStrategy()),
+            # Player("Bob", AvoidPointsStrategy()),
+            # Player("Charlie", AggressiveStrategy()),
+            # Player("AI", RandomStrategy()),
         ]
 
     def _create_replay_players(self, game_file: str) -> List[Player]:
@@ -144,7 +146,7 @@ class GameVisualizer:
 
     def is_good_move(self, player_index: int, trick: CompletedTrick) -> bool:
         return player_index in self.good_player_indexes and (
-            trick.score <= 1 or trick.winner != player_index
+            trick.score <= 1 or trick.winner_index != player_index
         )
 
     def _handle_game_over(self):

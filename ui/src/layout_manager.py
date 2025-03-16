@@ -1,15 +1,16 @@
 from typing import Dict, Tuple
 
+
 class LayoutManager:
     def __init__(self, window_width: int, window_height: int):
         self.window_width = window_width
         self.window_height = window_height
         self.trick_center = (window_width // 2, window_height // 2)
-        
+
         # Player positions (center points for names and scores)
         self.player_positions = {
             0: (window_width // 2, window_height - 50),  # Bottom
-            1: (200, window_height // 2),  # Left
+            1: (250, window_height // 2),  # Left
             2: (window_width // 2, 30),  # Top
             3: (window_width - 200, window_height // 2),  # Right
         }
@@ -26,7 +27,7 @@ class LayoutManager:
                 "offset": (0, card_overlap),
             },
             2: {
-                "start": (window_width // 4, 70),  # Top
+                "start": (window_width // 4, 90),  # Top
                 "offset": (card_overlap, 0),
             },
             3: {

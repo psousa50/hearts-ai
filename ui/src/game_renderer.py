@@ -128,8 +128,8 @@ class GameRenderer:
             self.draw_player_hand(i, game.hands[i], valid_moves)
             self.draw_player_info(
                 i,
-                game.current_player.name,
-                game.current_player.strategy.__class__.__name__,
+                game.players[i].name,
+                game.players[i].strategy.__class__.__name__,
                 game.scores[i],
             )
 
