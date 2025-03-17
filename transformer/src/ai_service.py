@@ -45,8 +45,8 @@ async def predict_post(request: dict):
             if card in predictRequest.valid_moves
         ]
         # print("\nTop most probable cards:")
-        # for card in valid_predicted_cards[:5]:
-        #     print(f"Card: {card}")
+        for card in valid_predicted_cards[:5]:
+            print(f"Card: {card}")
         chosen_valid_move = valid_predicted_cards[0]
 
         return chosen_valid_move

@@ -10,9 +10,9 @@ class LayoutManager:
         # Player positions (center points for names and scores)
         self.player_positions = {
             0: (window_width // 2, window_height - 50),  # Bottom
-            1: (250, window_height // 2),  # Left
+            1: (50, window_height // 2),  # Left
             2: (window_width // 2, 30),  # Top
-            3: (window_width - 200, window_height // 2),  # Right
+            3: (window_width - 150, window_height // 2),  # Right
         }
 
         # Hand display positions and offsets
@@ -23,7 +23,7 @@ class LayoutManager:
                 "offset": (card_overlap, 0),
             },
             1: {
-                "start": (100, window_height // 4),  # Left
+                "start": (150, window_height // 4),  # Left
                 "offset": (0, card_overlap),
             },
             2: {
@@ -31,7 +31,7 @@ class LayoutManager:
                 "offset": (card_overlap, 0),
             },
             3: {
-                "start": (window_width - 120, window_height // 4),  # Right
+                "start": (window_width - 320, window_height // 4),  # Right
                 "offset": (0, card_overlap),
             },
         }
