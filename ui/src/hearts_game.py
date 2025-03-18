@@ -83,7 +83,6 @@ class HeartsGame:
             return hand.copy()
 
         # Leading a trick (current_trick is empty)
-        
         # On first trick, can't play hearts or queen of spades
         if not self.previous_tricks:
             safe_cards = [
@@ -138,11 +137,10 @@ class HeartsGame:
         )
 
         # Calculate points
-        points = sum(1 for card in trick_cards if card.suit == "H")
-        points += 13 if Card.QueenOfSpades in trick_cards else 0
+        score = self.current_trick.score()
 
         # Update scores
-        self.scores[winner_idx] += points
+        self.scores[winner_idx] += score
 
         # Save completed trick
         self.previous_tricks.append(
@@ -150,7 +148,7 @@ class HeartsGame:
                 cards=self.current_trick.cards,
                 first_player_index=self.current_trick.first_player_index,
                 winner_index=winner_idx,
-                score=points,
+                score=score,
             )
         )
 

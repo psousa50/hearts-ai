@@ -13,10 +13,9 @@ from game_state import GameState
 from hearts_game import CompletedTrick, HeartsGame, Player
 from layout_manager import LayoutManager
 from strategies import (
-    AggressiveStrategy,
     AIStrategy,
-    AvoidPointsStrategy,
     HumanStrategy,
+    MyStrategy,
     RandomStrategy,
     ReplayStrategy,
 )
@@ -61,14 +60,38 @@ class GameVisualizer:
         self.good_player_indexes = []
 
     def _create_players(self) -> List[Player]:
+        return self._create_my_strategies()
+
+    def _create_human_players(self) -> List[Player]:
         return [
-            Player("You", HumanStrategy()),
-            Player("Bob", AIStrategy()),
-            Player("Charlie", AIStrategy()),
-            Player("AI", AIStrategy()),
-            # Player("Bob", AvoidPointsStrategy()),
-            # Player("Charlie", AggressiveStrategy()),
-            # Player("AI", RandomStrategy()),
+            Player("Human 1", HumanStrategy()),
+            Player("Human 2", HumanStrategy()),
+            Player("Human 3", HumanStrategy()),
+            Player("Human 4", HumanStrategy()),
+        ]
+
+    def _create_ai_players(self) -> List[Player]:
+        return [
+            Player("AI 1", AIStrategy()),
+            Player("AI 2", AIStrategy()),
+            Player("AI 3", AIStrategy()),
+            Player("AI 4", AIStrategy()),
+        ]
+
+    def _create_ai_players_and_human(self) -> List[Player]:
+        return [
+            Player("Human 1", HumanStrategy()),
+            Player("My Strategy 1", MyStrategy()),
+            Player("My Strategy 2", MyStrategy()),
+            Player("AI 4", AIStrategy()),
+        ]
+
+    def _create_my_strategies(self) -> List[Player]:
+        return [
+            Player("My Strategy 1", MyStrategy()),
+            Player("My Strategy 2", MyStrategy()),
+            Player("My Strategy 3", MyStrategy()),
+            Player("My Strategy 4", MyStrategy()),
         ]
 
     def _create_replay_players(self, game_file: str) -> List[Player]:

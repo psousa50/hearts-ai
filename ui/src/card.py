@@ -30,11 +30,11 @@ class Trick:
 
     @property
     def is_empty(self):
-        return self.size == 0
+        return self.cards.count(None) == 4
 
     @property
     def is_completed(self):
-        return self.size == 4
+        return self.cards.count(None) == 0
 
     @property
     def first_card(self):
@@ -52,6 +52,18 @@ class Trick:
     def reset(self):
         self.cards = [None, None, None, None]
         self.first_player_index = None
+
+    def score(self):
+        s = 0
+        for card in self.all_cards():
+            if card.suit == "H":
+                s += 1
+            if card == Card.QueenOfSpades:
+                s += 13
+        return s
+
+    def all_cards(self):
+        return [card for card in self.cards if card is not None]
 
 
 @dataclass

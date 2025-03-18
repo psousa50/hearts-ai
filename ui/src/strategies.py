@@ -125,3 +125,133 @@ class ReplayStrategy(Strategy):
     def reset(self):
         """Reset the replay sequence back to the start"""
         self.current_index = 0
+
+
+class MyStrategy(Strategy):
+    def choose_card(self, gameState: StrategyGameState) -> Card:
+        print("------------------------------------------------")
+        print("Current trick:", gameState.current_trick)
+        card = self._choose_card(gameState)
+        print("Chosen card:", card)
+        if card not in gameState.valid_moves:
+            print("Valid moves:", gameState.valid_moves)
+            raise ValueError("Invalid move predicted by strategy")
+        return card
+
+    def _choose_card(self, gameState: StrategyGameState) -> Card:
+        if gameState.current_trick.is_empty and not gameState.previous_tricks:
+            return Card(suit="C", rank=2)
+        numberOfCardsOutPerSuit = {
+            "C": 0,
+            "D": 0,
+            "H": 0,
+            "S": 0,
+        }
+        for card in gameState.player_hand:
+            numberOfCardsOutPerSuit[card.suit] += 1
+        for previous_trick in gameState.previous_tricks:
+            for card in previous_trick.cards:
+                numberOfCardsOutPerSuit[card.suit] += 1
+        for card in gameState.current_trick.all_cards():
+            numberOfCardsOutPerSuit[card.suit] += 1
+
+        print("Number of cards out per suit:", numberOfCardsOutPerSuit)
+        excludedSuits = ["H"]
+        queenOfSpadesIsOut = False
+        for previous_trick in gameState.previous_tricks:
+            for card in previous_trick.cards:
+                if card == Card.QueenOfSpades:
+                    queenOfSpadesIsOut = True
+                    break
+        if not queenOfSpadesIsOut:
+            excludedSuits.append("S")
+        print("Queen of spades is out:", queenOfSpadesIsOut)
+        print("Excluded suits:", excludedSuits)
+
+        if gameState.current_trick.is_empty:
+            suitWithLessCardsOutButNotZero = min(
+                numberOfCardsOutPerSuit.items(),
+                key=lambda item: item[1]
+                if item[1] > 0 and item[0] not in excludedSuits
+                else float("inf"),
+            )
+
+            print("Suit with less cards but not zero:", suitWithLessCardsOutButNotZero)
+            sortedHand = self.sorted_hand_from_suit(
+                gameState, suitWithLessCardsOutButNotZero[0]
+            )
+            print("Sorted hand:", sortedHand)
+            if numberOfCardsOutPerSuit[suitWithLessCardsOutButNotZero[0]] > 7:
+                if sortedHand:
+                    print("Playing lowest card in sorted hand")
+                    return sortedHand[0]
+                else:
+                    print("Playing lowest card in hand")
+                    return gameState.player_hand[0]
+            else:
+                if sortedHand:
+                    print("Playing highest card in sorted hand")
+                    return sortedHand[-1]
+                else:
+                    print("Playing highest card in hand")
+                    return gameState.player_hand[-1]
+        else:
+            lead_suit = gameState.current_trick.lead_suit
+            print("Lead suit:", lead_suit)
+            trick_cards_in_suit = [
+                card
+                for card in gameState.current_trick.all_cards()
+                if card.suit == lead_suit
+            ]
+            print("Trick cards in lead suit:", trick_cards_in_suit)
+
+            highestCardInTrick = max(trick_cards_in_suit, key=lambda card: card.rank)
+            print("Highest card in trick:", highestCardInTrick)
+
+            canFollowSuit = lead_suit in [card.suit for card in gameState.player_hand]
+            print("Can follow suit:", canFollowSuit)
+            if canFollowSuit:
+                sortedHand = self.sorted_hand_from_suit(gameState, lead_suit)
+                print("Sorted hand:", sortedHand)
+                score = gameState.current_trick.score()
+                print("Score:", score)
+                shouldTakeTrick = score == 0 and numberOfCardsOutPerSuit[lead_suit] < 7
+                shouldTakeTrick = shouldTakeTrick and lead_suit not in excludedSuits
+                print("Should take trick:", shouldTakeTrick)
+                if shouldTakeTrick:
+                    return sortedHand[-1]
+                else:
+                    sortedHandLowerThanHighestCardInTrick = [
+                        card
+                        for card in sortedHand
+                        if card.rank < highestCardInTrick.rank
+                    ]
+                    print(
+                        "Sorted hand lower than highest card in trick:",
+                        sortedHandLowerThanHighestCardInTrick,
+                    )
+                    if sortedHandLowerThanHighestCardInTrick:
+                        print("Playing lowest card in hand")
+                        return sortedHandLowerThanHighestCardInTrick[-1]
+                    else:
+                        print("Playing highest card in hand")
+                        return sortedHand[-1]
+            else:
+                hasQueenOfSpades = Card.QueenOfSpades in gameState.player_hand
+                print("Has queen of spades:", hasQueenOfSpades)
+                if hasQueenOfSpades:
+                    return Card.QueenOfSpades
+                sortedHearts = self.sorted_hand_from_suit(gameState, "H")
+                print("Sorted hearts:", sortedHearts)
+                if sortedHearts:
+                    return sortedHearts[-1]
+                else:
+                    return gameState.valid_moves[0]
+
+    def sorted_hand_from_suit(
+        self, gameState: StrategyGameState, suit: str
+    ) -> List[Card]:
+        return sorted(
+            [card for card in gameState.player_hand if card.suit == suit],
+            key=lambda card: card.rank,
+        )
