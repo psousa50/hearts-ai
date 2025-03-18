@@ -1,6 +1,6 @@
 use chrono::Utc;
 use hearts_game::{
-    AIStrategy, AggressiveStrategy, AvoidPointsStrategy, HeartsGame, RandomStrategy, Strategy,
+    AIStrategy, AggressiveStrategy, HeartsGame, MyStrategy, RandomStrategy, Strategy,
 };
 use serde_json;
 use std::fs::{self, File};
@@ -19,7 +19,7 @@ pub fn generate_games(num_games: usize) {
         ("Alice", Strategy::Random(RandomStrategy)),
         // ("Bob", Strategy::Random(RandomStrategy)),
         ("Bob", Strategy::AI(ai_strategy)),
-        ("Charlie", Strategy::AvoidPoints(AvoidPointsStrategy)),
+        ("My", Strategy::My(MyStrategy)),
         ("David", Strategy::Aggressive(AggressiveStrategy)),
     ];
 
