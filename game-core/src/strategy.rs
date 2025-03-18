@@ -111,7 +111,7 @@ impl PlayingStrategy for AIStrategy {
                     valid_moves[0]
                 }
             }
-            Err(e) => {
+            Err(_) => {
                 // Fallback to first valid move if request fails
                 valid_moves[0]
             }

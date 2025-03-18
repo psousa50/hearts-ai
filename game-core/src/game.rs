@@ -202,13 +202,21 @@ impl HeartsGame {
                 score: p.score,
                 strategy: p.strategy_name().to_string(),
             })
-            .collect();
+            .collect::<Vec<PlayerInfo>>();
+
+        // Find the player with the lowest score
+        let winner_index = players
+            .iter()
+            .enumerate()
+            .min_by_key(|(_, player)| player.score)
+            .map(|(index, _)| index)
+            .unwrap_or(0);
 
         CompletedHeartsGame {
             previous_tricks: self.tricks.clone(),
             players,
             hearts_broken: self.hearts_broken,
-            winner_index: self.current_player_index,
+            winner_index,
         }
     }
 
