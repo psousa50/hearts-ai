@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import os
 import signal
 import sys
@@ -78,7 +79,7 @@ def train():
     print("Initializing model...", flush=True)
     model = HeartsTransformerModel(
         pretrained_embeddings_path=args.embeddings_path,
-        trainable_embeddings=args.trainable_embeddings
+        trainable_embeddings=args.trainable_embeddings,
     )
 
     if args.model_path:
@@ -102,9 +103,11 @@ def train():
     try:
         print("Starting training...", flush=True)
         model.train(game_states, epochs=epochs, batch_size=batch_size)
-        model.save(len(game_states))
-        model.save()
-        
+        timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        path = f"models/model_{timestamp}_{len(game_states)}.keras"
+        model.save(path)
+        model.save("models/latest.keras")
+
         # Save the trained embeddings for future use or visualization
         if args.embeddings_path:
             embeddings_output_path = "embeddings/trained_embeddings.txt"

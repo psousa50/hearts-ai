@@ -17,7 +17,7 @@ def build_trick():
 
 def train_model_test():
     game_states = []
-    for _ in range(10):
+    for _ in range(100):
         cards = random.choices(range(2, 11), k=4)
         current_trick = Trick(
             cards=[Card(suit="S", rank=card) for card in cards[:3]],
@@ -38,13 +38,13 @@ def train_model_test():
 
     model.train(game_states, epochs=50, batch_size=16)
 
-    model.save_weights("models/test_hearts.weights.h5")
+    model.save("models/test_hearts.keras")
 
 
 def predict_model_test():
     model = HeartsTransformerModel()
     model.build()
-    model.load_weights("models/test_hearts.weights.h5")
+    model.load("models/test_hearts.keras")
     model.model.summary()
 
     cards = random.choices(range(2, 11), k=4)
@@ -57,6 +57,10 @@ def predict_model_test():
         current_trick=current_trick,
         current_player_index=3,
         player_hand=[],
+    )
+
+    print(
+        f"Current trick: {', '.join([f'{card}' for card in game_state.current_trick.cards])}"
     )
 
     predictions = model.predict(game_state)
@@ -79,6 +83,6 @@ def predict_model_test():
 
 
 if __name__ == "__main__":
-    train_model_test()
+    # train_model_test()
 
     predict_model_test()

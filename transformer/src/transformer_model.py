@@ -224,12 +224,8 @@ class HeartsTransformerModel:
         predictions = self.model.predict(input_sequence)
         return predictions
 
-    def save(self, number_of_game_states: int = 0):
-        path = "models/latest.keras"
-        if number_of_game_states > 0:
-            timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-            path = f"models/model_{timestamp}_{number_of_game_states}.keras"
-        self.model.save(path)
+    def save(self, model_path):
+        self.model.save(model_path)
 
     def save_weights(self, path):
         self.model.save_weights(path)
