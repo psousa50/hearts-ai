@@ -113,7 +113,11 @@ class HeartsTransformerModel:
         self.model = Model(inputs=sequence_input, outputs=outputs)
 
         # Compile model
-        self.compile_model()
+        self.model.compile(
+            optimizer="adam",
+            loss="sparse_categorical_crossentropy",
+            metrics=["accuracy"],
+        )
 
     def transformer_encoder(self, inputs):
         # Get the embedding dimension from the inputs
