@@ -60,7 +60,7 @@ class GameVisualizer:
         self.good_player_indexes = []
 
     def _create_players(self) -> List[Player]:
-        return self._create_all_players()
+        return self._create_ai_players()
 
     def _create_all_players(self) -> List[Player]:
         return [
