@@ -60,7 +60,15 @@ class GameVisualizer:
         self.good_player_indexes = []
 
     def _create_players(self) -> List[Player]:
-        return self._create_my_strategies()
+        return self._create_all_players()
+
+    def _create_all_players(self) -> List[Player]:
+        return [
+            Player("Human", HumanStrategy()),
+            Player("AI", AIStrategy()),
+            Player("My Strategy", MyStrategy()),
+            Player("Random", RandomStrategy()),
+        ]
 
     def _create_human_players(self) -> List[Player]:
         return [
@@ -81,8 +89,8 @@ class GameVisualizer:
     def _create_ai_players_and_human(self) -> List[Player]:
         return [
             Player("Human 1", HumanStrategy()),
-            Player("My Strategy 1", MyStrategy()),
-            Player("My Strategy 2", MyStrategy()),
+            Player("AI 2", AIStrategy()),
+            Player("AI 3", AIStrategy()),
             Player("AI 4", AIStrategy()),
         ]
 

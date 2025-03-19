@@ -135,7 +135,7 @@ class HeartsTransformerModel:
     def load(self, model_path):
         self.model = tf.keras.models.load_model(model_path)
         self.compile_model()  # Recompile to ensure metrics are built
-        print("Pre-trained model loaded successfully!", flush=True)
+        print(f"Pre-trained model loaded successfully: {model_path}", flush=True)
 
         self.initial_epoch = 0
         # Extract epoch number from filename if possible
