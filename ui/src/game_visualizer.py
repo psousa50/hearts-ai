@@ -5,12 +5,13 @@ from typing import List, Optional
 
 import pygame
 from animation_manager import AnimationManager
-from card import Card
+from card import Card, CompletedTrick
 from card_sprite import CardSprite
 from event_handler import EventHandler
+from game_moves_filter import GameMovesFilter
 from game_renderer import GameRenderer
 from game_state import GameState
-from hearts_game import CompletedTrick, HeartsGame, Player
+from hearts_game import HeartsGame, Player
 from layout_manager import LayoutManager
 from strategies import (
     AIStrategy,
@@ -57,7 +58,6 @@ class GameVisualizer:
             self.layout,
             lambda card: self.play_card(card),
         )
-        self.good_player_indexes = []
 
     def _create_players(self) -> List[Player]:
         return self._create_ai_players()
@@ -106,19 +106,27 @@ class GameVisualizer:
         print(f"Loading game from {game_file}")
         with open(game_file, "r") as f:
             games_data = json.load(f)
+        print(f"Loaded {len(games_data)} moves")
 
         game_data = games_data[0]  # First game only for now
         player_moves = [[] for _ in range(4)]
 
-        for trick in game_data["tricks"]:
+        for trick in game_data["previous_tricks"]:
             for i, card_dict in enumerate(trick["cards"]):
                 card = Card(card_dict["suit"], card_dict["rank"])
                 player_moves[i].append(card)
 
         player_scores = [p["score"] for p in game_data["players"]]
-        self.good_player_indexes = [
-            i for i, score in enumerate(player_scores) if score < 3
-        ]
+
+        # Create a temporary game to initialize the GameMovesFilter
+        temp_game = HeartsGame(
+            [Player(f"Player {i}", RandomStrategy()) for i in range(4)]
+        )
+        temp_game.scores = player_scores
+
+        # Create the filter and get the good player indexes
+        self.game_filter = GameMovesFilter(temp_game)
+
         player_hands = [p["initial_hand"] for p in game_data["players"]]
         player_hands = [
             [Card(card["suit"], card["rank"]) for card in hand] for hand in player_hands
@@ -176,9 +184,7 @@ class GameVisualizer:
             self.game_state.paused = True
 
     def is_good_move(self, player_index: int, trick: CompletedTrick) -> bool:
-        return player_index in self.good_player_indexes and (
-            trick.score <= 1 or trick.winner_index != player_index
-        )
+        return self.game_filter.filter(player_index, trick)
 
     def _handle_game_over(self):
         """Handle game over state"""
