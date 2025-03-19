@@ -13,7 +13,11 @@ pub struct HeartsGame {
 
 impl HeartsGame {
     pub fn new(player_configs: &[(&str, Strategy)]) -> Self {
-        let mut deck = Deck::new();
+        Self::new_with_deck(player_configs, None)
+    }
+
+    pub fn new_with_deck(player_configs: &[(&str, Strategy)], initial_deck: Option<Deck>) -> Self {
+        let mut deck = initial_deck.unwrap_or_else(|| Deck::new(None));
         let hands = deck.deal(4);
         let players: Vec<Player> = player_configs
             .iter()
@@ -95,7 +99,7 @@ impl HeartsGame {
         }
 
         // Leading a trick (current_trick is empty or is first card)
-        
+
         // On first trick, can't play hearts or queen of spades
         if self.tricks.is_empty() {
             return Self::avoid_penalties(hand);

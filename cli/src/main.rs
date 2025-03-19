@@ -20,6 +20,10 @@ enum Commands {
         /// Number of games to simulate
         #[arg(short, long, default_value_t = 1)]
         num_games: usize,
+
+        /// Use the same deck for all player positions (rotating players)
+        #[arg(short, long)]
+        same_deck: bool,
     },
 
     /// Generate AI training data from simulated games
@@ -42,8 +46,8 @@ fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::GenerateGames { num_games } => {
-            generate::generate_games(*num_games);
+        Commands::GenerateGames { num_games, same_deck } => {
+            generate::generate_games(*num_games, *same_deck);
         }
         Commands::GenerateAiTrainingData {
             num_games,
