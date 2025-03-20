@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import argparse
 import io
+import json
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
 import cairosvg
-import msgpack
 import pygame
 
 # Enable extensive debug logging
@@ -140,19 +140,11 @@ class TrainingDataViewer:
         self.current_index = 0
 
     def load_training_data(self, file_path: str) -> List[CompactTrainingData]:
-        """Load training data from msgpack file"""
+        """Load training data from JSON file"""
         try:
-            with open(file_path, "rb") as f:
-                file_data = f.read()
-
-                # Try to unpack the data
-                try:
-                    data = msgpack.unpackb(file_data, raw=False)
-                except Exception:
-                    # Try with raw=True
-                    data = msgpack.unpackb(file_data, raw=True)
-
-                # Convert raw dictionaries to CompactTrainingData objects
+            with open(file_path, "r") as f:
+                data = json.load(f)
+                # Convert raw data to CompactTrainingData objects
                 result = self.convert_to_compact_training_data(data)
                 return result
         except Exception:
@@ -160,86 +152,83 @@ class TrainingDataViewer:
             return []
 
     def convert_to_compact_training_data(self, data):
-        """Convert raw dictionaries to CompactTrainingData objects"""
+        """Convert raw data to CompactTrainingData objects"""
         result = []
-
-        # Create a simple mock training data for testing if data is empty
-        if not data or len(data) == 0:
-            # Create a simple mock CompactTrainingData
-            mock_card = CompactCard("S", 12)  # Queen of Spades
-            mock_trick = CompactTrick(
-                cards=[mock_card, None, None, None], first_player=0
-            )
-            mock_completed_trick = CompactCompletedTrick(
-                cards=[
-                    CompactCard("S", 12),
-                    CompactCard("S", 2),
-                    CompactCard("S", 3),
-                    CompactCard("S", 4),
-                ],
-                winner=0,
-                points=13,
-                first_player_index=0,
-            )
-
-            mock_data = CompactTrainingData(
-                previous_tricks=[mock_completed_trick],
-                current_trick=mock_trick,
-                current_player_index=1,
-                player_hand=[
-                    CompactCard("H", 2),
-                    CompactCard("H", 3),
-                    CompactCard("H", 4),
-                ],
-                played_card=CompactCard("H", 2),
-            )
-
-            result.append(mock_data)
-            return result
-
-        # Check if data is a list of dictionaries or a list of lists
-        if isinstance(data, list) and data and isinstance(data[0], dict):
-            # Handle dictionary format
+        
+        # Check if data is a list
+        if isinstance(data, list):
             for item in data:
                 try:
-                    # Convert previous tricks
+                    # Extract previous tricks
                     previous_tricks = []
-                    for trick in item.get("previous_tricks", []):
-                        cards = [
-                            CompactCard(c["0"], c["1"]) for c in trick.get("cards", [])
-                        ]
+                    for trick_data in item.get("previous_tricks", []):
+                        cards = []
+                        for card in trick_data.get("cards", []):
+                            # Check if card is a list or dict
+                            if isinstance(card, list):
+                                # List format [suit, rank]
+                                cards.append(CompactCard(card[0], card[1]))
+                            elif isinstance(card, dict):
+                                # Dict format {"suit": suit, "rank": rank}
+                                cards.append(CompactCard(card.get("suit"), card.get("rank")))
+                        
                         previous_tricks.append(
                             CompactCompletedTrick(
                                 cards=cards,
-                                winner=trick.get("winner", 0),
-                                points=trick.get("points", 0),
-                                first_player_index=trick.get("first_player_index", 0),
+                                winner=trick_data.get("winner", 0),
+                                points=trick_data.get("points", 0),
+                                first_player_index=trick_data.get("first_player_index", 0),
                             )
                         )
-
-                    # Convert current trick
+                    
+                    # Extract current trick
                     current_trick_data = item.get("current_trick", {})
-                    cards = []
+                    current_cards = []
                     for card_data in current_trick_data.get("cards", []):
                         if card_data is None:
-                            cards.append(None)
+                            current_cards.append(None)
                         else:
-                            cards.append(CompactCard(card_data["0"], card_data["1"]))
-
+                            # Check if card is a list or dict
+                            if isinstance(card_data, list):
+                                # List format [suit, rank]
+                                current_cards.append(CompactCard(card_data[0], card_data[1]))
+                            elif isinstance(card_data, dict):
+                                # Dict format {"suit": suit, "rank": rank}
+                                current_cards.append(
+                                    CompactCard(card_data.get("suit"), card_data.get("rank"))
+                                )
+                    
                     current_trick = CompactTrick(
-                        cards=cards,
+                        cards=current_cards,
                         first_player=current_trick_data.get("first_player", 0),
                     )
-
-                    # Convert player hand and played card
-                    player_hand = [
-                        CompactCard(c["0"], c["1"]) for c in item.get("player_hand", [])
-                    ]
-                    played_card = CompactCard(
-                        item.get("played_card", {}).get("0", "S"),
-                        item.get("played_card", {}).get("1", 0),
-                    )
-
+                    
+                    # Extract player hand
+                    player_hand = []
+                    for card in item.get("player_hand", []):
+                        # Check if card is a list or dict
+                        if isinstance(card, list):
+                            # List format [suit, rank]
+                            player_hand.append(CompactCard(card[0], card[1]))
+                        elif isinstance(card, dict):
+                            # Dict format {"suit": suit, "rank": rank}
+                            player_hand.append(
+                                CompactCard(card.get("suit"), card.get("rank"))
+                            )
+                    
+                    # Extract played card
+                    played_card_data = item.get("played_card", {})
+                    # Check if played_card is a list or dict
+                    if isinstance(played_card_data, list):
+                        # List format [suit, rank]
+                        played_card = CompactCard(played_card_data[0], played_card_data[1])
+                    else:
+                        # Dict format {"suit": suit, "rank": rank}
+                        played_card = CompactCard(
+                            played_card_data.get("suit", "S"),
+                            played_card_data.get("rank", 2),
+                        )
+                    
                     # Create CompactTrainingData object
                     result.append(
                         CompactTrainingData(
@@ -252,100 +241,7 @@ class TrainingDataViewer:
                     )
                 except Exception:
                     import traceback
-
                     traceback.print_exc()
-        elif isinstance(data, list) and data and isinstance(data[0], list):
-            # Handle list format
-            for item in data:
-                try:
-                    # Based on the debug output, the format seems to be:
-                    # [previous_tricks, current_trick, current_player_index, player_hand, played_card]
-
-                    # Extract previous tricks (item[0])
-                    previous_tricks = []
-                    for trick_data in item[0]:
-                        # trick_data format: [cards, winner, points, first_player_index]
-                        if len(trick_data) >= 4:
-                            cards = [
-                                CompactCard(card[0], card[1]) for card in trick_data[0]
-                            ]
-                            previous_tricks.append(
-                                CompactCompletedTrick(
-                                    cards=cards,
-                                    winner=trick_data[1],
-                                    points=trick_data[2],
-                                    first_player_index=trick_data[3],
-                                )
-                            )
-
-                    # Extract current trick (item[1])
-                    current_trick_data = item[1]
-                    cards = []
-                    for card_data in current_trick_data[0]:
-                        if card_data is None:
-                            cards.append(None)
-                        else:
-                            cards.append(CompactCard(card_data[0], card_data[1]))
-
-                    current_trick = CompactTrick(
-                        cards=cards, first_player=current_trick_data[1]
-                    )
-
-                    # Extract current player index (item[2])
-                    current_player_index = item[2]
-
-                    # Extract player hand (item[3])
-                    player_hand = [CompactCard(card[0], card[1]) for card in item[3]]
-
-                    # Extract played card (item[4])
-                    played_card = CompactCard(item[4][0], item[4][1])
-
-                    # Create CompactTrainingData object
-                    result.append(
-                        CompactTrainingData(
-                            previous_tricks=previous_tricks,
-                            current_trick=current_trick,
-                            current_player_index=current_player_index,
-                            player_hand=player_hand,
-                            played_card=played_card,
-                        )
-                    )
-                except Exception:
-                    import traceback
-
-                    traceback.print_exc()
-        else:
-            # For now, create mock data for testing
-            # Create a simple mock CompactTrainingData
-            mock_card = CompactCard("S", 12)  # Queen of Spades
-            mock_trick = CompactTrick(
-                cards=[mock_card, None, None, None], first_player=0
-            )
-            mock_completed_trick = CompactCompletedTrick(
-                cards=[
-                    CompactCard("S", 12),
-                    CompactCard("S", 2),
-                    CompactCard("S", 3),
-                    CompactCard("S", 4),
-                ],
-                winner=0,
-                points=13,
-                first_player_index=0,
-            )
-
-            mock_data = CompactTrainingData(
-                previous_tricks=[mock_completed_trick],
-                current_trick=mock_trick,
-                current_player_index=1,
-                player_hand=[
-                    CompactCard("H", 2),
-                    CompactCard("H", 3),
-                    CompactCard("H", 4),
-                ],
-                played_card=CompactCard("H", 2),
-            )
-
-            result.append(mock_data)
 
         return result
 
@@ -452,7 +348,7 @@ class TrainingDataViewer:
 
 def main():
     parser = argparse.ArgumentParser(description="Hearts AI Training Data Viewer")
-    parser.add_argument("file", help="Path to the msgpack training data file")
+    parser.add_argument("file", help="Path to the JSON training data file")
     args = parser.parse_args()
 
     viewer = TrainingDataViewer(args.file)
