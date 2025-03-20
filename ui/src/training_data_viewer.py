@@ -3,12 +3,12 @@ import argparse
 import io
 import json
 import sys
-from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import cairosvg
 import pygame
+from pydantic import BaseModel, root_validator
 
 # Enable extensive debug logging
 DEBUG = False
@@ -35,8 +35,7 @@ FONT_SIZE = 14
 SUIT_SYMBOLS = {"C": "C", "D": "D", "H": "H", "S": "S"}
 
 
-@dataclass
-class CompactCard:
+class Card(BaseModel):
     suit: str
     rank: int
 
@@ -44,28 +43,32 @@ class CompactCard:
         rank_str = {11: "J", 12: "Q", 13: "K", 14: "A"}.get(self.rank, str(self.rank))
         return f"{rank_str}{SUIT_SYMBOLS[self.suit]}"
 
+    @root_validator(pre=True)
+    @classmethod
+    def parse_list(cls, values):
+        if isinstance(values, list) and len(values) == 2:
+            return {"suit": values[0], "rank": values[1]}
+        return values
 
-@dataclass
-class CompactTrick:
-    cards: List[Optional[CompactCard]]
-    first_player: int
 
-
-@dataclass
-class CompactCompletedTrick:
-    cards: List[CompactCard]
+class CompletedTrick(BaseModel):
+    cards: List[Card]
     winner: int
     points: int
     first_player_index: int
 
 
-@dataclass
-class CompactTrainingData:
-    previous_tricks: List[CompactCompletedTrick]
-    current_trick: CompactTrick
+class Trick(BaseModel):
+    cards: List[Optional[Card]]
+    first_player: int
+
+
+class TrainingData(BaseModel):
+    previous_tricks: List[CompletedTrick]
+    current_trick: Trick
     current_player_index: int
-    player_hand: List[CompactCard]
-    played_card: CompactCard
+    player_hand: List[Card]
+    played_card: Card
 
 
 class CardImage:
@@ -73,7 +76,7 @@ class CardImage:
     image_cache = {}
 
     @staticmethod
-    def get_card_image(card: CompactCard) -> pygame.Surface:
+    def get_card_image(card: Card) -> pygame.Surface:
         """Get the image for a card, loading from assets or cache"""
         # Use numeric rank for all cards
         card_key = f"{card.rank}{card.suit}"
@@ -139,113 +142,22 @@ class TrainingDataViewer:
         self.training_data = self.load_training_data(file_path)
         self.current_index = 0
 
-    def load_training_data(self, file_path: str) -> List[CompactTrainingData]:
+    def load_training_data(self, file_path: str) -> List[TrainingData]:
         """Load training data from JSON file"""
         try:
             with open(file_path, "r") as f:
                 data = json.load(f)
-                # Convert raw data to CompactTrainingData objects
-                result = self.convert_to_compact_training_data(data)
-                return result
-        except Exception:
+                # Parse JSON data directly into Pydantic models
+                return [TrainingData.model_validate(item) for item in data]
+        except Exception as e:
+            print(f"Error loading training data: {e}")
+            import traceback
+
+            traceback.print_exc()
             # Return empty list instead of exiting
             return []
 
-    def convert_to_compact_training_data(self, data):
-        """Convert raw data to CompactTrainingData objects"""
-        result = []
-        
-        # Check if data is a list
-        if isinstance(data, list):
-            for item in data:
-                try:
-                    # Extract previous tricks
-                    previous_tricks = []
-                    for trick_data in item.get("previous_tricks", []):
-                        cards = []
-                        for card in trick_data.get("cards", []):
-                            # Check if card is a list or dict
-                            if isinstance(card, list):
-                                # List format [suit, rank]
-                                cards.append(CompactCard(card[0], card[1]))
-                            elif isinstance(card, dict):
-                                # Dict format {"suit": suit, "rank": rank}
-                                cards.append(CompactCard(card.get("suit"), card.get("rank")))
-                        
-                        previous_tricks.append(
-                            CompactCompletedTrick(
-                                cards=cards,
-                                winner=trick_data.get("winner", 0),
-                                points=trick_data.get("points", 0),
-                                first_player_index=trick_data.get("first_player_index", 0),
-                            )
-                        )
-                    
-                    # Extract current trick
-                    current_trick_data = item.get("current_trick", {})
-                    current_cards = []
-                    for card_data in current_trick_data.get("cards", []):
-                        if card_data is None:
-                            current_cards.append(None)
-                        else:
-                            # Check if card is a list or dict
-                            if isinstance(card_data, list):
-                                # List format [suit, rank]
-                                current_cards.append(CompactCard(card_data[0], card_data[1]))
-                            elif isinstance(card_data, dict):
-                                # Dict format {"suit": suit, "rank": rank}
-                                current_cards.append(
-                                    CompactCard(card_data.get("suit"), card_data.get("rank"))
-                                )
-                    
-                    current_trick = CompactTrick(
-                        cards=current_cards,
-                        first_player=current_trick_data.get("first_player", 0),
-                    )
-                    
-                    # Extract player hand
-                    player_hand = []
-                    for card in item.get("player_hand", []):
-                        # Check if card is a list or dict
-                        if isinstance(card, list):
-                            # List format [suit, rank]
-                            player_hand.append(CompactCard(card[0], card[1]))
-                        elif isinstance(card, dict):
-                            # Dict format {"suit": suit, "rank": rank}
-                            player_hand.append(
-                                CompactCard(card.get("suit"), card.get("rank"))
-                            )
-                    
-                    # Extract played card
-                    played_card_data = item.get("played_card", {})
-                    # Check if played_card is a list or dict
-                    if isinstance(played_card_data, list):
-                        # List format [suit, rank]
-                        played_card = CompactCard(played_card_data[0], played_card_data[1])
-                    else:
-                        # Dict format {"suit": suit, "rank": rank}
-                        played_card = CompactCard(
-                            played_card_data.get("suit", "S"),
-                            played_card_data.get("rank", 2),
-                        )
-                    
-                    # Create CompactTrainingData object
-                    result.append(
-                        CompactTrainingData(
-                            previous_tricks=previous_tricks,
-                            current_trick=current_trick,
-                            current_player_index=item.get("current_player_index", 0),
-                            player_hand=player_hand,
-                            played_card=played_card,
-                        )
-                    )
-                except Exception:
-                    import traceback
-                    traceback.print_exc()
-
-        return result
-
-    def draw_card(self, card: CompactCard, x: int, y: int):
+    def draw_card(self, card: Card, x: int, y: int):
         """Draw a card at the specified position"""
         # Get the card image
         card_image = CardImage.get_card_image(card)
@@ -254,7 +166,12 @@ class TrainingDataViewer:
         self.screen.blit(card_image, (x, y))
 
     def draw_trick(
-        self, trick, x: int, y: int, is_completed: bool = False, winner: int = None
+        self,
+        trick: Union[Trick, CompletedTrick],
+        x: int,
+        y: int,
+        is_completed: bool = False,
+        winner: int = None,
     ):
         """Draw a trick (completed or current) at the specified position"""
         cards = trick.cards
@@ -274,7 +191,7 @@ class TrainingDataViewer:
                         2,
                     )
 
-    def draw_training_data(self, data: CompactTrainingData):
+    def draw_training_data(self, data: TrainingData):
         trick_x_pos = 300
         """Draw the current training data on the screen"""
 
