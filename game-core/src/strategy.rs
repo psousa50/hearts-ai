@@ -112,8 +112,7 @@ impl PlayingStrategy for AIStrategy {
                 }
             }
             Err(_) => {
-                // Fallback to first valid move if request fails
-                valid_moves[0]
+                panic!("Failed to make request to Python service");
             }
         }
     }

@@ -92,14 +92,17 @@ def train():
         # Load latest checkpoint if exists and no specific model was provided
         model.load_latest_checkpoint()
 
+    # Set up data loading with prefetching
+    print("Loading training data...", flush=True)
     with open(args.training_data_file, "rb") as f:
         raw_data = msgpack.unpackb(f.read(), raw=False)
 
     game_states = extract_game_states(raw_data)
 
-    # Train model
+    # Train model with optimized parameters
     epochs = args.epochs if args.epochs else 50
-    batch_size = args.batch_size if args.batch_size else 16
+    # Use larger batch size for better GPU utilization if not specified
+    batch_size = args.batch_size if args.batch_size else 256
     try:
         print("Starting training...", flush=True)
         model.train(game_states, epochs=epochs, batch_size=batch_size)
