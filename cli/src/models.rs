@@ -6,7 +6,7 @@ pub struct CompactCard(pub char, pub u8);
 #[derive(Clone, Serialize)]
 pub struct CompactTrick {
     pub cards: Vec<Option<CompactCard>>,
-    pub first_player: usize,
+    pub first_player_index: usize,
 }
 
 #[derive(Clone, Serialize)]

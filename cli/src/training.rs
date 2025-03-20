@@ -111,7 +111,8 @@ fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTra
         let mut current_trick = Trick::new();
         current_trick.first_player_index = trick.first_player_index;
 
-        for (player_index, trick_card) in trick.cards.iter().enumerate() {
+        for (p, trick_card) in trick.cards_starting_first_player().iter().enumerate() {
+            let player_index = (trick.first_player_index + p) % 4;
             let card_idx = hands[player_index]
                 .iter()
                 .position(|c| c == trick_card)
@@ -128,7 +129,7 @@ fn extract_training_data(completed_game: &CompletedHeartsGame) -> Vec<CompactTra
                             .iter()
                             .map(|c| c.map(|c| CompactCard(c.suit, c.rank)))
                             .collect(),
-                        first_player: trick.first_player_index,
+                        first_player_index: trick.first_player_index,
                     },
                     current_player_index: player_index,
                     player_hand: hands[player_index]

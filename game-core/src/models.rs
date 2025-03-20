@@ -55,6 +55,12 @@ impl CompletedTrick {
     pub fn first_card(&self) -> Card {
         self.cards[self.first_player_index]
     }
+
+    pub fn cards_starting_first_player(&self) -> Vec<Card> {
+        let mut cards = self.cards.clone();
+        cards.rotate_left(self.first_player_index);
+        cards
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -89,6 +95,12 @@ impl Trick {
 
     pub fn is_completed(&self) -> bool {
         self.cards.iter().all(|c| c.is_some())
+    }
+
+    pub fn cards_starting_first_player(&self) -> Vec<Card> {
+        let mut cards = self.cards.clone();
+        cards.rotate_left(self.first_player_index);
+        cards.into_iter().filter_map(|c| c).collect()
     }
 }
 

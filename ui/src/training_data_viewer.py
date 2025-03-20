@@ -20,9 +20,13 @@ def debug_print(*args, **kwargs):
         sys.stdout.flush()  # Force output to be displayed immediately
 
 
+YELLOW = (255, 255, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+
 # Constants
-WINDOW_WIDTH = 900
-WINDOW_HEIGHT = 1200
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 1300
 BACKGROUND_COLOR = (0, 100, 0)  # Dark green
 TEXT_COLOR = (255, 255, 255)  # White
 CARD_WIDTH = 71 * 0.75
@@ -60,7 +64,7 @@ class CompletedTrick(BaseModel):
 
 class Trick(BaseModel):
     cards: List[Optional[Card]]
-    first_player: int
+    first_player_index: int
 
 
 class TrainingData(BaseModel):
@@ -175,24 +179,47 @@ class TrainingDataViewer:
     ):
         """Draw a trick (completed or current) at the specified position"""
         cards = trick.cards
-        first_player = trick.first_player_index if is_completed else trick.first_player
 
         for i, card in enumerate(cards):
             if card is not None:
                 card_x = x + i * (CARD_WIDTH + CARD_SPACING)
+                is_first_player_card = i == trick.first_player_index
+                is_winner = is_completed and i == winner
+                is_last_card = (
+                    not is_completed
+                    and i == len([c for c in cards if c is not None]) - 1
+                )
                 self.draw_card(card, card_x, y)
 
-                # Highlight winner if completed trick
-                if is_completed and i == (winner - first_player) % 4:
+                # Highlight first card in the current trick
+                if is_first_player_card:
                     pygame.draw.rect(
                         self.screen,
-                        (255, 255, 0),
+                        BLUE,
+                        (card_x, y, CARD_WIDTH, CARD_HEIGHT),
+                        2,
+                    )
+
+                # Highlight winner if completed trick
+                if is_winner:
+                    pygame.draw.rect(
+                        self.screen,
+                        GREEN,
+                        (card_x, y, CARD_WIDTH, CARD_HEIGHT),
+                        2,
+                    )
+
+                # Highlight the last card in the current trick
+                if is_last_card:
+                    pygame.draw.rect(
+                        self.screen,
+                        YELLOW,
                         (card_x, y, CARD_WIDTH, CARD_HEIGHT),
                         2,
                     )
 
     def draw_training_data(self, data: TrainingData):
-        trick_x_pos = 300
+        trick_x_pos = 250
         """Draw the current training data on the screen"""
 
         self.screen.fill(BACKGROUND_COLOR)
@@ -217,9 +244,7 @@ class TrainingDataViewer:
         y_pos += ROW_HEIGHT / 2
 
         # Draw current trick
-        current_trick_text = "Current Trick - Player's Turn: " + str(
-            data.current_player_index
-        )
+        current_trick_text = "Current Trick"
         current_trick_surface = self.font.render(current_trick_text, True, TEXT_COLOR)
         self.screen.blit(current_trick_surface, (20, y_pos))
 
