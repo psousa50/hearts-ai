@@ -14,6 +14,7 @@ class AnimationManager:
         target_pos: Tuple[int, int],
     ):
         card_sprite.current_pos = start_pos
+        card_sprite.rect.topleft = start_pos
         card_sprite.target_pos = target_pos
         card_sprite.moving = True
         self.cards_in_play.append(card_sprite)

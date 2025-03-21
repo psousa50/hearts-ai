@@ -68,6 +68,7 @@ class CardSprite:
             CardSprite.image_cache[card_key] = self.image
 
         self.rect = self.image.get_rect()
+        self.current_pos = (self.rect.topleft[0], self.rect.topleft[1])
 
     def move_towards_target(self):
         if not self.moving or not self.target_pos:
@@ -80,10 +81,11 @@ class CardSprite:
         if distance < ANIMATION_SPEED:
             self.current_pos = self.target_pos
             self.moving = False
+            self.rect.topleft = (self.current_pos[0], self.current_pos[1])
             return
 
         move_x = (dx / distance) * ANIMATION_SPEED
         move_y = (dy / distance) * ANIMATION_SPEED
 
         self.current_pos = (self.current_pos[0] + move_x, self.current_pos[1] + move_y)
-        self.rect.center = self.current_pos
+        self.rect.topleft = (self.current_pos[0], self.current_pos[1])
