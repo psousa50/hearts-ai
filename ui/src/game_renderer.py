@@ -78,20 +78,6 @@ class GameRenderer:
         info_text = self.font.render(game_info, True, self.WHITE)
         self.screen.blit(info_text, (10, 10))
 
-    def draw_controls(self):
-        """Draw control information"""
-        controls = [
-            "Controls:",
-            "Space - Toggle auto-play",
-            "Click card to play (when it's your turn)",
-            "Close window to quit",
-        ]
-        for i, control in enumerate(controls):
-            control_text = self.medium_font.render(control, True, self.WHITE)
-            self.screen.blit(
-                control_text, (10, self.layout.window_height - 20 * (len(controls) - i))
-            )
-
     def draw_cards_in_play(self, cards: List[CardSprite]):
         """Draw cards currently in play"""
         for card in cards:
@@ -118,6 +104,9 @@ class GameRenderer:
         # Clear screen
         self.screen.fill(self.GREEN)
 
+        # Draw a circle at the trick center
+        pygame.draw.circle(self.screen, self.WHITE, self.layout.trick_center, 10)
+
         # Draw player hands and info
         for i in range(4):
             valid_moves = (
@@ -136,7 +125,6 @@ class GameRenderer:
 
         # Draw UI elements
         self.draw_game_info(game.current_player.name, game.current_trick.size)
-        self.draw_controls()
 
         # Update display
         pygame.display.flip()
