@@ -60,7 +60,7 @@ class GameVisualizer:
         )
 
     def _create_players(self) -> List[Player]:
-        return self._create_ai_players()
+        return self._create_all_players()
 
     def _create_all_players(self) -> List[Player]:
         return [
@@ -162,6 +162,10 @@ class GameVisualizer:
         self.game_state.last_auto_play = current_time
 
     def play_card(self, played_card: Card):
+        self.game_state.paused = False
+        if self.game.current_trick.is_empty:
+            self.animation_mgr.clear_animations()
+
         card_idx = self.game.hands[self.game.current_player_index].index(played_card)
 
         start_pos = self.layout.get_hand_position(
