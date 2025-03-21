@@ -7,7 +7,7 @@ import tensorflow as tf
 from game_classes import GameState
 from gensim.models import KeyedVectors
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from tensorflow.keras.layers import (
     Add,
     Dense,
@@ -29,8 +29,8 @@ from transformer_encoding import (
 
 NUM_CARDS = 52
 EMBED_DIM = 16
-NUM_HEADS = 4
-FEED_FORWARD_DIM = 64
+NUM_HEADS = 2
+FEED_FORWARD_DIM = 32
 
 
 class HeartsTransformerModel:
@@ -114,7 +114,7 @@ class HeartsTransformerModel:
 
         # Compile model
         self.model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
+            optimizer=tf.keras.optimizers.Adam(learning_rate=5e-5),  
             loss="categorical_crossentropy",
             metrics=[
                 "accuracy",
@@ -126,15 +126,17 @@ class HeartsTransformerModel:
         # Get the embedding dimension from the inputs
         embed_dim = inputs.shape[-1]
 
+        # Simplified transformer encoder with fewer parameters
         attn_output = MultiHeadAttention(
             num_heads=NUM_HEADS, key_dim=embed_dim // NUM_HEADS
         )(inputs, inputs)
-        attn_output = Dropout(0.3)(attn_output)
+        attn_output = Dropout(0.2)(attn_output)  
         attn_output = LayerNormalization(epsilon=1e-6)(Add()([inputs, attn_output]))
 
+        # Simplified feed-forward network
         ffn = Dense(FEED_FORWARD_DIM, activation="relu")(attn_output)
-        ffn = Dense(embed_dim)(ffn)
-        ffn = Dropout(0.3)(ffn)
+        ffn = Dense(embed_dim)(ffn)  # Project back to original dimension
+        ffn = Dropout(0.2)(ffn)  
 
         output = LayerNormalization(epsilon=1e-6)(Add()([attn_output, ffn]))
         return output
@@ -173,6 +175,14 @@ class HeartsTransformerModel:
             mode="max",
             verbose=1,
         )
+        
+        # Add early stopping callback
+        early_stopping = EarlyStopping(
+            monitor='val_accuracy',
+            patience=5,             # Stop after 5 epochs without improvement
+            restore_best_weights=True,  # Restore model to best weights when stopped
+            verbose=1
+        )
 
         X, y = build_train_data(game_states)
         X_train, X_test, y_train, y_test = train_test_split(
@@ -185,13 +195,13 @@ class HeartsTransformerModel:
             epochs=epochs,
             initial_epoch=self.initial_epoch,
             batch_size=batch_size,
-            callbacks=[versioned_checkpoint_callback],
+            callbacks=[versioned_checkpoint_callback, early_stopping],
         )
 
     def compile_model(self):
         """Compile the model with optimizer and metrics"""
         self.model.compile(
-            optimizer=Adam(learning_rate=1e-4),
+            optimizer=Adam(learning_rate=5e-5),  
             loss="categorical_crossentropy",
             metrics=["accuracy"],
         )
