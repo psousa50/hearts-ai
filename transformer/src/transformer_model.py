@@ -18,7 +18,6 @@ from tensorflow.keras.layers import (
     LayerNormalization,
     MultiHeadAttention,
 )
-from tensorflow.keras.metrics import top_k_categorical_accuracy
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from transformer_encoding import (
@@ -119,15 +118,9 @@ class HeartsTransformerModel:
             loss="categorical_crossentropy",
             metrics=[
                 "accuracy",
-                self.top_k_accuracy_5,
+                tf.keras.metrics.TopKCategoricalAccuracy(k=5, name="top_5_accuracy"),
             ],
         )
-
-    def top_k_accuracy(self, y_true, y_pred, k=5):
-        return top_k_categorical_accuracy(y_true, y_pred, k=k)
-
-    def top_k_accuracy_5(self, y_true, y_pred):
-        return self.top_k_accuracy(y_true, y_pred, k=5)
 
     def transformer_encoder(self, inputs):
         # Get the embedding dimension from the inputs

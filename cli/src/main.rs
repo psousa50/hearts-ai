@@ -46,9 +46,13 @@ fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::GenerateGames { num_games, same_deck } => {
+        Commands::GenerateGames {
+            num_games,
+            same_deck,
+        } => {
             generate::generate_games(*num_games, *same_deck);
         }
+        
         Commands::GenerateAiTrainingData {
             num_games,
             save_games,
