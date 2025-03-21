@@ -23,9 +23,10 @@ class EventHandler:
 
     def handle_click(self, pos: Tuple[int, int]):
         if not self.game.current_player_is_human:
+            if self.game_state.paused:
+                self.game_state.paused = False
             return
 
-        # Check if clicked on a card in the player's hand
         hand = self.game.hands[self.game.current_player_index]
         start_x, start_y = self.layout.hand_positions[0]["start"]
         offset_x, _ = self.layout.hand_positions[0]["offset"]

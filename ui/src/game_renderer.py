@@ -74,8 +74,6 @@ class GameRenderer:
     def draw_game_info(self, current_player_name: str, trick_size: int):
         """Draw game status information"""
         game_info = f"Current Player: {current_player_name}"
-        if trick_size > 0:
-            game_info += f" - Cards in trick: {trick_size}/4"
 
         info_text = self.font.render(game_info, True, self.WHITE)
         self.screen.blit(info_text, (10, 10))
