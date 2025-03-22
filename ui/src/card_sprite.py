@@ -3,7 +3,7 @@ from pathlib import Path
 
 import cairosvg
 import pygame
-from hearts_game import Card
+from hearts_game_core.game_models import Card
 
 # Constants
 CARD_WIDTH = 71

@@ -5,13 +5,13 @@ from typing import List, Optional
 
 import pygame
 from animation_manager import AnimationManager
-from card import Card, CompletedTrick
 from card_sprite import CardSprite
 from event_handler import EventHandler
 from game_moves_filter import GameMovesFilter
 from game_renderer import GameRenderer
 from game_state import GameState
-from hearts_game import HeartsGame, Player
+from hearts_game_core.game_core import HeartsGame, Player
+from hearts_game_core.game_models import Card, CompletedTrick
 from layout_manager import LayoutManager
 from strategies import (
     AIStrategy,
@@ -142,7 +142,7 @@ class GameVisualizer:
         return players
 
     def _handle_play(self):
-        if self.game.current_player_is_human:
+        if self.game_state.current_player_is_human:
             return
 
         current_time = pygame.time.get_ticks()

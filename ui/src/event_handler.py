@@ -1,10 +1,10 @@
 from typing import Callable, Tuple
 
 import pygame
-from card import Card
-from card_sprite import CARD_HEIGHT, CARD_WIDTH
+from game_renderer import CARD_HEIGHT, CARD_WIDTH
 from game_state import GameState
-from hearts_game import HeartsGame
+from hearts_game_core.game_core import HeartsGame
+from hearts_game_core.game_models import Card
 from layout_manager import LayoutManager
 
 
@@ -22,7 +22,7 @@ class EventHandler:
         self.play_card_handler = play_card_handler
 
     def handle_click(self, pos: Tuple[int, int]):
-        if not self.game.current_player_is_human:
+        if not self.game_state.current_player_is_human:
             if self.game_state.paused:
                 self.game_state.paused = False
             return

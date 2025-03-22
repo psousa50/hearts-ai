@@ -1,7 +1,4 @@
-from typing import List
-
-from card import CompletedTrick
-from hearts_game import HeartsGame
+from hearts_game_core.game_core import CompletedTrick, HeartsGame
 
 
 class GameMovesFilter:

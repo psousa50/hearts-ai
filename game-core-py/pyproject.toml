@@ -1,0 +1,9 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hearts_game_core"
+version = "0.1.0"
+description = "Hearts game core module"
+authors = [{name = "Pedro Sousa"}]

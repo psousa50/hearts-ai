@@ -1,10 +1,11 @@
-from typing import Dict, List, Tuple
+from typing import List
 
 import pygame
 from animation_manager import AnimationManager
 from card_sprite import CARD_HEIGHT, CARD_WIDTH, CardSprite
 from game_state import GameState
-from hearts_game import Card, HeartsGame
+from hearts_game_core.game_core import HeartsGame
+from hearts_game_core.game_models import Card
 from layout_manager import LayoutManager
 
 
@@ -110,7 +111,7 @@ class GameRenderer:
         # Draw player hands and info
         for i in range(4):
             valid_moves = (
-                game.get_valid_moves(i) if game.current_player_is_human else None
+                game.get_valid_moves(i) if game_state.current_player_is_human else None
             )
             self.draw_player_hand(i, game.hands[i], valid_moves)
             self.draw_player_info(

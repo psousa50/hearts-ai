@@ -1,8 +1,9 @@
 import random
 from typing import List
 
-from card import Card, CompletedTrick, Trick
-from strategies import HumanStrategy, Strategy, StrategyGameState
+from strategies import Strategy, StrategyGameState
+
+from hearts_game_core.game_models import Card, CompletedTrick, Trick
 
 
 class Player:
@@ -34,10 +35,6 @@ class HeartsGame:
     @property
     def current_player(self) -> Player:
         return self.players[self.current_player_index]
-
-    @property
-    def current_player_is_human(self) -> bool:
-        return isinstance(self.current_player.strategy, HumanStrategy)
 
     def deal_cards(self) -> List[List[Card]]:
         # Create a deck of cards

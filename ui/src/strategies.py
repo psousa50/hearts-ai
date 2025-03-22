@@ -1,25 +1,11 @@
-import json
 import random
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from typing import List
 
 import requests
-from card import Card, CompletedTrick, Trick
+from hearts_game_core.game_models import Card
+from hearts_game_core.strategies import Strategy, StrategyGameState
 from predict_request import GameState, PredictRequest
-
-
-@dataclass
-class StrategyGameState:
-    previous_tricks: List[CompletedTrick]
-    current_trick: Trick
-    current_player_index: int
-    player_hand: List[Card]
-    valid_moves: List[Card]
-
-
-class Strategy:
-    def choose_card(self, gameState: StrategyGameState) -> Card:
-        raise NotImplementedError
 
 
 class HumanStrategy(Strategy):
