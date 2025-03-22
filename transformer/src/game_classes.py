@@ -8,7 +8,7 @@ class Card(BaseModel):
     rank: int
 
     def __str__(self):
-        return f"{self.suit}{self.rank}"
+        return f"{self.rank}{self.suit}"
 
 
 class Trick(BaseModel):

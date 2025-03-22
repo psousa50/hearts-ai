@@ -35,17 +35,13 @@ CARD_SPACING = 20 * 0.75
 ROW_HEIGHT = 120 * 0.75
 FONT_SIZE = 14
 
-# Card suit symbols and colors
-SUIT_SYMBOLS = {"C": "C", "D": "D", "H": "H", "S": "S"}
-
 
 class Card(BaseModel):
     suit: str
     rank: int
 
     def __str__(self):
-        rank_str = {11: "J", 12: "Q", 13: "K", 14: "A"}.get(self.rank, str(self.rank))
-        return f"{rank_str}{SUIT_SYMBOLS[self.suit]}"
+        return f"{self.rank}{self.suit}"
 
     @root_validator(pre=True)
     @classmethod
