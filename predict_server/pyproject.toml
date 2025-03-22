@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "predict_server"
+version = "0.1.0"
+description = "Request models for Hearts game"
+authors = [{name = "Pedro Sousa"}]
+
+dependencies = [
+    "hearts_game_core",
+    "request_models",
+    "transformer",
+    "fastapi",
+    "uvicorn",
+    "numpy>=1.24.0"
+]

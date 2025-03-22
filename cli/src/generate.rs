@@ -25,7 +25,7 @@ pub fn generate_games(num_games: usize, use_same_deck_for_all_players: bool) {
     let ai_strategy = AIStrategy::new("http://localhost:8000/predict".to_string());
     let player_configs = [
         ("Alice", Strategy::Random(RandomStrategy)),
-        ("Bob", Strategy::AI(ai_strategy)),
+        ("Bob", Strategy::Random(RandomStrategy)),
         ("My", Strategy::My(MyStrategy)),
         ("David", Strategy::Aggressive(AggressiveStrategy)),
     ];

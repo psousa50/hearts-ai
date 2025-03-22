@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "strategies"
+version = "0.1.0"
+description = "Hearts game strategies module"
+authors = [{name = "Pedro Sousa"}]
+
+dependencies = [
+    "hearts_game_core",
+    "request_models",
+]

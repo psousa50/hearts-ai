@@ -10,3 +10,5 @@
 *.log
 *.sqlite
 libcairo*
+build
+*egg-info

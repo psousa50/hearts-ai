@@ -1,0 +1,9 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "request_models"
+version = "0.1.0"
+description = "Request models for Hearts game"
+authors = [{name = "Pedro Sousa"}]

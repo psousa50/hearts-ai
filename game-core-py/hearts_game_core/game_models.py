@@ -1,28 +1,38 @@
-from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import ClassVar, List, Optional
+
+from pydantic import BaseModel
 
 
-@dataclass(frozen=True)
-class Card:
+class Card(BaseModel):
     suit: str
     rank: int
+
+    def json(self, **kwargs):
+        return super().model_dump_json(**kwargs)
 
     def __str__(self):
         return f"{self.rank}{self.suit}"
 
-    QueenOfSpades = None
+
+Card.QueenOfSpades: ClassVar[Card] = Card(suit="S", rank=12)
 
 
-Card.QueenOfSpades = Card("S", 12)
-
-
-@dataclass
-class Trick:
-    cards: List[Optional[Card]] = field(init=False)
-    first_player_index: int = field(init=False)
+class Trick(BaseModel):
+    cards: List[Optional[Card]] = []
+    first_player_index: int = 0
 
     def __post_init__(self):
         self.reset()
+
+    def __str__(self):
+        return (
+            " ".join([str(card) for card in self.all_cards()])
+            if not self.is_empty
+            else "(No Cards)"
+        )
+
+    def json(self, **kwargs):
+        return super().model_dump_json(**kwargs)
 
     @property
     def size(self):
@@ -51,7 +61,7 @@ class Trick:
 
     def reset(self):
         self.cards = [None, None, None, None]
-        self.first_player_index = None
+        self.first_player_index = 0
 
     def score(self):
         s = 0
@@ -65,10 +75,31 @@ class Trick:
     def all_cards(self):
         return [card for card in self.cards if card is not None]
 
+    def ordered_cards(self):
+        return [
+            card
+            for card in (
+                self.cards[self.first_player_index :]
+                + self.cards[: self.first_player_index]
+            )
+            if card is not None
+        ]
 
-@dataclass
-class CompletedTrick:
+
+class CompletedTrick(BaseModel):
     cards: List[Card]
     first_player_index: int
     winner_index: int
     score: int
+
+    def json(self, **kwargs):
+        return super().model_dump_json(**kwargs)
+
+    def ordered_cards(self):
+        return [
+            card
+            for card in (
+                self.cards[self.first_player_index :]
+                + self.cards[: self.first_player_index]
+            )
+        ]
