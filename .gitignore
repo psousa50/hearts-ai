@@ -11,4 +11,5 @@
 *.sqlite
 libcairo*
 build
-*egg-info
+*.egg-info/
+completed_games/

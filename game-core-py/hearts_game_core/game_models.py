@@ -18,7 +18,7 @@ Card.QueenOfSpades: ClassVar[Card] = Card(suit="S", rank=12)
 
 
 class Trick(BaseModel):
-    cards: List[Optional[Card]] = []
+    cards: List[Optional[Card]] = [None, None, None, None]
     first_player_index: int = 0
 
     def __post_init__(self):

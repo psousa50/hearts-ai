@@ -1,10 +1,10 @@
 import datetime
 import os
-from typing import List
 
 import numpy as np
 import tensorflow as tf
 from gensim.models import KeyedVectors
+from hearts_game_core.game import GameCurrentState
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.layers import (
@@ -19,12 +19,8 @@ from tensorflow.keras.layers import (
 )
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
-from transformer_encoding import (
-    INPUT_SEQUENCE_LENGTH,
-    build_input_sequence,
-    build_train_data,
-    decode_card,
-)
+
+from transformer.inputs import INPUT_SEQUENCE_LENGTH, build_model_input, card_from_token
 
 NUM_CARDS = 52
 EMBED_DIM = 16
@@ -60,7 +56,8 @@ class HeartsTransformerModel:
             for i in range(NUM_CARDS):
                 # Convert token index to card representation
                 # This mapping needs to match the one used in the original embedding training
-                card_key = self._token_to_card_key(i)
+                card = card_from_token(i)
+                card_key = f"{card.suit}{card.rank}"
 
                 if card_key in embedding_model:
                     embedding_matrix[i] = embedding_model[card_key]
@@ -77,10 +74,6 @@ class HeartsTransformerModel:
         except Exception as e:
             print(f"Error loading pretrained embeddings: {e}")
             self.pretrained_embeddings = None
-
-    def _token_to_card_key(self, token_idx):
-        card = decode_card(token_idx)
-        return f"{card.suit}{card.rank}"
 
     def build(self):
         sequence_input = Input(shape=(INPUT_SEQUENCE_LENGTH,), name="sequence_input")
@@ -155,7 +148,7 @@ class HeartsTransformerModel:
             except (IndexError, ValueError):
                 self.initial_epoch = 0
 
-    def train(self, game_states: List[GameState], epochs, batch_size):
+    def train(self, train_data, epochs, batch_size):
         os.makedirs("models", exist_ok=True)
         os.makedirs("models/checkpoints", exist_ok=True)
 
@@ -183,17 +176,18 @@ class HeartsTransformerModel:
             verbose=1,
         )
 
-        X, y = build_train_data(game_states)
+        X, y = train_data
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42
         )
+
         self.model.fit(
             X_train,
             y_train,
             validation_data=(X_test, y_test),
             epochs=epochs,
-            initial_epoch=self.initial_epoch,
             batch_size=batch_size,
+            initial_epoch=self.initial_epoch,
             callbacks=[versioned_checkpoint_callback, early_stopping],
         )
 
@@ -234,9 +228,9 @@ class HeartsTransformerModel:
 
         self.initial_epoch = epoch + 1
 
-    def predict(self, game_state: GameState):
-        input_sequence = build_input_sequence(game_state)
-        input_sequence = np.expand_dims(input_sequence, axis=0)
+    def predict(self, game_state: GameCurrentState):
+        inputs = build_model_input(game_state)
+        input_sequence = np.expand_dims(inputs, axis=0)
         predictions = self.model.predict(input_sequence)
         return predictions
 
@@ -270,7 +264,7 @@ class HeartsTransformerModel:
 
             # Write each vector
             for i in range(NUM_CARDS):
-                card_key = self._token_to_card_key(i)
+                card_key = card_from_token(i)
                 vector_str = " ".join([str(val) for val in embedding_weights[i]])
                 f.write(f"{card_key} {vector_str}\n")
 

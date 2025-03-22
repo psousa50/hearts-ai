@@ -1,9 +1,9 @@
 import random
 from typing import List
 
-from hearts_game_core.game import CompletedGame, Player, PlayerInfo
+from hearts_game_core.game import CompletedGame, GameCurrentState, Player, PlayerInfo
 from hearts_game_core.game_models import Card, CompletedTrick, Trick
-from strategies.strategies import StrategyGameState
+from hearts_game_core.strategies import StrategyGameState
 
 
 class HeartsGame:
@@ -17,8 +17,8 @@ class HeartsGame:
         self.current_trick = Trick()
         self.scores = [0] * 4
         for player, hand in zip(self.players, self.deal_cards()):
-            player.hand = hand
-            player.initial_hand = hand.copy()
+            player.initial_hand = hand
+            player.hand = hand.copy()
             player.score = 0
         self.current_player_index = self.find_starting_player()
 
@@ -148,16 +148,14 @@ class HeartsGame:
     def is_game_over(self):
         return all(len(player.hand) == 0 for player in self.players)
 
-    def play_game(self) -> CompletedGame:
-        for player in self.players:
-            print(f"{player.name}: {player.initial_hand}")
-        while not self.is_game_over():
-            card_to_play = self.choose_card(self.current_player_index)
-            self.play_card(card_to_play)
+    def play_next_card(self):
+        card_to_play = self.choose_card(self.current_player_index)
+        self.play_card(card_to_play)
 
+    def play_game(self) -> CompletedGame:
+        while not self.is_game_over():
+            self.play_next_card()
         winner_index = min(enumerate(self.scores), key=lambda x: x[1])[0]
-        for player in self.players:
-            print(f"{player.name}: {player.initial_hand}")
 
         return CompletedGame(
             players=[
@@ -171,4 +169,12 @@ class HeartsGame:
             ],
             winner_index=winner_index,
             completed_tricks=self.previous_tricks,
+        )
+
+    def current_state(self) -> GameCurrentState:
+        return GameCurrentState(
+            previous_tricks=self.previous_tricks,
+            current_trick=self.current_trick,
+            hearts_broken=self.hearts_broken,
+            current_player_index=self.current_player_index,
         )
