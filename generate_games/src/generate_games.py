@@ -1,8 +1,10 @@
 import argparse
+import json
+import os
 import time
 from dataclasses import dataclass
 
-from hearts_game_core.game import Player
+from hearts_game_core.game import CompletedGame, Player
 from hearts_game_core.game_core import HeartsGame
 
 from strategies.strategies import (
@@ -21,10 +23,10 @@ class PlayerStatistics:
     total_wins: int
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Train Hearts AI model on game data")
+def generate_games():
+    parser = argparse.ArgumentParser(description="Generate games for Hearts game")
     parser.add_argument(
-        "--num-games", type=int, default=1, help="Number of games to simulate"
+        "--num-games", type=int, default=1, help="Number of games to generate"
     )
     parser.add_argument(
         "--same-deck",
@@ -60,16 +62,33 @@ def main():
         game = HeartsGame(players)
         completed_game = game.play_game()
         completed_games.append(completed_game)
+        update_statistics(completed_game, game_statistics)
 
-        game_statistics[completed_game.winner_index].total_wins += 1
-        for player_index, _ in enumerate(completed_game.players):
-            game_statistics[player_index].total_score += completed_game.players[
-                player_index
-            ].score
     end_time = time.time()
     print(f"Time taken: {end_time - start_time:.2f} seconds")
 
     display_statistics(args.num_games, game_statistics)
+
+    save_completed_games(completed_games)
+
+
+def save_completed_games(completed_games: list[CompletedGame]):
+    os.makedirs("completed_games", exist_ok=True)
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    num_games = len(completed_games)
+    filename = f"games_{timestamp}_{num_games}.json"
+    with open(f"completed_games/{filename}", "w") as f:
+        json.dump([game.model_dump() for game in completed_games], f)
+
+
+def update_statistics(
+    completed_game: CompletedGame, game_statistics: list[PlayerStatistics]
+):
+    game_statistics[completed_game.winner_index].total_wins += 1
+    for player_index, _ in enumerate(completed_game.players):
+        game_statistics[player_index].total_score += completed_game.players[
+            player_index
+        ].score
 
 
 def display_statistics(num_games: int, game_statistics: list[PlayerStatistics]):
@@ -97,4 +116,4 @@ def display_statistics(num_games: int, game_statistics: list[PlayerStatistics]):
 
 
 if __name__ == "__main__":
-    main()
+    generate_games()

@@ -16,7 +16,10 @@ class HeartsGame:
         self.previous_tricks: List[CompletedTrick] = []
         self.current_trick = Trick()
         self.scores = [0] * 4
-        self.hands = self.deal_cards()
+        for player, hand in zip(self.players, self.deal_cards()):
+            player.hand = hand
+            player.initial_hand = hand.copy()
+            player.score = 0
         self.current_player_index = self.find_starting_player()
 
         self.current_trick.reset()
@@ -47,14 +50,15 @@ class HeartsGame:
 
     def find_starting_player(self) -> int:
         # Player with 2 of clubs starts
-        for i, hand in enumerate(self.hands):
-            for card in hand:
+        for i, player in enumerate(self.players):
+            for card in player.hand:
                 if card.suit == "C" and card.rank == 2:
                     return i
         return 0
 
     def get_valid_moves(self, player_idx: int) -> List[Card]:
-        hand = self.hands[player_idx]
+        player = self.players[player_idx]
+        hand = player.hand
 
         # First card of first trick must be 2 of clubs
         if not self.previous_tricks and self.current_trick.is_empty:
@@ -95,7 +99,7 @@ class HeartsGame:
                 previous_tricks=self.previous_tricks,
                 current_trick=self.current_trick,
                 current_player_index=player_idx,
-                player_hand=self.hands[player_idx],
+                player_hand=self.players[player_idx].hand,
                 valid_moves=valid_moves,
             )
         card = self.players[player_idx].strategy.choose_card(valid_moves, game_state)
@@ -103,7 +107,7 @@ class HeartsGame:
 
     def play_card(self, card: Card):
         player_idx = self.current_player_index
-        self.hands[player_idx].remove(card)
+        self.players[player_idx].hand.remove(card)
 
         if card.suit == "H":
             self.hearts_broken = True
@@ -142,22 +146,28 @@ class HeartsGame:
         return winner_index
 
     def is_game_over(self):
-        return all(len(hand) == 0 for hand in self.hands)
+        return all(len(player.hand) == 0 for player in self.players)
 
     def play_game(self) -> CompletedGame:
+        for player in self.players:
+            print(f"{player.name}: {player.initial_hand}")
         while not self.is_game_over():
             card_to_play = self.choose_card(self.current_player_index)
             self.play_card(card_to_play)
 
         winner_index = min(enumerate(self.scores), key=lambda x: x[1])[0]
+        for player in self.players:
+            print(f"{player.name}: {player.initial_hand}")
+
         return CompletedGame(
             players=[
                 PlayerInfo(
-                    name=player.name,
-                    strategy=player.strategy.__class__.__name__,
+                    name=self.players[player_index].name,
+                    strategy=self.players[player_index].strategy.__class__.__name__,
+                    initial_hand=self.players[player_index].initial_hand,
                     score=score,
                 )
-                for player, score in zip(self.players, self.scores)
+                for player_index, score in enumerate(self.scores)
             ],
             winner_index=winner_index,
             completed_tricks=self.previous_tricks,
