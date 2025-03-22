@@ -34,7 +34,7 @@ It should contain all the information about a trick, including:
 It should contain all the information about the current trick, including:
 
 - The cards played, in the players order
-- Non-played cards are represented by NONE (or similar))
+- Non-played cards are represented by NONE (or similar)
 - The first player
 
 ### Player
@@ -65,7 +65,7 @@ It should contain all the information needed to train the AI, including:
 
 ### Generating the training data (Rust):
 
-1. Generate a game
+1. Generate a lot of games
 2. Create the training data from the game
 3. Convert it to a compact form (?)
 4. Save it to a file
