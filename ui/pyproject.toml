@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ui"
+version = "0.1.0"
+description = "UI for Hearts game"
+authors = [{name = "Pedro Sousa"}]
+
+dependencies = [
+    "hearts_game_core",
+    "strategies",
+    "request_models",
+    "strategies",
+    "pygame",
+    "cairosvg",
+    "pydantic",
+    "msgpack",
+]

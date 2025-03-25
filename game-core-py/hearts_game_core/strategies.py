@@ -1,28 +1,20 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from hearts_game_core.game_models import Card, CompletedTrick, Trick
+from hearts_game_core.game_models import Card, GameCurrentState
 
 
 @dataclass
 class StrategyGameState:
-    previous_tricks: List[CompletedTrick]
-    current_trick: Trick
-    current_player_index: int
+    game_state: GameCurrentState
     player_hand: List[Card]
     valid_moves: List[Card]
 
 
 
 class Strategy:
-    def choose_card(
-        self, _valid_moves: List[Card], _game_state: Optional[StrategyGameState]
-    ) -> Card:
+    def choose_card(self, game_state: StrategyGameState) -> Card:
         raise NotImplementedError
-
-    @property
-    def requires_game_state(self) -> bool:
-        return False
 
 @dataclass
 class Player:

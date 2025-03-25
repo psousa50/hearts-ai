@@ -27,7 +27,8 @@ class EventHandler:
                 self.game_state.paused = False
             return
 
-        hand = self.game.hands[self.game.current_player_index]
+        hands = [p.hand for p in self.game.players]
+        hand = hands[self.game.current_player_index]
         start_x, start_y = self.layout.hand_positions[0]["start"]
         offset_x, _ = self.layout.hand_positions[0]["offset"]
 

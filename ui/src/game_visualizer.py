@@ -13,12 +13,14 @@ from game_state import GameState
 from hearts_game_core.game_core import HeartsGame, Player
 from hearts_game_core.game_models import Card, CompletedTrick
 from layout_manager import LayoutManager
-from strategies import (
+from strategies.strategies import (
     AIStrategy,
     HumanStrategy,
     MyStrategy,
     RandomStrategy,
     ReplayStrategy,
+    AggressiveStrategy,
+    AvoidPointsStrategy,
 )
 
 # Initialize Pygame
@@ -60,12 +62,20 @@ class GameVisualizer:
         )
 
     def _create_players(self) -> List[Player]:
-        return self._create_all_players()
+        return self._create_all_players_no_ai()
 
     def _create_all_players(self) -> List[Player]:
         return [
             Player("Human", HumanStrategy()),
             Player("AI", AIStrategy()),
+            Player("My Strategy", MyStrategy()),
+            Player("Random", RandomStrategy()),
+        ]
+
+    def _create_all_players_no_ai(self) -> List[Player]:
+        return [
+            Player("Aggressive", AggressiveStrategy()),
+            Player("Avoid Points", AvoidPointsStrategy()),
             Player("My Strategy", MyStrategy()),
             Player("Random", RandomStrategy()),
         ]
@@ -166,7 +176,8 @@ class GameVisualizer:
         if self.game.current_trick.is_empty:
             self.animation_mgr.clear_animations()
 
-        card_idx = self.game.hands[self.game.current_player_index].index(played_card)
+        hands = [p.hand for p in self.game.players]
+        card_idx = hands[self.game.current_player_index].index(played_card)
 
         start_pos = self.layout.get_hand_position(
             self.game.current_player_index, card_idx

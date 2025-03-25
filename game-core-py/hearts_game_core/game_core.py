@@ -98,17 +98,12 @@ class HeartsGame:
 
     def choose_card(self, player_idx: int) -> Card:
         valid_moves = self.get_valid_moves(player_idx)
-        strategy = self.players[player_idx].strategy
-        game_state = None
-        if strategy.requires_game_state:
-            game_state = StrategyGameState(
-                previous_tricks=self.previous_tricks,
-                current_trick=self.current_trick,
-                current_player_index=player_idx,
-                player_hand=self.players[player_idx].hand,
-                valid_moves=valid_moves,
-            )
-        card = self.players[player_idx].strategy.choose_card(valid_moves, game_state)
+        game_state = StrategyGameState(
+            game_state=self.current_state,
+            player_hand=self.players[player_idx].hand,
+            valid_moves=valid_moves,
+        )
+        card = self.players[player_idx].strategy.choose_card(game_state)
         return card if card in valid_moves else None
 
     def play_card(self, card: Card):

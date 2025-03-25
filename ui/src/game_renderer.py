@@ -113,7 +113,8 @@ class GameRenderer:
             valid_moves = (
                 game.get_valid_moves(i) if game_state.current_player_is_human else None
             )
-            self.draw_player_hand(i, game.hands[i], valid_moves)
+            hands = [p.hand for p in game.players]
+            self.draw_player_hand(i, hands[i], valid_moves)
             self.draw_player_info(
                 i,
                 game.players[i].name,

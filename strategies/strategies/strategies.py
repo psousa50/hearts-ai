@@ -1,7 +1,7 @@
 import json
 import random
 import sys
-from typing import List, Optional
+from typing import List
 
 import requests
 from hearts_game_core.game_models import Card
@@ -18,29 +18,20 @@ def debug_print(*args, **kwargs):
 
 
 class HumanStrategy(Strategy):
-    def choose_card(self, _gameState: Optional[StrategyGameState]) -> Card:
+    def choose_card(self, strategy_game_state: StrategyGameState) -> Card:
         raise NotImplementedError
 
 
 class RandomStrategy(Strategy):
-    """Strategy that plays random valid moves"""
-
-    def choose_card(
-        self, valid_moves: List[Card], _gameState: Optional[StrategyGameState]
-    ) -> Card:
-        """Choose a random valid card to play"""
-        if not valid_moves:
-            return _gameState.player_hand[0]
-        return random.choice(valid_moves)
+    def choose_card(self, strategy_game_state: StrategyGameState) -> Card:
+        return random.choice(strategy_game_state.valid_moves)
 
 
 class AvoidPointsStrategy(Strategy):
-    def choose_card(
-        self, valid_moves: List[Card], _gameState: Optional[StrategyGameState]
-    ) -> Card:
+    def choose_card(self, strategy_game_state: StrategyGameState) -> Card:
         # Play lowest value card, avoiding hearts and queen of spades
         return min(
-            valid_moves,
+            strategy_game_state.valid_moves,
             key=lambda card: card.rank + 13
             if (card.suit == "H" or card == Card.QueenOfSpades)
             else card.rank,
@@ -48,12 +39,10 @@ class AvoidPointsStrategy(Strategy):
 
 
 class AggressiveStrategy(Strategy):
-    def choose_card(
-        self, valid_moves: List[Card], _gameState: Optional[StrategyGameState]
-    ) -> Card:
+    def choose_card(self, strategy_game_state: StrategyGameState) -> Card:
         # Play highest value card, preferring hearts and queen of spades
         return max(
-            valid_moves,
+            strategy_game_state.valid_moves,
             key=lambda card: card.rank + 13
             if (card.suit == "H" or card == Card.QueenOfSpades)
             else card.rank,
@@ -65,13 +54,9 @@ class AIStrategy(Strategy):
         super().__init__()
         self.endpoint = "http://localhost:8000/predict"
 
-    def choose_card(
-        self, valid_moves: List[Card], game_state: Optional[StrategyGameState]
-    ) -> Card:
-        """Choose a card to play using the AI model"""
-        if not game_state:
-            return valid_moves[0]
+    def choose_card(self, strategy_game_state: StrategyGameState) -> Card:
         try:
+            game_state = strategy_game_state.game_state
             state = GameState(
                 previous_tricks=game_state.previous_tricks,
                 current_trick=game_state.current_trick,
@@ -114,7 +99,8 @@ class ReplayStrategy(Strategy):
         self.cards = cards.copy()  # Make a copy to avoid modifying the original
         self.current_index = 0
 
-    def choose_card(self, game_state: StrategyGameState) -> Card:
+    def choose_card(self, strategy_game_state: StrategyGameState) -> Card:
+        game_state = strategy_game_state.game_state
         if self.current_index >= len(self.cards):
             raise ValueError("Replay strategy ran out of cards")
 
@@ -133,31 +119,24 @@ class ReplayStrategy(Strategy):
 
 
 class MyStrategy(Strategy):
-    def requires_game_state(self) -> bool:
-        return True
 
-    def choose_card(
-        self, valid_moves: List[Card], _gameState: Optional[StrategyGameState]
-    ) -> Card:
-        if not _gameState:
-            raise ValueError("Game state is required for MyStrategy")
-        gameState = _gameState
+    def choose_card(self, strategy_game_state: StrategyGameState) -> Card:
+        game_state = strategy_game_state.game_state
         debug_print("------------------------------------------------")
-        debug_print("Player hand:", [str(card) for card in gameState.player_hand])
-        debug_print("Current trick:", gameState.current_trick)
-        card = self._choose_card(valid_moves, gameState)
+        debug_print("Player hand:", [str(card) for card in strategy_game_state.player_hand])
+        debug_print("Current trick:", game_state.current_trick)
+        card = self._choose_card(strategy_game_state)
 
         debug_print("Chosen card:", card)
 
-        if card not in valid_moves:
-            debug_print("Valid moves:", valid_moves)
-            return valid_moves[0]
+        if card not in strategy_game_state.valid_moves:
+            debug_print("Valid moves:", strategy_game_state.valid_moves)
+            return strategy_game_state.valid_moves[0]
         return card
 
-    def _choose_card(
-        self, valid_moves: List[Card], gameState: StrategyGameState
-    ) -> Card:
-        if gameState.current_trick.is_empty and not gameState.previous_tricks:
+    def _choose_card(self, strategy_game_state: StrategyGameState) -> Card:
+        game_state = strategy_game_state.game_state
+        if game_state.current_trick.is_empty and not game_state.previous_tricks:
             return Card(suit="C", rank=2)
         numberOfCardsOutPerSuit = {
             "C": 0,
@@ -165,18 +144,18 @@ class MyStrategy(Strategy):
             "H": 0,
             "S": 0,
         }
-        for card in gameState.player_hand:
+        for card in strategy_game_state.player_hand:
             numberOfCardsOutPerSuit[card.suit] += 1
-        for previous_trick in gameState.previous_tricks:
+        for previous_trick in game_state.previous_tricks:
             for card in previous_trick.cards:
                 numberOfCardsOutPerSuit[card.suit] += 1
-        for card in gameState.current_trick.all_cards():
+        for card in game_state.current_trick.all_cards():
             numberOfCardsOutPerSuit[card.suit] += 1
 
         debug_print("Number of cards out per suit:", numberOfCardsOutPerSuit)
         excludedSuits = ["H"]
         queenOfSpadesIsOut = False
-        for previous_trick in gameState.previous_tricks:
+        for previous_trick in game_state.previous_tricks:
             for card in previous_trick.cards:
                 if card == Card.QueenOfSpades:
                     queenOfSpadesIsOut = True
@@ -186,7 +165,7 @@ class MyStrategy(Strategy):
         debug_print("Queen of spades is out:", queenOfSpadesIsOut)
         debug_print("Excluded suits:", excludedSuits)
 
-        if gameState.current_trick.is_empty:
+        if game_state.current_trick.is_empty:
             suitWithLessCardsOutButNotZero = min(
                 numberOfCardsOutPerSuit.items(),
                 key=lambda item: item[1]
@@ -198,7 +177,7 @@ class MyStrategy(Strategy):
                 "Suit with less cards but not zero:", suitWithLessCardsOutButNotZero
             )
             sortedHand = self.sorted_hand_from_suit(
-                gameState, suitWithLessCardsOutButNotZero[0]
+                strategy_game_state, suitWithLessCardsOutButNotZero[0]
             )
             debug_print("Sorted hand:", sortedHand)
             if numberOfCardsOutPerSuit[suitWithLessCardsOutButNotZero[0]] > 7:
@@ -207,20 +186,20 @@ class MyStrategy(Strategy):
                     return sortedHand[0]
                 else:
                     debug_print("Playing lowest card in hand")
-                    return gameState.player_hand[0]
+                    return strategy_game_state.player_hand[0]
             else:
                 if sortedHand:
                     debug_print("Playing highest card in sorted hand")
                     return sortedHand[-1]
                 else:
                     debug_print("Playing highest card in hand")
-                    return gameState.player_hand[-1]
+                    return strategy_game_state.player_hand[-1]
         else:
-            lead_suit = gameState.current_trick.lead_suit
+            lead_suit = game_state.current_trick.lead_suit
             debug_print("Lead suit:", lead_suit)
             trick_cards_in_suit = [
                 card
-                for card in gameState.current_trick.all_cards()
+                for card in game_state.current_trick.all_cards()
                 if card.suit == lead_suit
             ]
             debug_print("Trick cards in lead suit:", trick_cards_in_suit)
@@ -228,12 +207,12 @@ class MyStrategy(Strategy):
             highestCardInTrick = max(trick_cards_in_suit, key=lambda card: card.rank)
             debug_print("Highest card in trick:", highestCardInTrick)
 
-            canFollowSuit = lead_suit in [card.suit for card in gameState.player_hand]
+            canFollowSuit = lead_suit in [card.suit for card in strategy_game_state.player_hand]
             debug_print("Can follow suit:", canFollowSuit)
             if canFollowSuit:
-                sortedHand = self.sorted_hand_from_suit(gameState, lead_suit)
+                sortedHand = self.sorted_hand_from_suit(strategy_game_state, lead_suit)
                 debug_print("Sorted hand:", sortedHand)
-                score = gameState.current_trick.score()
+                score = game_state.current_trick.score()
                 debug_print("Score:", score)
                 shouldTakeTrick = score == 0 and numberOfCardsOutPerSuit[lead_suit] < 7
                 shouldTakeTrick = shouldTakeTrick and lead_suit not in excludedSuits
@@ -257,21 +236,21 @@ class MyStrategy(Strategy):
                         debug_print("Playing highest card in hand")
                         return sortedHand[-1]
             else:
-                hasQueenOfSpades = Card.QueenOfSpades in gameState.player_hand
+                hasQueenOfSpades = Card.QueenOfSpades in strategy_game_state.player_hand
                 debug_print("Has queen of spades:", hasQueenOfSpades)
                 if hasQueenOfSpades:
                     return Card.QueenOfSpades
-                sortedHearts = self.sorted_hand_from_suit(gameState, "H")
+                sortedHearts = self.sorted_hand_from_suit(strategy_game_state, "H")
                 debug_print("Sorted hearts:", sortedHearts)
                 if sortedHearts:
                     return sortedHearts[-1]
                 else:
-                    return gameState.valid_moves[0]
+                    return strategy_game_state.valid_moves[0]
 
     def sorted_hand_from_suit(
-        self, gameState: StrategyGameState, suit: str
+        self, strategy_game_state: StrategyGameState, suit: str
     ) -> List[Card]:
         return sorted(
-            [card for card in gameState.player_hand if card.suit == suit],
+            [card for card in strategy_game_state.player_hand if card.suit == suit],
             key=lambda card: card.rank,
         )

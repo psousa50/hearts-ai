@@ -1,6 +1,6 @@
 import pygame
 from hearts_game_core.game_core import HeartsGame
-from strategies import HumanStrategy
+from strategies.strategies import HumanStrategy
 
 
 class GameState:
