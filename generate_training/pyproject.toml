@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "generate_training"
+version = "0.1.0"
+description = "Generate training data for Hearts game"
+authors = [{name = "Pedro Sousa"}]
+
+dependencies = [
+    "hearts_game_core",
+    "strategies",
+]

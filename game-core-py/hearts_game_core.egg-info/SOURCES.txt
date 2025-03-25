@@ -1,9 +1,0 @@
-pyproject.toml
-hearts_game_core/__init__.py
-hearts_game_core/game_core.py
-hearts_game_core/game_models.py
-hearts_game_core/strategies.py
-hearts_game_core.egg-info/PKG-INFO
-hearts_game_core.egg-info/SOURCES.txt
-hearts_game_core.egg-info/dependency_links.txt
-hearts_game_core.egg-info/top_level.txt
