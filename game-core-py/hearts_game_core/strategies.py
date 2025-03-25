@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 from hearts_game_core.game_models import Card, CompletedTrick, Trick
@@ -13,6 +13,7 @@ class StrategyGameState:
     valid_moves: List[Card]
 
 
+
 class Strategy:
     def choose_card(
         self, _valid_moves: List[Card], _game_state: Optional[StrategyGameState]
@@ -22,3 +23,12 @@ class Strategy:
     @property
     def requires_game_state(self) -> bool:
         return False
+
+@dataclass
+class Player:
+    name: str
+    strategy: Strategy
+    initial_hand: List[Card] = field(default_factory=list)
+    hand: List[Card] = field(default_factory=list)
+    score: int = 0
+

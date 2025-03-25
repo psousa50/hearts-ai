@@ -4,7 +4,7 @@ import os
 import numpy as np
 import tensorflow as tf
 from gensim.models import KeyedVectors
-from hearts_game_core.game import GameCurrentState
+from hearts_game_core.game_models import GameCurrentState
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.layers import (

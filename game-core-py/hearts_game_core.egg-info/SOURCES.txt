@@ -1,6 +1,5 @@
 pyproject.toml
 hearts_game_core/__init__.py
-hearts_game_core/game.py
 hearts_game_core/game_core.py
 hearts_game_core/game_models.py
 hearts_game_core/strategies.py

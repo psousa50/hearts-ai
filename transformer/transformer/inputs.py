@@ -1,8 +1,7 @@
 from typing import List
 
 import numpy as np
-from hearts_game_core.game import GameCurrentState
-from hearts_game_core.game_models import Card
+from hearts_game_core.game_models import GameCurrentState, Card
 from tensorflow.keras.utils import to_categorical
 
 CardToken = int

@@ -4,8 +4,9 @@ import os
 import time
 from dataclasses import dataclass
 
-from hearts_game_core.game import CompletedGame, Player
+from hearts_game_core.game_models import CompletedGame
 from hearts_game_core.game_core import HeartsGame
+from hearts_game_core.strategies import Player
 
 from strategies.strategies import (
     AggressiveStrategy,

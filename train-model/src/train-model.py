@@ -4,9 +4,9 @@ import datetime
 from typing import List
 
 import numpy as np
-from hearts_game_core.game import GameCurrentState, Player
 from hearts_game_core.game_core import CompletedGame, HeartsGame
-from hearts_game_core.game_models import Card, Trick
+from hearts_game_core.game_models import Card, Trick, GameCurrentState
+from hearts_game_core.strategies import Player
 
 from strategies.strategies import (
     AggressiveStrategy,
@@ -121,7 +121,7 @@ def train_model():
     transformer = HeartsTransformerModel()
     transformer.build()
     start = time.time()
-    games = generate_games(10000)
+    games = generate_games(1)
     print(f"Generated {len(games)} games in {time.time() - start} seconds")
     train_data = extract_training_data(games)
     transformer.train(
@@ -156,5 +156,5 @@ def test_predict():
 
 
 if __name__ == "__main__":
-    # train_model()
+    train_model()
     test_predict()

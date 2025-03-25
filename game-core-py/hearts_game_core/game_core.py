@@ -1,9 +1,8 @@
 import random
 from typing import List
 
-from hearts_game_core.game import CompletedGame, GameCurrentState, Player, PlayerInfo
-from hearts_game_core.game_models import Card, CompletedTrick, Trick
-from hearts_game_core.strategies import StrategyGameState
+from hearts_game_core.game_models import Card, CompletedTrick, Trick, CompletedGame, GameCurrentState, PlayerInfo
+from hearts_game_core.strategies import StrategyGameState, Player
 
 
 class HeartsGame:
@@ -12,18 +11,25 @@ class HeartsGame:
         self.reset_game()
 
     def reset_game(self):
-        self.hearts_broken = False
-        self.previous_tricks: List[CompletedTrick] = []
-        self.current_trick = Trick()
         self.scores = [0] * 4
         for player, hand in zip(self.players, self.deal_cards()):
             player.initial_hand = hand
             player.hand = hand.copy()
             player.score = 0
-        self.current_player_index = self.find_starting_player()
+        self.current_state = GameCurrentState()
+        self.current_state.set_first_player(self.find_starting_player())
 
-        self.current_trick.reset()
-        self.current_trick.first_player_index = self.current_player_index
+    @property
+    def current_player_index(self) -> int:
+        return self.current_state.current_player_index
+
+    @property
+    def current_trick(self) -> Trick:
+        return self.current_state.current_trick
+
+    @property
+    def previous_tricks(self) -> List[CompletedTrick]:
+        return self.current_state.previous_tricks
 
     @property
     def current_player(self) -> Player:
@@ -83,7 +89,7 @@ class HeartsGame:
                 return safe_cards
 
         # If hearts not broken, avoid hearts if possible
-        if not self.hearts_broken:
+        if not self.current_state.hearts_broken:
             non_hearts = [c for c in hand if c.suit != "H"]
             if non_hearts:
                 return non_hearts
@@ -110,14 +116,18 @@ class HeartsGame:
         self.players[player_idx].hand.remove(card)
 
         if card.suit == "H":
-            self.hearts_broken = True
+            self.current_state.hearts_broken = True
 
         self.current_trick.add_card(player_idx, card)
 
         if self.current_trick.is_completed:
-            self.current_player_index = self.complete_trick()
+            current_player = self.complete_trick()
+            self.set_current_player(current_player)
         else:
-            self.current_player_index = (player_idx + 1) % 4
+            self.set_current_player((player_idx + 1) % 4)
+    
+    def set_current_player(self, player_idx: int):
+        self.current_state.current_player_index = player_idx
 
     def complete_trick(self) -> int:
         lead_suit = self.current_trick.lead_suit
@@ -169,12 +179,4 @@ class HeartsGame:
             ],
             winner_index=winner_index,
             completed_tricks=self.previous_tricks,
-        )
-
-    def current_state(self) -> GameCurrentState:
-        return GameCurrentState(
-            previous_tricks=self.previous_tricks,
-            current_trick=self.current_trick,
-            hearts_broken=self.hearts_broken,
-            current_player_index=self.current_player_index,
         )

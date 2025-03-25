@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from typing import ClassVar, List, Optional
 
 from pydantic import BaseModel
@@ -103,3 +104,33 @@ class CompletedTrick(BaseModel):
                 + self.cards[: self.first_player_index]
             )
         ]
+
+@dataclass
+class GameCurrentState:
+    previous_tricks: List[CompletedTrick] = field(default_factory=list)
+    current_trick: Trick = field(default_factory=Trick)
+    hearts_broken: bool = False
+    current_player_index: int = -1
+
+    def reset(self):
+        self.previous_tricks = []
+        self.current_trick.reset()
+        self.hearts_broken = False
+        self.current_player_index = -1
+
+    def set_first_player(self, player_index: int):
+        self.current_player_index = player_index
+        self.current_trick.first_player_index = player_index
+
+
+class PlayerInfo(BaseModel):
+    name: str
+    strategy: str
+    initial_hand: List[Card] = []
+    score: int
+
+
+class CompletedGame(BaseModel):
+    players: List[PlayerInfo]
+    winner_index: int
+    completed_tricks: List[CompletedTrick]

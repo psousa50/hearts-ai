@@ -13,3 +13,4 @@ libcairo*
 build
 *.egg-info/
 completed_games/
+models
