@@ -9,12 +9,11 @@ import os
 import time
 from dataclasses import dataclass
 
-from strategies.strategies import (
-    AggressiveStrategy,
-    AvoidPointsStrategy,
-    MyStrategy,
-    RandomStrategy,
-)
+from strategies.aggressive import AggressiveStrategy
+from strategies.avoid_points import AvoidPointsStrategy
+from strategies.my import MyStrategy
+from strategies.random import RandomStrategy
+
 
 
 @dataclass

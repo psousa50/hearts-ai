@@ -11,4 +11,5 @@ authors = [{name = "Pedro Sousa"}]
 dependencies = [
     "hearts_game_core",
     "request_models",
+    "requests",
 ]

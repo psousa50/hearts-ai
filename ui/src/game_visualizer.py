@@ -13,15 +13,14 @@ from game_state import GameState
 from hearts_game_core.game_core import HeartsGame, Player
 from hearts_game_core.game_models import Card, CompletedTrick, CompletedGame
 from layout_manager import LayoutManager
-from strategies.strategies import (
-    AIStrategy,
-    HumanStrategy,
-    MyStrategy,
-    RandomStrategy,
-    ReplayStrategy,
-    AggressiveStrategy,
-    AvoidPointsStrategy,
-)
+from strategies.human import HumanStrategy
+from strategies.my import MyStrategy
+from strategies.aggressive import AggressiveStrategy
+from strategies.avoid_points import AvoidPointsStrategy
+from strategies.random import RandomStrategy
+from strategies.ai import AIStrategy
+from strategies.replay import ReplayStrategy
+
 
 # Initialize Pygame
 pygame.init()
@@ -35,12 +34,10 @@ AUTO_PLAY_DELAY = 500  # milliseconds
 
 class GameVisualizer:
     def __init__(self, game_file: Optional[str] = None):
-        # Initialize display
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption("Hearts Game")
         self.clock = pygame.time.Clock()
 
-        # Create game with appropriate players
         self.replaying_games = game_file is not None
         players = (
             self._create_players()
@@ -49,7 +46,6 @@ class GameVisualizer:
         )
         self.game = HeartsGame(players)
 
-        # Initialize managers
         self.layout = LayoutManager(WINDOW_WIDTH, WINDOW_HEIGHT)
         self.game_state = GameState(self.game)
         self.animation_mgr = AnimationManager()
@@ -114,68 +110,21 @@ class GameVisualizer:
 
     def _create_replay_players(self, game_file: str) -> List[Player]:
         with open(game_file, "r") as f:
-            data = json.load(f)
-            games_data = [CompletedGame.parse_obj(d) for d in data]
-        print(f"Loaded {len(games_data)} moves")
+            all_games_data = json.load(f)
+            completed_games = [CompletedGame.parse_obj(game) for game in all_games_data]
+        print(f"Loaded {len(completed_games)} games")
 
-        game_data = games_data[0]  # First game only for now
+        completed_game = completed_games[0]  # First game only for now
+
         player_moves = [[] for _ in range(4)]
-
-        for trick in game_data.completed_tricks:
+        for trick in completed_game.completed_tricks:
             for i, card in enumerate(trick.cards):
                 player_moves[i].append(card)
 
-        player_scores = [p.score for p in game_data.players]
-
-        # Create a temporary game to initialize the GameMovesFilter
-        temp_game = HeartsGame(
-            [Player(f"Player {i}", RandomStrategy()) for i in range(4)]
-        )
-        temp_game.scores = player_scores
-
-        # Create the filter and get the good player indexes
-        self.game_filter = GameMovesFilter(temp_game)
+        self.game_filter = GameMovesFilter(completed_game)
 
         players = [
-            Player(f"Player {i}", ReplayStrategy(player_moves[i]), initial_hand=game_data.players[i].initial_hand)
-            for i in range(4)
-        ]
-
-        return players
-
-    def _create_replay_players_old(self, game_file: str) -> List[Player]:
-        with open(game_file, "r") as f:
-            games_data = json.load(f)
-        print(f"Loaded {len(games_data)} moves")
-
-        game_data = games_data[0]  # First game only for now
-        player_moves = [[] for _ in range(4)]
-
-        for trick in game_data.completed_tricks:
-            for i, card_dict in enumerate(trick.cards):
-                card = Card(card_dict.suit, card_dict.rank)
-                player_moves[i].append(card)
-
-        player_scores = [p.score for p in game_data.players]
-
-        # Create a temporary game to initialize the GameMovesFilter
-        temp_game = HeartsGame(
-            [Player(f"Player {i}", RandomStrategy()) for i in range(4)]
-        )
-        temp_game.scores = player_scores
-
-        # Create the filter and get the good player indexes
-        self.game_filter = GameMovesFilter(temp_game)
-
-        player_hands = [p.initial_hand for p in game_data.players]
-        player_hands = [
-            [Card(card.suit, card.rank) for card in hand] for hand in player_hands
-        ]
-        for hand in player_hands:
-            hand.sort(key=lambda c: (c.suit, c.rank))
-
-        players = [
-            Player(f"Player {i}", ReplayStrategy(player_moves[i]), player_hands[i])
+            Player(f"Player {i}", ReplayStrategy(player_moves[i]), initial_hand=completed_game.players[i].initial_hand)
             for i in range(4)
         ]
 

@@ -1,4 +1,3 @@
-import random
 from typing import List
 
 from hearts_game_core.game_models import Card, CompletedTrick, Trick, CompletedGame, GameCurrentState, PlayerInfo
@@ -15,8 +14,8 @@ class HeartsGame:
     def reset_game(self):
         self.scores = [0] * 4
         for player, hand in zip(self.players, self.deal_cards()):
-            player.initial_hand = hand
-            player.hand = hand.copy()
+            player.initial_hand = hand if player.initial_hand is None else player.initial_hand
+            player.hand = player.initial_hand.copy()
             player.score = 0
         self.current_state = GameCurrentState()
         self.current_state.set_first_player(self.find_starting_player())
@@ -42,7 +41,6 @@ class HeartsGame:
         return [sorted(hand, key=lambda c: (c.suit, c.rank)) for hand in hands]
 
     def find_starting_player(self) -> int:
-        # Player with 2 of clubs starts
         for i, player in enumerate(self.players):
             for card in player.hand:
                 if card.suit == "C" and card.rank == 2:
@@ -85,12 +83,12 @@ class HeartsGame:
 
     def choose_card(self, player_idx: int) -> Card:
         valid_moves = self.get_valid_moves(player_idx)
-        game_state = StrategyGameState(
+        strategy_game_state = StrategyGameState(
             game_state=self.current_state,
             player_hand=self.players[player_idx].hand,
             valid_moves=valid_moves,
         )
-        card = self.players[player_idx].strategy.choose_card(game_state)
+        card = self.players[player_idx].strategy.choose_card(strategy_game_state)
         return card if card in valid_moves else None
 
     def play_card(self, card: Card):
