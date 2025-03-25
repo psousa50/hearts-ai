@@ -3,11 +3,13 @@ from typing import List
 
 from hearts_game_core.game_models import Card, CompletedTrick, Trick, CompletedGame, GameCurrentState, PlayerInfo
 from hearts_game_core.strategies import StrategyGameState, Player
+from hearts_game_core.deck import Deck
 
 
 class HeartsGame:
-    def __init__(self, players: List[Player]):
+    def __init__(self, players: List[Player], deck: Deck = None):
         self.players = players
+        self.deck = deck or Deck()
         self.reset_game()
 
     def reset_game(self):
@@ -36,23 +38,8 @@ class HeartsGame:
         return self.players[self.current_player_index]
 
     def deal_cards(self) -> List[List[Card]]:
-        # Create a deck of cards
-        deck = []
-        for suit in ["C", "D", "H", "S"]:
-            for rank in range(2, 15):  # 2-14 (Ace is 14)
-                deck.append(Card(suit=suit, rank=rank))
-
-        # Shuffle and deal
-        random.shuffle(deck)
-        hands = [[] for _ in range(4)]
-        for i, card in enumerate(deck):
-            hands[i % 4].append(card)
-
-        # Sort hands
-        for hand in hands:
-            hand.sort(key=lambda c: (c.suit, c.rank))
-
-        return hands
+        hands = self.deck.deal(4, 13)
+        return [sorted(hand, key=lambda c: (c.suit, c.rank)) for hand in hands]
 
     def find_starting_player(self) -> int:
         # Player with 2 of clubs starts

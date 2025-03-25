@@ -1,12 +1,13 @@
+from hearts_game_core.deck import Deck
+from hearts_game_core.game_models import CompletedGame
+from hearts_game_core.game_core import HeartsGame
+from hearts_game_core.strategies import Player
+
 import argparse
 import json
 import os
 import time
 from dataclasses import dataclass
-
-from hearts_game_core.game_models import CompletedGame
-from hearts_game_core.game_core import HeartsGame
-from hearts_game_core.strategies import Player
 
 from strategies.strategies import (
     AggressiveStrategy,
@@ -59,8 +60,13 @@ def generate_games():
 
     completed_games = []
     start_time = time.time()
-    for _ in range(args.num_games):
-        game = HeartsGame(players)
+    for i in range(args.num_games):
+        if (i % 4 == 0) or not args.same_deck:
+            deck = Deck()
+        else:
+            deck.shift_left(13)
+            
+        game = HeartsGame(players, deck)
         completed_game = game.play_game()
         completed_games.append(completed_game)
         update_statistics(completed_game, game_statistics)
