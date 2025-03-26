@@ -16,6 +16,7 @@ class Card(BaseModel):
 
 
 Card.QueenOfSpades: ClassVar[Card] = Card(suit="S", rank=12)
+Card.TwoOfClubs: ClassVar[Card] = Card(suit="C", rank=2)
 
 
 class Trick(BaseModel):

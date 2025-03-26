@@ -13,6 +13,7 @@ from strategies.aggressive import AggressiveStrategy
 from strategies.avoid_points import AvoidPointsStrategy
 from strategies.my import MyStrategy
 from strategies.random import RandomStrategy
+from strategies.ai import AIStrategy
 
 
 
@@ -43,8 +44,12 @@ def generate_games():
         Player("Random", RandomStrategy()),
         Player("My Strategy", MyStrategy()),
         Player("AvoidPointsStrategy", AvoidPointsStrategy()),
-        Player("AggressiveStrategy", AggressiveStrategy()),
+        Player("AI", AIStrategy()),
     ]
+
+    print("Players:")
+    for player in players:
+        print(f"{player.name} ({player.strategy.__class__.__name__})")
 
     game_statistics = []
     for player in players:

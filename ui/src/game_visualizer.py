@@ -58,7 +58,7 @@ class GameVisualizer:
         )
 
     def _create_players(self) -> List[Player]:
-        return self._create_all_players_no_ai()
+        return self._create_human_players()
 
     def _create_all_players(self) -> List[Player]:
         return [

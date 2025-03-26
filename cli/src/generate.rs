@@ -1,7 +1,5 @@
 use chrono::Utc;
-use hearts_game::{
-    AIStrategy, AggressiveStrategy, Deck, HeartsGame, MyStrategy, RandomStrategy, Strategy,
-};
+use hearts_game::{AggressiveStrategy, Deck, HeartsGame, MyStrategy, RandomStrategy, Strategy};
 use serde_json;
 use std::fs::{self, File};
 use std::io::BufWriter;
@@ -22,7 +20,7 @@ pub fn generate_games(num_games: usize, use_same_deck_for_all_players: bool) {
     );
     let start = Instant::now();
 
-    let ai_strategy = AIStrategy::new("http://localhost:8000/predict".to_string());
+    // let ai_strategy = AIStrategy::new("http://localhost:8000/predict".to_string());
     let player_configs = [
         ("Alice", Strategy::Random(RandomStrategy)),
         ("Bob", Strategy::Random(RandomStrategy)),

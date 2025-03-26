@@ -3,20 +3,20 @@ from typing import List
 import numpy as np
 from hearts_game_core.game_models import GameCurrentState, Card
 from tensorflow.keras.utils import to_categorical
+from tensorflow import keras
 
 CardToken = int
 
+PADDING_TOKEN: CardToken = 0
 TRICK_SEPARATOR_TOKEN: CardToken = -1
 COMPLETED_TRICK_SEPARATOR_TOKEN: CardToken = -2
 
-# previous moves + 11 trick separators + 1 current trick separator
-INPUT_SEQUENCE_LENGTH = 12 * (4 + 1) + 1 + 3
+TOKENS_DIM=52 + 3
+
+# previous tricks with a separator betwwen + 1 current trick separator + 3 trick cards
+INPUT_LENGTH = 12 * 4 + 11 + 1 + 3
 SUITS = ["C", "D", "H", "S"]
-
-
-def pad_sequence(seq, length=INPUT_SEQUENCE_LENGTH):
-    return [0] * (length - len(seq)) + seq
-
+NUM_CARDS = 52
 
 def card_token(card: Card):
     return SUITS.index(card.suit) * 13 + (card.rank - 2)
@@ -35,21 +35,44 @@ def build_model_input(game_state: GameCurrentState):
     tokens.extend(
         [card_token(card) for card in game_state.current_trick.ordered_cards()]
     )
-    tokens = pad_sequence(tokens)
 
     return tokens
 
+def map_tokens(sequences):
+    # Shift card values from 0-51 to 1-52
+    if not isinstance(sequences, np.ndarray):
+        sequences = np.array(sequences, dtype=np.int32)
+    
+    # Create a copy to avoid modifying the original array
+    mapped_sequences = sequences.copy()
+    
+    # Mask for valid card values (0-51)
+    valid_card_mask = (mapped_sequences >= 0) & (mapped_sequences <= 51)
+    
+    # Map card values (0-51 → 1-52)
+    mapped_sequences[valid_card_mask] += 1
+    
+    # Map special tokens
+    mapped_sequences[mapped_sequences == -1] = 53
+    mapped_sequences[mapped_sequences == -2] = 54
+
+    return mapped_sequences
 
 def build_train_data(
     game_states: List[GameCurrentState], played_cards: List[Card]
 ) -> (np.ndarray, np.ndarray):
     X = [build_model_input(game_state) for game_state in game_states]
+    X = [map_tokens(sequence) for sequence in X]
+    X = keras.preprocessing.sequence.pad_sequences(
+        X, 
+        maxlen=INPUT_LENGTH, 
+        padding='post', 
+        truncating='post'
+    )
+
     y = [card_token(card) for card in played_cards]
+    y = np.array(y)
 
-    X = np.array(X)  # Convert list to NumPy array (N, INPUT_SEQUENCE_LENGTH)
-    y = np.array(y)  # Convert list to NumPy array (N,)
+    y = to_categorical(y, num_classes=NUM_CARDS)
 
-    # One-hot encode the target values
-    y_one_hot = to_categorical(y, num_classes=52)
-
-    return X, y_one_hot
+    return X, y

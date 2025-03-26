@@ -14,7 +14,7 @@ class HeartsGame:
     def reset_game(self):
         self.scores = [0] * 4
         for player, hand in zip(self.players, self.deal_cards()):
-            player.initial_hand = hand if player.initial_hand is None else player.initial_hand
+            player.initial_hand = hand if len(player.initial_hand) == 0 else player.initial_hand
             player.hand = player.initial_hand.copy()
             player.score = 0
         self.current_state = GameCurrentState()
@@ -43,7 +43,7 @@ class HeartsGame:
     def find_starting_player(self) -> int:
         for i, player in enumerate(self.players):
             for card in player.hand:
-                if card.suit == "C" and card.rank == 2:
+                if card == Card.TwoOfClubs:
                     return i
         return 0
 
@@ -53,7 +53,7 @@ class HeartsGame:
 
         # First card of first trick must be 2 of clubs
         if not self.previous_tricks and self.current_trick.is_empty:
-            return [c for c in hand if c.suit == "C" and c.rank == 2]
+            return [c for c in hand if c == Card.TwoOfClubs]
 
         # If a suit was led, must follow suit if possible
         if not self.current_trick.is_empty:

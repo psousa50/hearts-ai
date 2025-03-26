@@ -8,23 +8,22 @@ from hearts_game_core.game_models import GameCurrentState
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.layers import (
-    Add,
     Dense,
-    Dropout,
     Embedding,
     GlobalAveragePooling1D,
     Input,
     LayerNormalization,
     MultiHeadAttention,
+    Conv1D,
 )
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
-from transformer.inputs import INPUT_SEQUENCE_LENGTH, build_model_input, card_from_token
+from transformer.inputs import INPUT_LENGTH, build_train_data, card_from_token, TOKENS_DIM
 
 NUM_CARDS = 52
-EMBED_DIM = 16
-NUM_HEADS = 2
+EMBED_DIM = 64
+NUM_HEADS = 4
 FEED_FORWARD_DIM = 32
 
 
@@ -50,10 +49,10 @@ class HeartsTransformerModel:
             embedding_dim = embedding_model.vector_size
 
             # Initialize embedding matrix
-            embedding_matrix = np.zeros((NUM_CARDS, embedding_dim))
+            embedding_matrix = np.zeros((TOKENS_DIM, embedding_dim))
 
             # Map card tokens to their embeddings
-            for i in range(NUM_CARDS):
+            for i in range(TOKENS_DIM):
                 # Convert token index to card representation
                 # This mapping needs to match the one used in the original embedding training
                 card = card_from_token(i)
@@ -76,24 +75,35 @@ class HeartsTransformerModel:
             self.pretrained_embeddings = None
 
     def build(self):
-        sequence_input = Input(shape=(INPUT_SEQUENCE_LENGTH,), name="sequence_input")
+        inputs = Input(shape=(INPUT_LENGTH,), name="inputs")
 
-        # Use pretrained embeddings if available
-        if self.pretrained_embeddings is not None:
-            embedding_layer = Embedding(
-                input_dim=NUM_CARDS,
-                output_dim=self.pretrained_embeddings.shape[1],
-                weights=[self.pretrained_embeddings],
-                trainable=self.trainable_embeddings,
-                name="card_embedding",
-            )(sequence_input)
-        else:
-            embedding_layer = Embedding(
-                input_dim=NUM_CARDS, output_dim=EMBED_DIM, name="card_embedding"
-            )(sequence_input)
+        x = Embedding(
+            input_dim=TOKENS_DIM,
+            output_dim=EMBED_DIM,
+            mask_zero=True,
+            name="card_embedding",
+        )(inputs)
 
-        # Transformer Encoder
-        x = self.transformer_encoder(embedding_layer)
+        x += Embedding(
+            input_dim=INPUT_LENGTH,
+            output_dim=EMBED_DIM,
+            name="positional_encoding",
+        )(tf.range(INPUT_LENGTH))
+
+        x = MultiHeadAttention(
+            num_heads=NUM_HEADS, 
+            key_dim=EMBED_DIM,
+            dropout=0.1
+        )(x, x)
+
+        x = LayerNormalization(epsilon=1e-6)(x)
+
+        x = Conv1D(
+            filters=FEED_FORWARD_DIM, 
+            kernel_size=1, 
+            activation='relu'
+        )(x)
+        x = LayerNormalization(epsilon=1e-6)(x)
 
         # Global average pooling for final representation
         x = GlobalAveragePooling1D()(x)
@@ -102,7 +112,7 @@ class HeartsTransformerModel:
         outputs = Dense(NUM_CARDS, activation="softmax", name="card_output")(x)
 
         # Create model
-        self.model = Model(inputs=sequence_input, outputs=outputs)
+        self.model = Model(inputs=inputs, outputs=outputs)
 
         # Compile model
         self.model.compile(
@@ -113,25 +123,6 @@ class HeartsTransformerModel:
                 tf.keras.metrics.TopKCategoricalAccuracy(k=5, name="top_5_accuracy"),
             ],
         )
-
-    def transformer_encoder(self, inputs):
-        # Get the embedding dimension from the inputs
-        embed_dim = inputs.shape[-1]
-
-        # Simplified transformer encoder with fewer parameters
-        attn_output = MultiHeadAttention(
-            num_heads=NUM_HEADS, key_dim=embed_dim // NUM_HEADS
-        )(inputs, inputs)
-        attn_output = Dropout(0.2)(attn_output)
-        attn_output = LayerNormalization(epsilon=1e-6)(Add()([inputs, attn_output]))
-
-        # Simplified feed-forward network
-        ffn = Dense(FEED_FORWARD_DIM, activation="relu")(attn_output)
-        ffn = Dense(embed_dim)(ffn)  # Project back to original dimension
-        ffn = Dropout(0.2)(ffn)
-
-        output = LayerNormalization(epsilon=1e-6)(Add()([attn_output, ffn]))
-        return output
 
     def load(self, model_path):
         self.model = tf.keras.models.load_model(model_path)
@@ -177,6 +168,7 @@ class HeartsTransformerModel:
         )
 
         X, y = train_data
+        print(f"Training data shape: {X.shape}, {y.shape}")
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42
         )
@@ -229,9 +221,8 @@ class HeartsTransformerModel:
         self.initial_epoch = epoch + 1
 
     def predict(self, game_state: GameCurrentState):
-        inputs = build_model_input(game_state)
-        input_sequence = np.expand_dims(inputs, axis=0)
-        predictions = self.model.predict(input_sequence)
+        inputs, _ = build_train_data([game_state], [])
+        predictions = self.model.predict(inputs, verbose=0)
         return predictions
 
     def save(self, model_path):
@@ -260,10 +251,10 @@ class HeartsTransformerModel:
         # Create the output file in Word2Vec format
         with open(output_path, "w") as f:
             # Header: number of vectors and vector size
-            f.write(f"{NUM_CARDS} {embedding_weights.shape[1]}\n")
+            f.write(f"{TOKENS_DIM} {embedding_weights.shape[1]}\n")
 
             # Write each vector
-            for i in range(NUM_CARDS):
+            for i in range(TOKENS_DIM):
                 card_key = card_from_token(i)
                 vector_str = " ".join([str(val) for val in embedding_weights[i]])
                 f.write(f"{card_key} {vector_str}\n")

@@ -1,3 +1,4 @@
+import argparse
 import time
 import copy
 import datetime
@@ -8,14 +9,13 @@ from hearts_game_core.game_core import CompletedGame, HeartsGame
 from hearts_game_core.game_models import Card, Trick, GameCurrentState
 from hearts_game_core.strategies import Player
 
-from strategies.strategies import (
-    AggressiveStrategy,
-    AvoidPointsStrategy,
-    MyStrategy,
-    RandomStrategy,
-)
+from strategies.my import MyStrategy
+from strategies.aggressive import AggressiveStrategy
+from strategies.avoid_points import AvoidPointsStrategy
+from strategies.random import RandomStrategy
+
 from transformer.game_moves_filter import GameMovesFilter
-from transformer.inputs import build_train_data, card_from_token
+from transformer.inputs import build_train_data, card_from_token, card_token
 from transformer.transformer_model import HeartsTransformerModel
 
 MODELS_DIR = "models"
@@ -24,13 +24,13 @@ MODELS_DIR = "models"
 def extract_training_data(
     completed_games: List[CompletedGame],
 ) -> (np.ndarray, np.ndarray):
-    game_states = []
-    played_cards = []
+    all_game_states = []
+    all_played_cards = []
     for completed_game in completed_games:
         game_states, played_cards = extract_game_state_and_played_card(completed_game)
-        game_states.extend(game_states)
-        played_cards.extend(played_cards)
-    return build_train_data(game_states, played_cards)
+        all_game_states.extend(game_states)
+        all_played_cards.extend(played_cards)
+    return build_train_data(all_game_states, all_played_cards)
 
 
 def extract_game_state_and_played_card(
@@ -39,13 +39,13 @@ def extract_game_state_and_played_card(
     games_filter = GameMovesFilter(completed_game)
     game_states = []
     played_cards = []
-    for trick_index, trick in enumerate(completed_game.completed_tricks[:1]):
+    for trick_index, trick in enumerate(completed_game.completed_tricks):
         previous_tricks = completed_game.completed_tricks[:trick_index]
         current_trick = Trick()
         for p in range(4):
             player_index = (trick.first_player_index + p) % 4
             played_card = trick.cards[player_index]
-            if games_filter.filter(player_index, trick):
+            if True or games_filter.filter(player_index, trick):
                 game_state = GameCurrentState(
                     previous_tricks=previous_tricks,
                     current_trick=copy.deepcopy(current_trick),
@@ -118,16 +118,38 @@ def model_path(size: int):
 
 
 def train_model():
+    parser = argparse.ArgumentParser(description="Generate games for Hearts game")
+    parser.add_argument(
+        "--num-games", type=int, default=1, help="Number of games to generate"
+    )
+    parser.add_argument(
+        "--epochs", type=int, default=50, help="Number of epochs for training"
+    )
+    parser.add_argument(
+        "--batch-size", type=int, default=32, help="Batch size for training"
+    )
+
+    args = parser.parse_args()
+    num_games = args.num_games
+    epochs = args.epochs
+    batch_size = args.batch_size
+
     transformer = HeartsTransformerModel()
     transformer.build()
     start = time.time()
-    games = generate_games(1)
+    games = generate_games(num_games)
     print(f"Generated {len(games)} games in {time.time() - start} seconds")
     train_data = extract_training_data(games)
+    # X, y = train_data
+    # for xx, yy in zip(X, y):
+
+    #     if xx[0] == 54 and all(x == 0 for x in xx[1:]) and not (yy[0]==1 and all(y==0 for y in yy[1:])):
+    #         print(f"y {yy}")
+    # exit(0)
     transformer.train(
         train_data,
-        epochs=20,
-        batch_size=32,
+        epochs=epochs,
+        batch_size=batch_size,
     )
     transformer.save(model_path(len(train_data)))
     transformer.save("models/latest.keras")
@@ -137,13 +159,10 @@ def test_predict():
     transformer = HeartsTransformerModel()
     transformer.load(f"{MODELS_DIR}/latest.keras")
     current_trick = Trick()
-    current_trick.add_card(0, Card(suit="S", rank=2))
-    current_trick.add_card(1, Card(suit="S", rank=3))
-    current_trick.add_card(2, Card(suit="S", rank=4))
     game_state = GameCurrentState(
         previous_tricks=[],
         current_trick=current_trick,
-        current_player_index=1,
+        current_player_index=0,
     )
     predictions = transformer.predict(game_state)
     # print predicted cards with probabilities, ordered by probability
