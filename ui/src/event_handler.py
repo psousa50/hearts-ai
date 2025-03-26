@@ -27,17 +27,15 @@ class EventHandler:
                 self.game_state.paused = False
             return
 
-        hands = [p.hand for p in self.game.players]
-        hand = hands[self.game.current_player_index]
-        start_x, start_y = self.layout.hand_positions[0]["start"]
-        offset_x, _ = self.layout.hand_positions[0]["offset"]
+        player_idx = self.game.current_player_index
+        hand = self.game.players[player_idx].hand
 
-        valid_moves = self.game.get_valid_moves(self.game.current_player_index)
+        valid_moves = self.game.get_valid_moves(player_idx)
 
         for i in range(len(hand) - 1, -1, -1):
             card = hand[i]
-            x = start_x + (i * offset_x)
-            rect = pygame.Rect(x, start_y, CARD_WIDTH, CARD_HEIGHT)
+            x, y = self.layout.get_hand_position(player_idx, i)
+            rect = pygame.Rect(x, y, CARD_WIDTH, CARD_HEIGHT)
 
             if rect.collidepoint(pos):
                 if card in valid_moves:

@@ -26,14 +26,14 @@ class GameRenderer:
         self.small_font = pygame.font.Font(None, 16)
 
     def draw_player_hand(
-        self, player_idx: int, hand: List[Card], valid_moves: List[Card] = None
+        self, player_idx: int, hand: List[Card], valid_moves: List[Card] = None, highlight_valid_moves: bool = False
     ):
         """Draw a player's hand with optional highlighting of valid moves"""
         for i, card in enumerate(hand):
             sprite = CardSprite(card)
             x, y = self.layout.get_hand_position(player_idx, i)
 
-            if valid_moves and card in valid_moves:
+            if valid_moves and card in valid_moves and highlight_valid_moves:
                 pygame.draw.rect(
                     self.screen,
                     self.YELLOW,
@@ -114,7 +114,7 @@ class GameRenderer:
                 game.get_valid_moves(i) if game_state.current_player_is_human else None
             )
             hands = [p.hand for p in game.players]
-            self.draw_player_hand(i, hands[i], valid_moves)
+            self.draw_player_hand(i, hands[i], valid_moves, highlight_valid_moves=i == game.current_player_index)
             self.draw_player_info(
                 i,
                 game.players[i].name,
