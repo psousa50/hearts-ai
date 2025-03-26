@@ -99,7 +99,7 @@ class GameRenderer:
             self.screen.blit(card.image, card.rect)
 
     def render_frame(
-        self, game_state: GameState, game: HeartsGame, animation_mgr: AnimationManager
+        self, game_state: GameState, animation_mgr: AnimationManager
     ):
         """Render a complete frame"""
         # Clear screen
@@ -111,22 +111,22 @@ class GameRenderer:
         # Draw player hands and info
         for i in range(4):
             valid_moves = (
-                game.get_valid_moves(i) if game_state.current_player_is_human else None
+                game_state.game.get_valid_moves(i) if game_state.current_player_is_human else None
             )
-            hands = [p.hand for p in game.players]
-            self.draw_player_hand(i, hands[i], valid_moves, highlight_valid_moves=i == game.current_player_index)
+            hands = [p.hand for p in game_state.game.players]
+            self.draw_player_hand(i, hands[i], valid_moves, highlight_valid_moves=i == game_state.game.current_player_index)
             self.draw_player_info(
                 i,
-                game.players[i].name,
-                game.players[i].strategy.__class__.__name__,
-                game.scores[i],
+                game_state.game.players[i].name,
+                game_state.game.players[i].strategy.__class__.__name__,
+                game_state.game.scores[i],
             )
 
         # Draw cards in play
         self.draw_cards_in_play(animation_mgr.get_cards_in_play())
 
         # Draw UI elements
-        self.draw_game_info(game.current_player.name, game.current_trick.size)
+        self.draw_game_info(game_state.game.current_player.name, game_state.game.current_trick.size)
 
         # Update display
         pygame.display.flip()

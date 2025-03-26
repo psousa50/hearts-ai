@@ -52,13 +52,12 @@ class GameVisualizer:
         self.renderer = GameRenderer(self.screen, self.layout)
         self.event_handler = EventHandler(
             self.game_state,
-            self.game,
             self.layout,
             lambda card: self.play_card(card),
         )
 
     def _create_players(self) -> List[Player]:
-        return self._create_human_players()
+        return self._create_ai_players()
 
     def _create_all_players(self) -> List[Player]:
         return [
@@ -213,7 +212,7 @@ class GameVisualizer:
             self.clock.tick(FPS)
             running = self.event_handler.handle_events()
             self.update()
-            self.renderer.render_frame(self.game_state, self.game, self.animation_mgr)
+            self.renderer.render_frame(self.game_state, self.animation_mgr)
 
         pygame.quit()
 

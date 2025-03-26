@@ -12,12 +12,10 @@ class EventHandler:
     def __init__(
         self,
         game_state: GameState,
-        game: HeartsGame,
         layout: LayoutManager,
         play_card_handler: Callable[[Card], None],
     ):
         self.game_state = game_state
-        self.game = game
         self.layout = layout
         self.play_card_handler = play_card_handler
 
@@ -46,10 +44,7 @@ class EventHandler:
         if key == pygame.K_SPACE:
             if self.game_state.paused:
                 self.game_state.paused = False
-                self.game_state.trick_completed = False
                 self.game_state.last_auto_play = pygame.time.get_ticks()
-        elif key == pygame.K_RETURN:
-            self.game_state.auto_play = not self.game_state.auto_play
         elif key == pygame.K_ESCAPE:
             return False
         return True
