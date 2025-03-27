@@ -140,18 +140,12 @@ def train_model():
     games = generate_games(num_games)
     print(f"Generated {len(games)} games in {time.time() - start} seconds")
     train_data = extract_training_data(games)
-    # X, y = train_data
-    # for xx, yy in zip(X, y):
-
-    #     if xx[0] == 54 and all(x == 0 for x in xx[1:]) and not (yy[0]==1 and all(y==0 for y in yy[1:])):
-    #         print(f"y {yy}")
-    # exit(0)
     transformer.train(
         train_data,
         epochs=epochs,
         batch_size=batch_size,
     )
-    transformer.save(model_path(len(train_data)))
+    transformer.save(model_path(len(train_data[0])))
     transformer.save("models/latest.keras")
 
 

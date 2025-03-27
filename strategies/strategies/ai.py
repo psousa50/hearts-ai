@@ -4,7 +4,7 @@ from transformer.transformer_model import HeartsTransformerModel
 from transformer.inputs import card_from_token
 import numpy as np
 
-DEBUG = True
+DEBUG = False
 
 def debug_print(message):
     if DEBUG:
