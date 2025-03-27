@@ -12,7 +12,6 @@ class HeartsGame:
         self.reset_game()
 
     def reset_game(self):
-        self.scores = [0] * 4
         for player, hand in zip(self.players, self.deal_cards()):
             player.initial_hand = hand if len(player.initial_hand) == 0 else player.initial_hand
             player.hand = player.initial_hand.copy()
@@ -119,7 +118,7 @@ class HeartsGame:
         )
 
         score = self.current_trick.score()
-        self.scores[winner_index] += score
+        self.players[winner_index].score += score
 
         self.previous_tricks.append(
             CompletedTrick(
@@ -145,7 +144,7 @@ class HeartsGame:
     def play_game(self) -> CompletedGame:
         while not self.is_game_over():
             self.play_next_card()
-        winner_index = min(enumerate(self.scores), key=lambda x: x[1])[0]
+        winner_index = min(enumerate(self.players), key=lambda x: x[1].score)[0]
 
         return CompletedGame(
             players=[
@@ -153,9 +152,9 @@ class HeartsGame:
                     name=self.players[player_index].name,
                     strategy=self.players[player_index].strategy.__class__.__name__,
                     initial_hand=self.players[player_index].initial_hand,
-                    score=score,
+                    score=self.players[player_index].score,
                 )
-                for player_index, score in enumerate(self.scores)
+                for player_index in range(4)
             ],
             winner_index=winner_index,
             completed_tricks=self.previous_tricks,
