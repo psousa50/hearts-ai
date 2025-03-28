@@ -8,6 +8,8 @@ from hearts_game_core.game_models import Card, GameCurrentState
 class StrategyGameState:
     game_state: GameCurrentState
     player_hand: List[Card]
+    player_index: int
+    player_score: int
     valid_moves: List[Card]
 
 

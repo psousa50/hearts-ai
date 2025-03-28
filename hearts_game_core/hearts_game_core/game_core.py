@@ -85,6 +85,8 @@ class HeartsGame:
         strategy_game_state = StrategyGameState(
             game_state=self.current_state,
             player_hand=self.players[player_idx].hand,
+            player_index=player_idx,
+            player_score=self.players[player_idx].score,
             valid_moves=valid_moves,
         )
         card = self.players[player_idx].strategy.choose_card(strategy_game_state)

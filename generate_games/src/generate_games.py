@@ -1,3 +1,4 @@
+import numpy as np
 from hearts_game_core.deck import Deck
 from hearts_game_core.game_models import CompletedGame
 from hearts_game_core.game_core import HeartsGame
@@ -14,7 +15,7 @@ from strategies.avoid_points import AvoidPointsStrategy
 from strategies.my import MyStrategy
 from strategies.random import RandomStrategy
 from strategies.ai import AIStrategy
-
+from strategies.simulation import SimulationStrategy
 
 
 @dataclass
@@ -44,8 +45,15 @@ def generate_games():
         Player("Random", RandomStrategy()),
         Player("My Strategy", MyStrategy()),
         Player("AvoidPointsStrategy", AvoidPointsStrategy()),
-        Player("AI", AIStrategy()),
+        Player("Sim 1", SimulationStrategy()),
     ]
+
+    # players = [
+    #     Player("Sim 1", SimulationStrategy()),
+    #     Player("Sim 2", SimulationStrategy()),
+    #     Player("Sim 3", SimulationStrategy()),
+    #     Player("Sim 4", SimulationStrategy()),
+    # ]
 
     print("Players:")
     for player in players:
@@ -65,6 +73,7 @@ def generate_games():
     completed_games = []
     start_time = time.time()
     for i in range(args.num_games):
+        print(f"Game {i + 1}/{args.num_games}")
         if (i % 4 == 0) or not args.same_deck:
             deck = Deck()
         else:
@@ -127,4 +136,5 @@ def display_statistics(num_games: int, game_statistics: list[PlayerStatistics]):
 
 
 if __name__ == "__main__":
+    np.random.seed(42)
     generate_games()

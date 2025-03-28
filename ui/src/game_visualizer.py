@@ -20,6 +20,7 @@ from strategies.avoid_points import AvoidPointsStrategy
 from strategies.random import RandomStrategy
 from strategies.ai import AIStrategy
 from strategies.replay import ReplayStrategy
+from strategies.simulation import SimulationStrategy
 
 
 # Initialize Pygame
@@ -57,7 +58,15 @@ class GameVisualizer:
         )
 
     def _create_players(self) -> List[Player]:
-        return self._create_ai_players()
+        return self._create_all_simulations()
+
+    def _create_all_simulations(self) -> List[Player]:
+        return [
+            Player("Sim 1", SimulationStrategy()),
+            Player("Sim 2", SimulationStrategy()),
+            Player("Sim 3", SimulationStrategy()),
+            Player("Sim 4", SimulationStrategy()),
+        ]
 
     def _create_all_players(self) -> List[Player]:
         return [
@@ -70,7 +79,7 @@ class GameVisualizer:
     def _create_all_players_no_ai(self) -> List[Player]:
         return [
             Player("Aggressive", AggressiveStrategy()),
-            Player("Avoid Points", AvoidPointsStrategy()),
+            Player("Simulation", SimulationStrategy()),
             Player("My Strategy", MyStrategy()),
             Player("Random", RandomStrategy()),
         ]
@@ -105,6 +114,14 @@ class GameVisualizer:
             Player("My Strategy 2", MyStrategy()),
             Player("My Strategy 3", MyStrategy()),
             Player("My Strategy 4", MyStrategy()),
+        ]
+
+    def _create_simulation_players(self) -> List[Player]:
+        return [
+            Player("Simulation 1", SimulationStrategy()),
+            Player("Simulation 2", SimulationStrategy()),
+            Player("Simulation 3", SimulationStrategy()),
+            Player("Simulation 4", SimulationStrategy()),
         ]
 
     def _create_replay_players(self, game_file: str) -> List[Player]:

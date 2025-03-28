@@ -119,7 +119,7 @@ class GameRenderer:
                 i,
                 game_state.game.players[i].name,
                 game_state.game.players[i].strategy.__class__.__name__,
-                game_state.game.scores[i],
+                game_state.game.players[i].score
             )
 
         # Draw cards in play
