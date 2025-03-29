@@ -6,9 +6,11 @@ import numpy as np
 
 DEBUG = False
 
-def debug_print(message):
+def debug_print(*args, **kwargs):
     if DEBUG:
-        print(message)
+        print(*args, **kwargs)
+        sys.stdout.flush()  # Force output to be displayed immediately
+
 
 class AIStrategy(Strategy):
     def __init__(self):

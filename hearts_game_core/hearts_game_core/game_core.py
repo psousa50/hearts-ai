@@ -3,12 +3,14 @@ from typing import List
 from hearts_game_core.game_models import Card, CompletedTrick, Trick, CompletedGame, GameCurrentState, PlayerInfo
 from hearts_game_core.strategies import StrategyGameState, Player
 from hearts_game_core.deck import Deck
+from hearts_game_core.random_manager import RandomManager
 
 
 class HeartsGame:
-    def __init__(self, players: List[Player], deck: Deck = None):
+    def __init__(self, players: List[Player], deck: Deck = None, random_manager: RandomManager = None):
+        self.random_manager = random_manager or RandomManager()
         self.players = players
-        self.deck = deck or Deck()
+        self.deck = deck or Deck(random_manager=self.random_manager)
         self.reset_game()
 
     def reset_game(self):

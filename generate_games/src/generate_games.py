@@ -1,4 +1,3 @@
-import numpy as np
 from hearts_game_core.deck import Deck
 from hearts_game_core.game_models import CompletedGame
 from hearts_game_core.game_core import HeartsGame
@@ -16,6 +15,7 @@ from strategies.my import MyStrategy
 from strategies.random import RandomStrategy
 from strategies.ai import AIStrategy
 from strategies.simulation import SimulationStrategy
+from hearts_game_core.random_manager import RandomManager
 
 
 @dataclass
@@ -36,16 +36,26 @@ def generate_games():
         action="store_true",
         help="Use the same deck for all player positions (rotating players)",
     )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Seed for random number generator",
+    )
 
     args = parser.parse_args()
+    num_games = args.num_games
+    same_deck = args.same_deck
+    seed = args.seed
 
-    print("Generating games...")
-
+    print(f"Generating {num_games} games with same deck: {same_deck} and seed: {seed}")
+    
+    random_manager = RandomManager(seed)
     players = [
-        Player("Random", RandomStrategy()),
-        Player("My Strategy", MyStrategy()),
-        Player("AvoidPointsStrategy", AvoidPointsStrategy()),
-        Player("Sim 1", SimulationStrategy()),
+        Player("My Strategy 1", MyStrategy()),
+        Player("My Strategy 2", MyStrategy()),
+        Player("My Strategy 3", MyStrategy()),
+        Player("Sim 1", SimulationStrategy(random_manager=random_manager)),
     ]
 
     # players = [
@@ -72,14 +82,14 @@ def generate_games():
 
     completed_games = []
     start_time = time.time()
-    for i in range(args.num_games):
-        print(f"Game {i + 1}/{args.num_games}")
-        if (i % 4 == 0) or not args.same_deck:
-            deck = Deck()
+    for i in range(num_games):
+        print(f"Game {i + 1}/{num_games}")
+        if (i % 4 == 0) or not same_deck:
+            deck = Deck(random_manager=random_manager)
         else:
             deck.shift_left(13)
             
-        game = HeartsGame(players, deck)
+        game = HeartsGame(players, deck, random_manager=random_manager)
         completed_game = game.play_game()
         completed_games.append(completed_game)
         update_statistics(completed_game, game_statistics)
@@ -87,7 +97,7 @@ def generate_games():
     end_time = time.time()
     print(f"Time taken: {end_time - start_time:.2f} seconds")
 
-    display_statistics(args.num_games, game_statistics)
+    display_statistics(num_games, game_statistics)
 
     save_completed_games(completed_games)
 
@@ -136,5 +146,4 @@ def display_statistics(num_games: int, game_statistics: list[PlayerStatistics]):
 
 
 if __name__ == "__main__":
-    np.random.seed(42)
     generate_games()

@@ -23,6 +23,8 @@ from strategies.replay import ReplayStrategy
 from strategies.simulation import SimulationStrategy
 
 
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
 # Initialize Pygame
 pygame.init()
 
