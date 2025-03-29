@@ -16,5 +16,6 @@ dependencies = [
     "pygame",
     "cairosvg",
     "pydantic",
-    "msgpack",
+    "msgpack"
 ]
+
