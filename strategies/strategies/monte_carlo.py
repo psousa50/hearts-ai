@@ -76,9 +76,7 @@ class MonteCarloStrategy(Strategy):
         exploration_weight: float = 1.4,
         random_manager: RandomManager = None,
     ):
-        self.random_manager = (
-            random_manager if random_manager is not None else RandomManager()
-        )
+        self.random_manager = random_manager if random_manager is not None else RandomManager()
         self.num_simulations = num_simulations
         self.exploration_weight = exploration_weight
         self.move_cache = {}
@@ -94,9 +92,7 @@ class MonteCarloStrategy(Strategy):
 
         # Group equivalent moves to reduce search space
         grouped_valid_moves = group_equivalent_moves(valid_moves)
-        debug_print(
-            f"Grouped valid moves: {" ".join([str(card) for card in grouped_valid_moves])}"
-        )
+        debug_print(f"Grouped valid moves: {" ".join([str(card) for card in grouped_valid_moves])}")
 
         # Check cache for this game state
         # cache_key = self._get_cache_key(strategy_game_state)
@@ -105,9 +101,7 @@ class MonteCarloStrategy(Strategy):
         #     return self.move_cache[cache_key]
 
         trick_number = len(strategy_game_state.game_state.previous_tricks) + 1
-        debug_print(
-            f"------------------------ Trick number: {trick_number} ------------------------"
-        )
+        debug_print(f"------------------------ Trick number: {trick_number} ------------------------")
 
         # Adjust simulation count based on game stage
         cards_left = len(strategy_game_state.player_hand)
@@ -133,10 +127,7 @@ class MonteCarloStrategy(Strategy):
 
         # Calculate remaining cards in other players' hands
         all_cards_in_players_hands = [
-            card
-            for card in self.all_cards
-            if card not in all_played_cards
-            and card not in strategy_game_state.player_hand
+            card for card in self.all_cards if card not in all_played_cards and card not in strategy_game_state.player_hand
         ]
 
         # Run Monte Carlo Tree Search
@@ -185,9 +176,7 @@ class MonteCarloStrategy(Strategy):
                     sim_state = copy.deepcopy(strategy_game_state)
 
                     # Create a game for simulation
-                    game = self._create_game_for_simulation(
-                        sim_state, all_cards_in_players_hands.copy()
-                    )
+                    game = self._create_game_for_simulation(sim_state, all_cards_in_players_hands.copy())
 
                     # Play the selected move
                     game.play_card(node.move)
@@ -196,9 +185,7 @@ class MonteCarloStrategy(Strategy):
                     completed_game = game.play_game()
 
                     # Get the final score
-                    final_score = completed_game.players[
-                        strategy_game_state.player_index
-                    ].score
+                    final_score = completed_game.players[strategy_game_state.player_index].score
 
                     # Calculate the added score (how many points this move added)
                     added_score = final_score - strategy_game_state.player_score
@@ -239,28 +226,18 @@ class MonteCarloStrategy(Strategy):
         all_cards_in_players_hands: List[Card],
     ) -> HeartsGame:
         """Create a game for simulation."""
-        first_player_index = (
-            strategy_game_state.game_state.current_trick.first_player_index
-        )
         current_player_idx = strategy_game_state.player_index
 
         # Create a new game with random strategies for all players
-        players = [
-            Player(f"Player {i}", RandomStrategy(random_manager=self.random_manager))
-            for i in range(4)
-        ]
+        players = [Player(f"Player {i}", RandomStrategy(random_manager=self.random_manager)) for i in range(4)]
 
         # Create a new game
         game = HeartsGame(players, random_manager=self.random_manager)
 
         # Set up the game state to match the current state
         # We need to access the internal attributes directly since properties don't have setters
-        game._current_trick = copy.deepcopy(
-            strategy_game_state.game_state.current_trick
-        )
-        game.completed_tricks = copy.deepcopy(
-            strategy_game_state.game_state.previous_tricks
-        )
+        game._current_trick = copy.deepcopy(strategy_game_state.game_state.current_trick)
+        game.completed_tricks = copy.deepcopy(strategy_game_state.game_state.previous_tricks)
         game.hearts_broken = strategy_game_state.game_state.hearts_broken
 
         # Set up player hands
@@ -313,18 +290,11 @@ class MonteCarloStrategy(Strategy):
 
     def _get_cache_key(self, strategy_game_state):
         current_trick = tuple(
-            (i, str(card))
-            for i, card in enumerate(strategy_game_state.game_state.current_trick.cards)
-            if card is not None
+            (i, str(card)) for i, card in enumerate(strategy_game_state.game_state.current_trick.cards) if card is not None
         )
-        player_hand = tuple(
-            sorted([str(card) for card in strategy_game_state.player_hand])
-        )
+        player_hand = tuple(sorted([str(card) for card in strategy_game_state.player_hand]))
 
-        prev_tricks = tuple(
-            (t.winner_index, t.score)
-            for t in strategy_game_state.game_state.previous_tricks
-        )
+        prev_tricks = tuple((t.winner_index, t.score) for t in strategy_game_state.game_state.previous_tricks)
 
         return (
             current_trick,
@@ -363,9 +333,7 @@ def group_equivalent_moves(cards: List[Card]) -> List[Card]:
             grouped.append(suit_cards[-1])
 
         # Add the Queen of Spades specifically (important in Hearts)
-        queen_of_spades = next(
-            (c for c in suit_cards if c.suit == "S" and c.rank == 12), None
-        )
+        queen_of_spades = next((c for c in suit_cards if c.suit == "S" and c.rank == 12), None)
         if queen_of_spades and queen_of_spades not in grouped:
             grouped.append(queen_of_spades)
 

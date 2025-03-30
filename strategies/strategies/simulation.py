@@ -23,12 +23,8 @@ def debug_print(*args, **kwargs):
 
 
 class SimulationStrategy(Strategy):
-    def __init__(
-        self, num_simulations: int = 5000, random_manager: RandomManager = None
-    ):
-        self.random_manager = (
-            random_manager if random_manager is not None else RandomManager()
-        )
+    def __init__(self, num_simulations: int = 5000, random_manager: RandomManager = None):
+        self.random_manager = random_manager if random_manager is not None else RandomManager()
         self.num_simulations = num_simulations
         self.move_cache = {}
         self.deck = Deck(shuffle=False, random_manager=self.random_manager)
@@ -48,9 +44,7 @@ class SimulationStrategy(Strategy):
 
         debug_print(f"Valid moves: {" ".join([str(card) for card in valid_moves])}")
         grouped_valid_moves = group_equivalent_moves(valid_moves)
-        debug_print(
-            f"Grouped valid moves: {" ".join([str(card) for card in grouped_valid_moves])}"
-        )
+        debug_print(f"Grouped valid moves: {" ".join([str(card) for card in grouped_valid_moves])}")
 
         # Check cache for this game state
         # cache_key = self._get_cache_key(strategy_game_state)
@@ -59,9 +53,7 @@ class SimulationStrategy(Strategy):
         #     return self.move_cache[cache_key]
 
         trick_number = len(strategy_game_state.game_state.previous_tricks) + 1
-        debug_print(
-            f"------------------------ Trick number: {trick_number} ------------------------"
-        )
+        debug_print(f"------------------------ Trick number: {trick_number} ------------------------")
 
         cards_left = len(strategy_game_state.player_hand)
         if cards_left <= 3:
@@ -71,7 +63,6 @@ class SimulationStrategy(Strategy):
             num_simulations = self.num_simulations
 
         simulations_per_move = max(1000, num_simulations // len(valid_moves))
-        # debug_print(f"Distributing {num_simulations} simulations evenly among {len(valid_moves)} moves: {simulations_per_move} simulations per move")
 
         all_played_cards = []
         for previous_trick in strategy_game_state.game_state.previous_tricks:
@@ -83,9 +74,7 @@ class SimulationStrategy(Strategy):
 
         all_played_cards.extend(strategy_game_state.player_hand)
 
-        all_cards_in_players_hands = [
-            card for card in self.all_cards if card not in all_played_cards
-        ]
+        all_cards_in_players_hands = [card for card in self.all_cards if card not in all_played_cards]
 
         best_move = None
         best_added_score_all = 10000
@@ -109,9 +98,7 @@ class SimulationStrategy(Strategy):
                 best_added_score_all = best_added_score
                 best_move = best_move
 
-        debug_print(
-            f"Best move: {best_move} with added score: {best_added_score_all:.2f}"
-        )
+        debug_print(f"Best move: {best_move} with added score: {best_added_score_all:.2f}")
 
         if best_move is None:
             best_move = strategy_game_state.valid_moves[0]
@@ -121,18 +108,11 @@ class SimulationStrategy(Strategy):
 
     def _get_cache_key(self, strategy_game_state):
         current_trick = tuple(
-            (i, str(card))
-            for i, card in enumerate(strategy_game_state.game_state.current_trick.cards)
-            if card is not None
+            (i, str(card)) for i, card in enumerate(strategy_game_state.game_state.current_trick.cards) if card is not None
         )
-        player_hand = tuple(
-            sorted([str(card) for card in strategy_game_state.player_hand])
-        )
+        player_hand = tuple(sorted([str(card) for card in strategy_game_state.player_hand]))
 
-        prev_tricks = tuple(
-            (t.winner_index, t.score)
-            for t in strategy_game_state.game_state.previous_tricks
-        )
+        prev_tricks = tuple((t.winner_index, t.score) for t in strategy_game_state.game_state.previous_tricks)
 
         return (current_trick, player_hand, prev_tricks)
 
@@ -145,10 +125,7 @@ def create_game_for_simulation(
     deck,
     random_manager: RandomManager,
 ):
-    players = [
-        Player(f"Random{i}", RandomStrategy(random_manager=random_manager))
-        for i in range(4)
-    ]
+    players = [Player(f"Random{i}", RandomStrategy(random_manager=random_manager)) for i in range(4)]
     game = HeartsGame(players, deck=deck, random_manager=random_manager)
 
     game.current_state = copy.deepcopy(strategy_game_state.game_state)
@@ -165,9 +142,7 @@ def create_game_for_simulation(
             if _has_played(first_player_index, current_player_idx, player_idx):
                 cards_to_distribute -= 1
 
-            game.players[player_idx].hand = all_cards_in_players_hands[
-                cards_index : cards_index + cards_to_distribute
-            ]
+            game.players[player_idx].hand = all_cards_in_players_hands[cards_index : cards_index + cards_to_distribute]
             cards_index += cards_to_distribute
 
     return game
@@ -204,9 +179,7 @@ def run_simulations_for_move(
         sim_game.play_card(move)
         sim_completed_game = sim_game.play_game()
 
-        player_score_after_simulation = sim_completed_game.players[
-            current_player_idx
-        ].score
+        player_score_after_simulation = sim_completed_game.players[current_player_idx].score
         added_score = player_score_after_simulation - strategy_game_state.player_score
 
         average_added_score += added_score

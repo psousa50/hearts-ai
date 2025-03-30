@@ -20,10 +20,10 @@ dev = [
 packages = []  # 👈 prevents setuptools from trying to package your whole monorepo
 
 [tool.black]
-line-length = 88
+line-length = 128
 
 [tool.ruff]
-line-length = 88
+line-length = 128
 select = ["E", "F", "I"]  # E = pycodestyle (formatting), F = pyflakes (errors), I = isort
 
 [tool.mypy]
@@ -35,4 +35,4 @@ quote-style = "double"
 
 [tool.isort]
 profile = "black"
-line_length = 88
+line_length = 128
