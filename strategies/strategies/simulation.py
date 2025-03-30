@@ -13,7 +13,7 @@ from hearts_game_core.deck import Deck
 from strategies.random import RandomStrategy
 from hearts_game_core.random_manager import RandomManager
 
-DEBUG = True
+DEBUG = False
 
 def debug_print(*args, **kwargs):
     if DEBUG:
@@ -159,6 +159,7 @@ def run_simulations_for_move(strategy_game_state, move, simulations_per_move, al
     return move, average_added_score
 
 def group_equivalent_moves(cards: List[Card]) -> List[Card]:
+    has_queen_of_spades = Card.QueenOfSpades in cards
     grouped_by_suit = defaultdict(list)
 
     # Group cards by suit
@@ -183,5 +184,8 @@ def group_equivalent_moves(cards: List[Card]) -> List[Card]:
 
         if group:
             result.append(group[-1])
+
+    if has_queen_of_spades:
+        result.append(Card.QueenOfSpades)
 
     return result

@@ -15,6 +15,8 @@ from strategies.my import MyStrategy
 from strategies.random import RandomStrategy
 from strategies.ai import AIStrategy
 from strategies.simulation import SimulationStrategy
+from strategies.monte_carlo import MonteCarloStrategy
+
 from hearts_game_core.random_manager import RandomManager
 
 
@@ -54,7 +56,7 @@ def generate_games():
     players = [
         Player("My Strategy 1", MyStrategy()),
         Player("My Strategy 2", MyStrategy()),
-        Player("My Strategy 3", MyStrategy()),
+        Player("Monte Carlo 1", MonteCarloStrategy(random_manager=random_manager)),
         Player("Sim 1", SimulationStrategy(random_manager=random_manager)),
     ]
 
@@ -124,8 +126,8 @@ def update_statistics(
 def display_statistics(num_games: int, game_statistics: list[PlayerStatistics]):
     sorted_statistics = sorted(
         game_statistics,
-        key=lambda stat: stat.total_wins / len(game_statistics),
-        reverse=True,
+        # Sort by win rate (descending) and then by average score (ascending, since lower is better)
+        key=lambda stat: (-stat.total_wins / num_games, stat.total_score / num_games)
     )
 
     print("\nPlayer Statistics:")

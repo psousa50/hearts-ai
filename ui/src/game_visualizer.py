@@ -21,6 +21,7 @@ from strategies.random import RandomStrategy
 from strategies.ai import AIStrategy
 from strategies.replay import ReplayStrategy
 from strategies.simulation import SimulationStrategy
+from strategies.monte_carlo import MonteCarloStrategy
 
 
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -60,7 +61,7 @@ class GameVisualizer:
         )
 
     def _create_players(self) -> List[Player]:
-        return self._create_all_simulations()
+        return self._create_monte_carlo_players()
 
     def _create_all_simulations(self) -> List[Player]:
         return [
@@ -124,6 +125,14 @@ class GameVisualizer:
             Player("Simulation 2", SimulationStrategy()),
             Player("Simulation 3", SimulationStrategy()),
             Player("Simulation 4", SimulationStrategy()),
+        ]
+
+    def _create_monte_carlo_players(self) -> List[Player]:
+        return [
+            Player("Monte Carlo 1", MonteCarloStrategy()),
+            Player("Monte Carlo 2", MonteCarloStrategy()),
+            Player("Monte Carlo 3", MonteCarloStrategy()),
+            Player("Monte Carlo 4", MonteCarloStrategy()),
         ]
 
     def _create_replay_players(self, game_file: str) -> List[Player]:

@@ -13,6 +13,14 @@ class Card(BaseModel):
 
     def __str__(self):
         return f"{self.rank}{self.suit}"
+    
+    def __hash__(self):
+        return hash((self.rank, self.suit))
+    
+    def __eq__(self, other):
+        if not isinstance(other, Card):
+            return False
+        return self.rank == other.rank and self.suit == other.suit
 
 
 Card.QueenOfSpades: ClassVar[Card] = Card(suit="S", rank=12)
