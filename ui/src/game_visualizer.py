@@ -10,21 +10,20 @@ from event_handler import EventHandler
 from game_moves_filter import GameMovesFilter
 from game_renderer import GameRenderer
 from game_state import GameState
-from hearts_game_core.game_core import HeartsGame, Player
-from hearts_game_core.game_models import Card, CompletedTrick, CompletedGame
 from layout_manager import LayoutManager
-from strategies.human import HumanStrategy
-from strategies.my import MyStrategy
+
+from hearts_game_core.game_core import HeartsGame, Player
+from hearts_game_core.game_models import Card, CompletedGame, CompletedTrick
 from strategies.aggressive import AggressiveStrategy
-from strategies.avoid_points import AvoidPointsStrategy
-from strategies.random import RandomStrategy
 from strategies.ai import AIStrategy
+from strategies.human import HumanStrategy
+from strategies.monte_carlo import MonteCarloStrategy
+from strategies.my import MyStrategy
+from strategies.random import RandomStrategy
 from strategies.replay import ReplayStrategy
 from strategies.simulation import SimulationStrategy
-from strategies.monte_carlo import MonteCarloStrategy
 
-
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 
 # Initialize Pygame
 pygame.init()
@@ -151,7 +150,11 @@ class GameVisualizer:
         self.game_filter = GameMovesFilter(completed_game)
 
         players = [
-            Player(f"Player {i}", ReplayStrategy(player_moves[i]), initial_hand=completed_game.players[i].initial_hand)
+            Player(
+                f"Player {i}",
+                ReplayStrategy(player_moves[i]),
+                initial_hand=completed_game.players[i].initial_hand,
+            )
             for i in range(4)
         ]
 

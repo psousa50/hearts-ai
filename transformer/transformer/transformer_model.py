@@ -4,22 +4,27 @@ import os
 import numpy as np
 import tensorflow as tf
 from gensim.models import KeyedVectors
-from hearts_game_core.game_models import GameCurrentState
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.layers import (
+    Conv1D,
     Dense,
     Embedding,
     GlobalAveragePooling1D,
     Input,
     LayerNormalization,
     MultiHeadAttention,
-    Conv1D,
 )
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
-from transformer.inputs import INPUT_LENGTH, build_train_data, card_from_token, TOKENS_DIM
+from hearts_game_core.game_models import GameCurrentState
+from transformer.inputs import (
+    INPUT_LENGTH,
+    TOKENS_DIM,
+    build_train_data,
+    card_from_token,
+)
 
 NUM_CARDS = 52
 EMBED_DIM = 64
@@ -90,19 +95,13 @@ class HeartsTransformerModel:
             name="positional_encoding",
         )(tf.range(INPUT_LENGTH))
 
-        x = MultiHeadAttention(
-            num_heads=NUM_HEADS, 
-            key_dim=EMBED_DIM,
-            dropout=0.1
-        )(x, x)
+        x = MultiHeadAttention(num_heads=NUM_HEADS, key_dim=EMBED_DIM, dropout=0.1)(
+            x, x
+        )
 
         x = LayerNormalization(epsilon=1e-6)(x)
 
-        x = Conv1D(
-            filters=FEED_FORWARD_DIM, 
-            kernel_size=1, 
-            activation='relu'
-        )(x)
+        x = Conv1D(filters=FEED_FORWARD_DIM, kernel_size=1, activation="relu")(x)
         x = LayerNormalization(epsilon=1e-6)(x)
 
         # Global average pooling for final representation

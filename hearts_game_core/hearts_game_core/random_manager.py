@@ -1,5 +1,7 @@
 from typing import Optional
+
 import numpy as np
+
 
 class RandomManager:
     def __init__(self, seed: Optional[int] = None):
@@ -14,6 +16,3 @@ class RandomManager:
 
     def shuffle(self, *args, **kwargs):
         return self._random.shuffle(*args, **kwargs)
-        
-    def sample(self, *args, **kwargs):
-        return self._random.sample(*args, **kwargs)

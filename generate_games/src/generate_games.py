@@ -1,23 +1,17 @@
-from hearts_game_core.deck import Deck
-from hearts_game_core.game_models import CompletedGame
-from hearts_game_core.game_core import HeartsGame
-from hearts_game_core.strategies import Player
-
 import argparse
 import json
 import os
 import time
 from dataclasses import dataclass
 
-from strategies.aggressive import AggressiveStrategy
-from strategies.avoid_points import AvoidPointsStrategy
-from strategies.my import MyStrategy
-from strategies.random import RandomStrategy
-from strategies.ai import AIStrategy
-from strategies.simulation import SimulationStrategy
-from strategies.monte_carlo import MonteCarloStrategy
-
+from hearts_game_core.deck import Deck
+from hearts_game_core.game_core import HeartsGame
+from hearts_game_core.game_models import CompletedGame
 from hearts_game_core.random_manager import RandomManager
+from hearts_game_core.strategies import Player
+from strategies.monte_carlo import MonteCarloStrategy
+from strategies.my import MyStrategy
+from strategies.simulation import SimulationStrategy
 
 
 @dataclass
@@ -51,7 +45,7 @@ def generate_games():
     seed = args.seed
 
     print(f"Generating {num_games} games with same deck: {same_deck} and seed: {seed}")
-    
+
     random_manager = RandomManager(seed)
     players = [
         Player("My Strategy 1", MyStrategy()),
@@ -129,7 +123,7 @@ def display_statistics(num_games: int, game_statistics: list[PlayerStatistics]):
     sorted_statistics = sorted(
         game_statistics,
         # Sort by win rate (descending) and then by average score (ascending, since lower is better)
-        key=lambda stat: (-stat.total_wins / num_games, stat.total_score / num_games)
+        key=lambda stat: (-stat.total_wins / num_games, stat.total_score / num_games),
     )
 
     print("\nPlayer Statistics:")

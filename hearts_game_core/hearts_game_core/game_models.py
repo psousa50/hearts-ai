@@ -8,23 +8,26 @@ class Card(BaseModel):
     suit: str
     rank: int
 
+    QueenOfSpades: ClassVar["Card"]
+    TwoOfClubs: ClassVar["Card"]
+
     def json(self, **kwargs):
         return super().model_dump_json(**kwargs)
 
     def __str__(self):
         return f"{self.rank}{self.suit}"
-    
+
     def __hash__(self):
         return hash((self.rank, self.suit))
-    
+
     def __eq__(self, other):
         if not isinstance(other, Card):
             return False
         return self.rank == other.rank and self.suit == other.suit
 
 
-Card.QueenOfSpades: ClassVar[Card] = Card(suit="S", rank=12)
-Card.TwoOfClubs: ClassVar[Card] = Card(suit="C", rank=2)
+Card.QueenOfSpades = Card(suit="S", rank=12)
+Card.TwoOfClubs = Card(suit="C", rank=2)
 
 
 class Trick(BaseModel):
@@ -62,7 +65,7 @@ class Trick(BaseModel):
 
     @property
     def lead_suit(self):
-        return self.first_card.suit
+        return self.first_card.suit if self.first_card else None
 
     def add_card(self, player_index: int, card: Card):
         if self.is_empty:
@@ -113,6 +116,25 @@ class CompletedTrick(BaseModel):
                 + self.cards[: self.first_player_index]
             )
         ]
+
+    @classmethod
+    def from_trick(cls, trick: Trick):
+        if trick.is_empty:
+            raise ValueError("Trick is empty, cannot create CompletedTrick.")
+        cards = trick.all_cards()
+        winner_index = cards.index(
+            max(
+                cards,
+                key=lambda card: card.rank if card.suit == trick.lead_suit else 0,
+            )
+        )
+        return CompletedTrick(
+            cards=trick.all_cards(),
+            first_player_index=trick.first_player_index,
+            winner_index=winner_index,
+            score=trick.score(),
+        )
+
 
 @dataclass
 class GameCurrentState:

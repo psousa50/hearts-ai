@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import msgpack
 import numpy as np
 import seaborn as sns
-import tensorflow as tf
 from game_classes import Card, GameState
 from game_state_extractor import extract_game_states
 from gensim.models import KeyedVectors, Word2Vec

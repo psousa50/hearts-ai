@@ -24,7 +24,15 @@ line-length = 88
 
 [tool.ruff]
 line-length = 88
+select = ["E", "F", "I"]  # E = pycodestyle (formatting), F = pyflakes (errors), I = isort
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.isort]
+profile = "black"
+line_length = 88

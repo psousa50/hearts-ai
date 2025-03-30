@@ -1,7 +1,8 @@
 from typing import List, Optional
 
-from hearts_game_core.game_models import Card, CompletedTrick, Trick
 from pydantic import BaseModel
+
+from hearts_game_core.game_models import Card, CompletedTrick, Trick
 
 
 class GameState(BaseModel):

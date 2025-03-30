@@ -3,6 +3,7 @@ from pathlib import Path
 
 import cairosvg
 import pygame
+
 from hearts_game_core.game_models import Card
 
 # Constants

@@ -3,9 +3,9 @@ from typing import Callable, Tuple
 import pygame
 from game_renderer import CARD_HEIGHT, CARD_WIDTH
 from game_state import GameState
-from hearts_game_core.game_core import HeartsGame
-from hearts_game_core.game_models import Card
 from layout_manager import LayoutManager
+
+from hearts_game_core.game_models import Card
 
 
 class EventHandler:

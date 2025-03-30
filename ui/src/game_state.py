@@ -1,4 +1,5 @@
 import pygame
+
 from hearts_game_core.game_core import HeartsGame
 from strategies.human import HumanStrategy
 

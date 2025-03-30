@@ -4,9 +4,9 @@ import pygame
 from animation_manager import AnimationManager
 from card_sprite import CARD_HEIGHT, CARD_WIDTH, CardSprite
 from game_state import GameState
-from hearts_game_core.game_core import HeartsGame
-from hearts_game_core.game_models import Card
 from layout_manager import LayoutManager
+
+from hearts_game_core.game_models import Card
 
 
 class GameRenderer:
@@ -26,7 +26,11 @@ class GameRenderer:
         self.small_font = pygame.font.Font(None, 16)
 
     def draw_player_hand(
-        self, player_idx: int, hand: List[Card], valid_moves: List[Card] = None, highlight_valid_moves: bool = False
+        self,
+        player_idx: int,
+        hand: List[Card],
+        valid_moves: List[Card] = None,
+        highlight_valid_moves: bool = False,
     ):
         """Draw a player's hand with optional highlighting of valid moves"""
         for i, card in enumerate(hand):
@@ -85,9 +89,7 @@ class GameRenderer:
             color = (
                 None
                 if card.good_move is None
-                else self.DARK_GREEN
-                if card.good_move
-                else self.RED
+                else self.DARK_GREEN if card.good_move else self.RED
             )
             if color:
                 pygame.draw.rect(
@@ -98,9 +100,7 @@ class GameRenderer:
 
             self.screen.blit(card.image, card.rect)
 
-    def render_frame(
-        self, game_state: GameState, animation_mgr: AnimationManager
-    ):
+    def render_frame(self, game_state: GameState, animation_mgr: AnimationManager):
         """Render a complete frame"""
         # Clear screen
         self.screen.fill(self.GREEN)
@@ -111,22 +111,31 @@ class GameRenderer:
         # Draw player hands and info
         for i in range(4):
             valid_moves = (
-                game_state.game.get_valid_moves(i) if game_state.current_player_is_human else None
+                game_state.game.get_valid_moves(i)
+                if game_state.current_player_is_human
+                else None
             )
             hands = [p.hand for p in game_state.game.players]
-            self.draw_player_hand(i, hands[i], valid_moves, highlight_valid_moves=i == game_state.game.current_player_index)
+            self.draw_player_hand(
+                i,
+                hands[i],
+                valid_moves,
+                highlight_valid_moves=i == game_state.game.current_player_index,
+            )
             self.draw_player_info(
                 i,
                 game_state.game.players[i].name,
                 game_state.game.players[i].strategy.__class__.__name__,
-                game_state.game.players[i].score
+                game_state.game.players[i].score,
             )
 
         # Draw cards in play
         self.draw_cards_in_play(animation_mgr.get_cards_in_play())
 
         # Draw UI elements
-        self.draw_game_info(game_state.game.current_player.name, game_state.game.current_trick.size)
+        self.draw_game_info(
+            game_state.game.current_player.name, game_state.game.current_trick.size
+        )
 
         # Update display
         pygame.display.flip()

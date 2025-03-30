@@ -1,13 +1,25 @@
-from typing import List
+from typing import List, Optional
 
-from hearts_game_core.game_models import Card, CompletedTrick, Trick, CompletedGame, GameCurrentState, PlayerInfo
-from hearts_game_core.strategies import StrategyGameState, Player
 from hearts_game_core.deck import Deck
+from hearts_game_core.game_models import (
+    Card,
+    CompletedGame,
+    CompletedTrick,
+    GameCurrentState,
+    PlayerInfo,
+    Trick,
+)
 from hearts_game_core.random_manager import RandomManager
+from hearts_game_core.strategies import Player, StrategyGameState
 
 
 class HeartsGame:
-    def __init__(self, players: List[Player], deck: Deck = None, random_manager: RandomManager = None):
+    def __init__(
+        self,
+        players: List[Player],
+        deck: Optional[Deck] = None,
+        random_manager: Optional[RandomManager] = None,
+    ):
         self.random_manager = random_manager or RandomManager()
         self.players = players
         self.deck = deck or Deck(random_manager=self.random_manager)
@@ -15,7 +27,9 @@ class HeartsGame:
 
     def reset_game(self):
         for player, hand in zip(self.players, self.deal_cards()):
-            player.initial_hand = hand if len(player.initial_hand) == 0 else player.initial_hand
+            player.initial_hand = (
+                hand if len(player.initial_hand) == 0 else player.initial_hand
+            )
             player.hand = player.initial_hand.copy()
             player.score = 0
         self.current_state = GameCurrentState()
@@ -92,7 +106,7 @@ class HeartsGame:
             valid_moves=valid_moves,
         )
         card = self.players[player_idx].strategy.choose_card(strategy_game_state)
-        return card if card in valid_moves else None
+        return card
 
     def play_card(self, card: Card):
         player_idx = self.current_player_index
@@ -108,30 +122,17 @@ class HeartsGame:
             self.set_current_player(current_player)
         else:
             self.set_current_player((player_idx + 1) % 4)
-    
+
     def set_current_player(self, player_idx: int):
         self.current_state.current_player_index = player_idx
 
     def complete_trick(self) -> int:
-        lead_suit = self.current_trick.lead_suit
-        trick_cards = self.current_trick.cards
-        winner_index = trick_cards.index(
-            max(
-                trick_cards, key=lambda card: card.rank if card.suit == lead_suit else 0
-            )
-        )
+        completed_trick = CompletedTrick.from_trick(self.current_trick)
+        self.previous_tricks.append(completed_trick)
 
-        score = self.current_trick.score()
-        self.players[winner_index].score += score
+        winner_index = completed_trick.winner_index
 
-        self.previous_tricks.append(
-            CompletedTrick(
-                cards=self.current_trick.cards,
-                first_player_index=self.current_trick.first_player_index,
-                winner_index=winner_index,
-                score=score,
-            )
-        )
+        self.players[winner_index].score += completed_trick.score
 
         self.current_trick.reset()
         self.current_trick.first_player_index = winner_index

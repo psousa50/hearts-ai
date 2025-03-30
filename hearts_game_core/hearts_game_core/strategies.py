@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List
 
 from hearts_game_core.game_models import Card, GameCurrentState
 
@@ -13,10 +13,10 @@ class StrategyGameState:
     valid_moves: List[Card]
 
 
-
 class Strategy:
     def choose_card(self, game_state: StrategyGameState) -> Card:
         raise NotImplementedError
+
 
 @dataclass
 class Player:
@@ -30,4 +30,3 @@ class Player:
         self.initial_hand = []
         self.hand = []
         self.score = 0
-

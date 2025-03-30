@@ -10,9 +10,7 @@ class GameMovesFilter:
         threshold = (
             ordered_scores[0] + (ordered_scores[1] - ordered_scores[0]) * percentile25
         )
-        self.good_players = [
-            i for i, score in enumerate(scores) if score <= threshold
-        ]
+        self.good_players = [i for i, score in enumerate(scores) if score <= threshold]
         print(f"Good players: {self.good_players}")
         print(f"Threshold: {threshold}")
         print(f"Scores: {scores}")

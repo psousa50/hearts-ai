@@ -1,10 +1,12 @@
-from hearts_game_core.game_models import Card
-from hearts_game_core.strategies import Strategy, StrategyGameState
-from transformer.transformer_model import HeartsTransformerModel
-from transformer.inputs import card_from_token
 import numpy as np
 
+from hearts_game_core.game_models import Card
+from hearts_game_core.strategies import Strategy, StrategyGameState
+from transformer.inputs import card_from_token
+from transformer.transformer_model import HeartsTransformerModel
+
 DEBUG = False
+
 
 def debug_print(*args, **kwargs):
     if DEBUG:
@@ -20,15 +22,17 @@ class AIStrategy(Strategy):
 
     def choose_card(self, strategy_game_state: StrategyGameState) -> Card:
         predictions = self.model.predict(strategy_game_state.game_state)
-        
+
         ordered_predicted_cards = [
             (card_from_token(i), predictions[0][i])
             for i in np.argsort(predictions[0])[-52:][::-1]
         ]
         debug_print("\nTop most probable cards:")
         for card, prob in ordered_predicted_cards:
-            debug_print(f"{card} -> {prob * 100:.2f}% {'*' if card in strategy_game_state.valid_moves else ''}")
-        
+            debug_print(
+                f"{card} -> {prob * 100:.2f}% {'*' if card in strategy_game_state.valid_moves else ''}"
+            )
+
         valid_predicted_cards = [
             (card, prob)
             for card, prob in ordered_predicted_cards

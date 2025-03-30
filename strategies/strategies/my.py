@@ -6,17 +6,21 @@ from hearts_game_core.strategies import Strategy, StrategyGameState
 
 DEBUG = False
 
+
 def debug_print(*args, **kwargs):
     if DEBUG:
         print(*args, **kwargs)
         sys.stdout.flush()  # Force output to be displayed immediately
+
 
 class MyStrategy(Strategy):
 
     def choose_card(self, strategy_game_state: StrategyGameState) -> Card:
         game_state = strategy_game_state.game_state
         debug_print("------------------------------------------------")
-        debug_print("Player hand:", [str(card) for card in strategy_game_state.player_hand])
+        debug_print(
+            "Player hand:", [str(card) for card in strategy_game_state.player_hand]
+        )
         debug_print("Current trick:", game_state.current_trick)
         card = self._choose_card(strategy_game_state)
 
@@ -61,9 +65,11 @@ class MyStrategy(Strategy):
         if game_state.current_trick.is_empty:
             suitWithLessCardsOutButNotZero = min(
                 numberOfCardsOutPerSuit.items(),
-                key=lambda item: item[1]
-                if item[1] > 0 and item[0] not in excludedSuits
-                else float("inf"),
+                key=lambda item: (
+                    item[1]
+                    if item[1] > 0 and item[0] not in excludedSuits
+                    else float("inf")
+                ),
             )
 
             debug_print(
@@ -100,7 +106,9 @@ class MyStrategy(Strategy):
             highestCardInTrick = max(trick_cards_in_suit, key=lambda card: card.rank)
             debug_print("Highest card in trick:", highestCardInTrick)
 
-            canFollowSuit = lead_suit in [card.suit for card in strategy_game_state.player_hand]
+            canFollowSuit = lead_suit in [
+                card.suit for card in strategy_game_state.player_hand
+            ]
             debug_print("Can follow suit:", canFollowSuit)
             if canFollowSuit:
                 sortedHand = self.sorted_hand_from_suit(strategy_game_state, lead_suit)
