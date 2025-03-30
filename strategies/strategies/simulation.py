@@ -45,10 +45,10 @@ class SimulationStrategy(Strategy):
         debug_print(f"Grouped valid moves: {" ".join([str(card) for card in grouped_valid_moves])}")
         
         # Check cache for this game state
-        cache_key = self._get_cache_key(strategy_game_state)
-        if cache_key in self.move_cache:
-            debug_print(f"Cache hit for {cache_key}")
-            return self.move_cache[cache_key]
+        # cache_key = self._get_cache_key(strategy_game_state)
+        # if cache_key in self.move_cache:
+        #     debug_print(f"Cache hit for {cache_key}")
+        #     return self.move_cache[cache_key]
                 
         trick_number = len(strategy_game_state.game_state.previous_tricks) + 1
         debug_print(f"------------------------ Trick number: {trick_number} ------------------------")
@@ -91,7 +91,7 @@ class SimulationStrategy(Strategy):
         if best_move is None:
             best_move = strategy_game_state.valid_moves[0]
 
-        self.move_cache[cache_key] = best_move
+        # self.move_cache[cache_key] = best_move
         return best_move
 
     def _get_cache_key(self, strategy_game_state):

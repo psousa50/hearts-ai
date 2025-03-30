@@ -90,7 +90,9 @@ def generate_games():
             deck = Deck(random_manager=random_manager)
         else:
             deck.shift_left(13)
-            
+
+        for player in players:
+            player.reset_game()
         game = HeartsGame(players, deck, random_manager=random_manager)
         completed_game = game.play_game()
         completed_games.append(completed_game)

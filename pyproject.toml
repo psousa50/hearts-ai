@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hearts-ai-meta"
+version = "0.1.0"
+description = "Dev-only meta package for monorepo tooling"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "black",
+  "isort",
+  "mypy",
+  "ruff"
+]
+
+[tool.setuptools]
+packages = []  # 👈 prevents setuptools from trying to package your whole monorepo
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+
+[tool.mypy]
+python_version = "3.12"
+strict = true

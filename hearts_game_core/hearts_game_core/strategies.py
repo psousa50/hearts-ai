@@ -26,3 +26,8 @@ class Player:
     hand: List[Card] = field(default_factory=list)
     score: int = 0
 
+    def reset_game(self):
+        self.initial_hand = []
+        self.hand = []
+        self.score = 0
+
